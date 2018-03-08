@@ -1,37 +1,35 @@
-## Welcome to GitHub Pages
+## Welcome to saiorm
 
-You can use the [editor on GitHub](https://github.com/weihaipy/saiorm/edit/master/README.md) to maintain and preview the content for your website in Markdown files.
+Saiorm is a simple library for accessing database from the asyncio framework.
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+It will take you have a easy way to use SQl database. 
 
-### Markdown
+### Usage
 
 Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
 
-```markdown
-Syntax highlighted code block
+```python
+DB("table_name").where({
+    "a": 1,
+    "b": 2,
+    "c": ("ABS({})", "3"),  # call mysql function with param
+    "d": "now()",  # call mysql function with no param
+}).select("sss,ds,dsd,dfd")
 
-# Header 1
-## Header 2
-### Header 3
+DB().select("now()")
+```
 
-- Bulleted
-- List
+will transform to
 
-1. Numbered
-2. List
-
-**Bold** and _Italic_ and `Code` text
-
-[Link](url) and ![Image](src)
+```mysql
+SELECT sss,ds,dsd,dfd FROM table_name WHERE a=1 AND b=2 AND c=ABS(3) AND d=now() ;
+SELECT now();
 ```
 
 For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
 
-### Jekyll Themes
+### Plan
 
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/weihaipy/saiorm/settings). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
+I will support MySQL first,and then PostgreSQL etc.
 
-### Support or Contact
 
-Having trouble with Pages? Check out our [documentation](https://help.github.com/categories/github-pages-basics/) or [contact support](https://github.com/contact) and we’ll help you sort it out.
