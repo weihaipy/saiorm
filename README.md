@@ -1,4 +1,4 @@
-## Welcome to saiorm
+## Welcome to saiorm (塞翁)
 
 Saiorm is a simple library for accessing database from the asyncio framework.
 
@@ -12,8 +12,8 @@ It will take you have a easy way to use SQl database.
 ```python
 DB("table").where({
     "a": "1",
-    "b": ("ABS({})", "3"),  
-    "c": "now()",  
+    "b": ("ABS({})", "3"),
+    "c": "now()",
 }).select("zz,xx")
 
 DB().select("now()")
