@@ -1,4 +1,4 @@
-## Welcome to saiorm (塞翁)
+## Welcome to saiorm (/saɪɔ:m/,塞翁)
 
 Saiorm is a simple library for accessing database from the asyncio framework.
 
