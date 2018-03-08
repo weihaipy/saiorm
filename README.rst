@@ -1,13 +1,13 @@
 saiorm
 ======
 
-`Saiorm <https://weihaipy.github.io/saiorm>`_  is a simple library for accessing database from the asyncio framework.
+`Saiorm <https://weihaipy.github.io/saiorm>`_  is a simple library for accessing database.
 
 It will take you have a easy way to use SQl database.
 
-Bases on aiomysql.
+The goal is tb be an asynchronous framework,but not now.
 
-**IT DO NOT WORK NOW**
+**IT DO NOT WORK NOW! NEARLY TO BE USED**
 
 Documentation
 -------------

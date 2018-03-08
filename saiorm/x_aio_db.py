@@ -5,49 +5,25 @@
 参考 https://www.liaoxuefeng.com/wiki/0014316089557264a6b348958f449949df42a6d3a2e542c000/0014323389656575142d0bcfeec434e9639a80d3684a7da000
 
 todo 参数里的 原生函数没做,insert 的部分在支持多种数据库时可能会导致复杂度太高
+todo 表前缀没做
 
-使用 aioodbc 可以支持更多的数据库,先使用 aiomysql 实现 mysql 的功能,再考虑 aiopg 还是 aioodbc 支持其他类型的数据库
+异步的支持略复杂,先不实现,只是用普通方式实现功能.
 
 """
-import logging
-import asyncio
+import x_torndb
 
-# import aioodbc
-import aiomysql
-
-# 连接池
-__pool = None
-
-loop = asyncio.get_event_loop()
+db = None  # 应该是个已连接的 x_torndb.Connection,使用中覆盖
 
 
-def log(sql, args=()):
-    logging.info('SQL: %s' % sql)
+class CoherentDB():
+    """支持连贯操作"""
 
-
-@asyncio.coroutine
-def create_pool_mysql(loop, **kw):
-    logging.info('create database connection pool...')
-    global __pool
-    __pool = yield from aiomysql.create_pool(
-        host=kw.get('host', 'localhost'),
-        port=kw.get('port', 3306),
-        user=kw['user'],
-        password=kw['password'],
-        db=kw['db'],
-        charset=kw.get('charset', 'utf8'),
-        autocommit=kw.get('autocommit', True),
-        maxsize=kw.get('maxsize', 10),
-        minsize=kw.get('minsize', 1),
-        loop=loop
-    )
-
-
-class DB():
     def __init__(self, table_name="", debug=False, strict=True):
+        global db
         self.debug = debug
         self.strict = strict
         self.table_name = table_name  # 为空可以直接使用 mysql 函数,如 now()
+        db = db
         self._where = ""
         self._order_by = ""
         self._group_by = ""
@@ -93,10 +69,6 @@ class DB():
     def on(self, condition):
         self._on = condition
         return self
-
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        global loop
-        loop.stop()
 
     def __gen_condition(self):
         """
@@ -157,99 +129,29 @@ class DB():
 
         return fields, values
 
-    @asyncio.coroutine
-    def exec(self, sql, args):
-        global __pool
-        with (yield from __pool) as conn:
-            try:
-                cur = yield from conn.cursor()
-                yield from cur.execute(sql.replace('?', '%s'), args)
-                rowcount = cur.rowcount  # 影响行数
-                lastrowid = cur.lastrowid  # 最后的主键
-                rownumber = cur.rownumber  # 行号
-                if self.debug:
-                    print(cur._executed)
-                yield from cur.close()
-            except BaseException as e:
-                raise
-            return {
-                "rowcount": rowcount,
-                "lastrowid": lastrowid,
-                "rownumber": rownumber,
-            }
-
-    @asyncio.coroutine
-    def __query(self, sql):
-        log(sql)
-        global __pool
-        with (yield from __pool) as conn:
-            try:
-                print(sql)
-                cur = yield from conn.cursor()
-                yield from cur.execute(sql)
-                if self.debug:
-                    print(cur._executed)
-                # print(cur.description)
-
-                print(cur.description)
-                res = yield from cur.fetchall()
-                print(res)
-                yield from cur.close()
-                conn.close()
-            except BaseException as e:
-                raise
-
-            print("res:", res)
-            return res
-
-    # @asyncio.coroutine
-    # def select(self, fields="*"):
-    #     if self.table_name:
-    #         sql = "SELECT {} FROM {} {};".format(fields, self.table_name, self.__gen_condition())
-    #     else:
-    #         sql = "SELECT {};".format(fields)  # 用于直接执行 mysql 函数
-    #     return self.__query(sql)
-
-    async def select(self, fields="*", args=[], size=None):
-
+    def select(self, fields="*"):
         if self.table_name:
             sql = "SELECT {} FROM {} {};".format(fields, self.table_name, self.__gen_condition())
         else:
             sql = "SELECT {};".format(fields)  # 用于直接执行 mysql 函数
 
-        log(sql, args)
-        global __pool
-        async with __pool.get() as conn:
-            async with conn.cursor(aiomysql.DictCursor) as cur:
-                await cur.execute(sql.replace('?', '%s'), args or ())
-                if size:
-                    rs = await cur.fetchmany(size)
-                else:
-                    rs = await cur.fetchall()
-            logging.info('rows returned: %s' % len(rs))
-            return rs
+        return db.query(sql)
 
-    @asyncio.coroutine
     def get(self, fields="*"):
-        # todo 考虑使用 fetchone 执行
         self._limit = "1"
         return self.select(fields)
 
-    @asyncio.coroutine
     def update(self, dict_data=None):
         if not dict_data:
             return
 
         fields, values = self.__gen_kv_with_native(dict_data)
         sql = "UPDATE {} SET {} {};".format(self.table_name, fields, self.__gen_condition())
-        self.exec(sql, values)
+        values = tuple(values)
+        return db.update(sql, *values)
 
-    @asyncio.coroutine
     def insert(self, dict_data=None):
-        """
-        插入单行
-        :param dict_data:
-        """
+        # 插入单行
         if not dict_data:
             return
 
@@ -270,18 +172,11 @@ class DB():
                                                             self.__gen_condition())
         else:
             sql = "INSERT INTO {} VALUES ({});".format(self.table_name, values_sign, self.__gen_condition())
-        self.exec(sql, values)
+        values = tuple(values)
+        return db.execute_with_detail(sql, *values)
 
-    @asyncio.coroutine
-    def insert_many(self, dict_data=None, one_line=True):
-        """
-
-        :param dict_data:
-        :param one_line: bool,是否使用一行语句,不建议传入超长数据
-        :return:
-
-        todo  考虑使用 executemany 执行
-        """
+    def insert_many(self, dict_data=None):
+        # 插入多行
         if not dict_data:
             return
 
@@ -294,36 +189,29 @@ class DB():
             dict_data_item_1 = dict_data[0]  # 应该是字典
             keys = dict_data_item_1.keys()
             fields = ",".join(keys)
-            values = [i.values for i in dict_data]
+            values = [tuple(i.values()) for i in dict_data]  # 字典的 values 先转换
             values_sign = ",".join(["%s" for i in keys])
         elif isinstance(dict_data, dict):  # 字段名和值分开传
             if dict_data.get("fields"):  # 允许不指定字段
                 fields = ",".join(dict_data["fields"])
-            values = [v for v in dict_data["values"]]
+            values = list([v for v in dict_data["values"]])  # 字典的 values 先转换
             values_sign = ",".join(["%s" for v in values])
         else:
             return
 
-        if one_line:
-            if fields:
-                sql = "INSERT INTO {} ({}) VALUES ({});".format(self.table_name, fields, values_sign)
-            else:
-                sql = "INSERT INTO {}  VALUES ({});".format(self.table_name, values_sign)
-            self.exec(sql, values)
+        if fields:
+            sql = "INSERT INTO {} ({}) VALUES ({});".format(self.table_name, fields, values_sign)
         else:
-            if fields:
-                for v in values:
-                    sql = "INSERT INTO {} ({}) VALUES ({});".format(self.table_name, fields, values_sign)
+            sql = "INSERT INTO {}  VALUES ({});".format(self.table_name, values_sign)
 
-                    self.exec(sql, v)
-            else:
+        # todo TypeError: not enough arguments for format string 但是查看了一下,没问题
 
-                for v in values:
-                    sql = "INSERT INTO {} VALUE ({});".format(self.table_name, values_sign)
+        # values = [tuple(i) for i in values]/
+        print("------------insert  many------")
+        print("sql:", sql)
+        print("values::", values)
+        return db.executemany_with_detail(sql, values)
 
-                    self.exec(sql, v)
-
-    @asyncio.coroutine
     def delete(self):
         if self.strict and not self._where:  # 没有 where 条件禁止执行
             if self.debug:
@@ -331,15 +219,13 @@ class DB():
             return
 
         sql = "DELETE FROM {} {};".format(self.table_name, self.__gen_condition())
-        self.exec(sql, ())
+        return db.execute_with_detail(sql)
 
-    @asyncio.coroutine
     def increase(self, field, step):
         # 数字字段增加
         # todo 执行  update 执行
         pass
 
-    @asyncio.coroutine
     def decrease(self, field, step):
         # 数字字段减少
         pass

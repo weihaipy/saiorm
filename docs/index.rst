@@ -1,29 +1,31 @@
 Welcome to saiorm /saɪɔ:m/,塞翁
 ===============================
-Saiorm is a simple library for accessing database from the asyncio framework.
+
+Saiorm is a simple library for accessing database.
 
 It will take you have a easy way to use SQl database.
 
-Bases on aiomysql.
+The goal is tb be an asynchronous framework,but not now.
 
 Basic knowledge
 ~~~~~~~~~~~~~~~
 
-insert / select / update / delete are action that will execute finally.
+Command insert / select / update / delete should be executed finally.
 
-They must be used in the end of you code.
+They must be used in the end of your code.
 
-Usage for select
+Usage for select and get
 ~~~~~~~~~~~~~~~~
-
-1. only param
-2. call mysql function with param(param should be str)
-3. call mysql function with no param
 
 .. code:: python
 
+    # select all fields
     DB("table").select()
-    DB("table").order_by("id DESC").get() # get last one line
+
+    # get the latest line
+    DB("table").order_by("id DESC").get()
+
+    # call mysql function with param(param should be str)
     DB("table").where({
         "a": 1,
         "b": 2,
@@ -31,6 +33,7 @@ Usage for select
         "d": "now()",
     }).select("zz,xx")
 
+    # call mysql function with no param
     DB().select("now()")
 
 
@@ -46,6 +49,8 @@ will transform to
 
 Usage for update
 ~~~~~~~~~~~~~~~~
+
+If you want use native function,you can pass a tuple.
 
 .. code:: python
 
@@ -70,7 +75,7 @@ will transform to
 Usage for insert
 ~~~~~~~~~~~~~~~~
 
-insert function support several kinds of data
+insert function support two kinds of data
 
 .. code:: python
 
@@ -96,15 +101,6 @@ insert function support several kinds of data
         "b": "4",
     }])
 
-    # use natural dict in list, SQL statement will in many line
-    DB("table").insert_many([{
-        "a": "1",
-        "b": "2",
-    }, {
-        "a": "3",
-        "b": "4",
-    }], one_line=False)
-
     # use split dict in list, SQL statement will in one line
     DB("table").insert_many({
         "fields": ["a", "b"],
@@ -114,16 +110,6 @@ insert function support several kinds of data
             ["5", "6"]
         ]
     })
-
-    # use split dict in list, SQL statement will in many line
-    DB("table").insert_many({
-        "fields": ["a", "b"],
-        "values": [
-            ["1", "2"],
-            ["3", "4"],
-            ["5", "6"]
-        ]
-    }, one_line=False)
 
 
 will transform to
