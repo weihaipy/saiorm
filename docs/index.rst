@@ -13,7 +13,7 @@ Usage for select
 2. call mysql function with param(param should be str)
 3. call mysql function with no param
 
-.. code-block:: python
+.. code:: python
 
     DB("table").select()
     DB("table").order_by("id DESC").get() # get last one line
