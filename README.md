@@ -43,8 +43,8 @@ DB("table").where({
     "c": ("ABS({})", "2"),
     "d": "now()",
 }).update({
-    "x": "1",
-    "y": "2",
+    "x": "1",
+    "y": "2",
 })
 ```
 
@@ -57,20 +57,23 @@ UPDATE table SET x=%s,y=%s WHERE a=1 AND b=2 AND c=ABS(2) AND d=now() ;
 
 ### Usage for insert
 
-```python
+insert function support several kinds of data
 
+```python
+# use dict 1 natural
 DB("table").insert({
     "a": "1",
     "b": "2",
 })
 
+# use dict 2
 DB("table").insert({
     "fields": ["a", "b"],
     "values": ["1", "2"],
 
 })
 
-# use list
+# use natural dict in list, SQL statement will in one line
 DB("table").insert_many([{
     "a": "1",
     "b": "2",
@@ -79,6 +82,7 @@ DB("table").insert_many([{
     "b": "4",
 }])
 
+# use natural dict in list, SQL statement will in many line
 DB("table").insert_many([{
     "a": "1",
     "b": "2",
@@ -87,7 +91,7 @@ DB("table").insert_many([{
     "b": "4",
 }], one_line=False)
 
-# use dict
+# use split dict in list, SQL statement will in one line
 DB("table").insert_many({
     "fields": ["a", "b"],
     "values": [
@@ -97,6 +101,7 @@ DB("table").insert_many({
     ]
 })
 
+# use split dict in list, SQL statement will in many line
 DB("table").insert_many({
     "fields": ["a", "b"],
     "values": [
@@ -111,17 +116,18 @@ will transform to
 
 
 ```sql
-INSERT INTO table (a,b) VALUE (%s,%s);
-INSERT INTO table (a,b) VALUE (%s,%s);
 INSERT INTO table (a,b) VALUES (%s,%s);
-INSERT INTO table (a,b) VALUE (%s,%s);
-INSERT INTO table (a,b) VALUE (%s,%s);
+INSERT INTO table (a,b) VALUES (%s,%s);
+INSERT INTO table (a,b) VALUES (%s,%s);
+INSERT INTO table (a,b) VALUES (%s,%s); -- repeat
 INSERT INTO table (a,b) VALUES (%s,%s,%s);
-INSERT INTO table (a,b) VALUE (%s,%s,%s); -- repeat
+INSERT INTO table (a,b) VALUES (%s,%s,%s); -- repeat
 
 ```
 
 ### Usage for delete
+
+By default, delete must have where condition,or you can pass strict=False when initialization.
 
 ```python
 DB("table").where({
@@ -131,7 +137,7 @@ DB("table").where({
     "d": "now()",
 }).delete()
 
-DB("table").delete()
+DB("table").delete()  -- will not execute
 DB("table", strict=False).delete()
 ```
 
