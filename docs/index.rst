@@ -27,7 +27,7 @@ Usage for select
 
 will transform to
 
-.. code-block:: sql
+.. code-block:: mysql
 
     SELECT * FROM table ;
     SELECT * FROM table  ORDER BY id DESC LIMIT 1;
