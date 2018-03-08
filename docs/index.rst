@@ -6,6 +6,13 @@ It will take you have a easy way to use SQl database.
 
 Bases on aiomysql.
 
+Basic knowledge
+~~~~~~~~~~~~~~~
+
+insert / select / update / delete are action that will execute finally.
+
+They must be used in the end of you code.
+
 Usage for select
 ~~~~~~~~~~~~~~~~
 
@@ -29,7 +36,7 @@ Usage for select
 
 will transform to
 
-.. code-block:: sql
+.. code:: sql
 
     SELECT * FROM table ;
     SELECT * FROM table  ORDER BY id DESC LIMIT 1;
@@ -40,7 +47,7 @@ will transform to
 Usage for update
 ~~~~~~~~~~~~~~~~
 
-.. code-block:: python
+.. code:: python
 
     DB("table").where({
         "a": 1,
@@ -55,7 +62,7 @@ Usage for update
 
 will transform to
 
-.. code-block:: sql
+.. code:: sql
 
     UPDATE table SET x=%s,y=%s WHERE a=1 AND b=2 AND c=ABS(2) AND d=now() ;
 
@@ -65,7 +72,7 @@ Usage for insert
 
 insert function support several kinds of data
 
-.. code-block:: python
+.. code:: python
 
     # use dict 1 natural
     DB("table").insert({
@@ -121,7 +128,7 @@ insert function support several kinds of data
 
 will transform to
 
-.. code-block:: sql
+.. code:: sql
 
     INSERT INTO table (a,b) VALUES (%s,%s);
     INSERT INTO table (a,b) VALUES (%s,%s);
@@ -136,7 +143,7 @@ Usage for delete
 
 By default, delete must have where condition,or you can pass strict=False when initialization.
 
-.. code-block:: python
+.. code:: python
 
     DB("table").where({
         "a": 1,
@@ -150,7 +157,7 @@ By default, delete must have where condition,or you can pass strict=False when i
 
 will transform to
 
-.. code-block:: sql
+.. code:: sql
 
     DELETE FROM table WHERE a=1 AND b=2 AND c=ABS(2) AND d=now() ;
     DELETE FROM table ;
