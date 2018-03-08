@@ -10,20 +10,22 @@ todo 表前缀没做
 异步的支持略复杂,先不实现,只是用普通方式实现功能.
 
 """
-import x_torndb
 
 db = None  # 应该是个已连接的 x_torndb.Connection,使用中覆盖
+
+
+def set_db(database):
+    global db
+    db = database
 
 
 class CoherentDB():
     """支持连贯操作"""
 
     def __init__(self, table_name="", debug=False, strict=True):
-        global db
         self.debug = debug
         self.strict = strict
         self.table_name = table_name  # 为空可以直接使用 mysql 函数,如 now()
-        db = db
         self._where = ""
         self._order_by = ""
         self._group_by = ""
@@ -197,7 +199,7 @@ class CoherentDB():
             values = list([v for v in dict_data["values"]])  # 字典的 values 先转换
             values_sign = ",".join(["%s" for v in values])
         else:
-            return
+            raise ValueError("Param Error")
 
         if fields:
             sql = "INSERT INTO {} ({}) VALUES ({});".format(self.table_name, fields, values_sign)
@@ -223,7 +225,7 @@ class CoherentDB():
 
     def increase(self, field, step):
         # 数字字段增加
-        # todo 执行  update 执行
+        # todo 执行  update 执行 update BBD set cs=cs+1
         pass
 
     def decrease(self, field, step):
