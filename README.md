@@ -9,12 +9,12 @@ It will take you have a easy way to use SQl database.
 Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
 
 ```python
-DB("table_name").where({
+DB("table").where({
     "a": 1,
     "b": 2,
-    "c": ("ABS({})", "3"),  # call mysql function with param
+    "c": ("ABS({})", "3"),  # call mysql function with param(param should be str)
     "d": "now()",  # call mysql function with no param
-}).select("sss,ds,dsd,dfd")
+}).select("zz,xx")
 
 DB().select("now()")
 ```
@@ -22,7 +22,7 @@ DB().select("now()")
 will transform to
 
 ```mysql
-SELECT sss,ds,dsd,dfd FROM table_name WHERE a=1 AND b=2 AND c=ABS(3) AND d=now() ;
+SELECT zz,xx FROM table WHERE a=1 AND b=2 AND c=ABS(3) AND d=now() ;
 SELECT now();
 ```
 
