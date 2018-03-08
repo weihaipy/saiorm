@@ -12,8 +12,8 @@ Markdown is a lightweight and easy-to-use syntax for styling your writing. It in
 DB("table").where({
     "a": 1,
     "b": 2,
-    "c": ("ABS({})", "3"),  # call mysql function with param(param should be str)
-    "d": "now()",  # call mysql function with no param
+    "c": ("ABS({})", "3"),  # call mysql function with param(param should be str)
+    "d": "now()",  # call mysql function with no param
 }).select("zz,xx")
 
 DB().select("now()")
@@ -21,7 +21,7 @@ DB().select("now()")
 
 will transform to
 
-```mysql
+```sql
 SELECT zz,xx FROM table WHERE a=1 AND b=2 AND c=ABS(3) AND d=now() ;
 SELECT now();
 ```
