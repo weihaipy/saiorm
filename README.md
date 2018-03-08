@@ -2,7 +2,8 @@
 
 Saiorm is a simple library for accessing database from the asyncio framework.
 
-It will take you have a easy way to use SQl database. 
+It will take you have a easy way to use SQl database. [learn more](http://saiorm.readthedocs.io/).
+
 
 ### Usage for select
 1. only param
@@ -147,11 +148,8 @@ will transform to
 ```sql
 DELETE FROM table WHERE a=1 AND b=2 AND c=ABS(2) AND d=now() ;
 DELETE FROM table ;
-
 ```
 
-
-For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
 
 ### Plan
 
