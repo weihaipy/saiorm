@@ -196,16 +196,15 @@ Get all fields name of the table and cache them(by default)
 Method Shorthand
 ~~~~~~~~~~~~~~~~
 
-::
-    t equals to table
-    w equals to where
-    o equals to order_by
-    l equals to limit
-    g equals to group_by
-    j equals to join
-    ij equals to inner_join
-    lj equals to left_join
-    rj equals to right_join
-    s equals to select
-    i equals to insert
-    im equals to insert_many
+| t equals to table
+| w equals to where
+| o equals to order_by
+| l equals to limit
+| g equals to group_by
+| j equals to join
+| ij equals to inner_join
+| lj equals to left_join
+| rj equals to right_join
+| s equals to select
+| i equals to insert
+| im equals to insert_many
