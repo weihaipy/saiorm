@@ -4,6 +4,7 @@
     <list default="true" id="e2547caf-800a-444f-838c-ef6fb39afda2" name="Default" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change beforePath="$PROJECT_DIR$/docs/index.rst" afterPath="$PROJECT_DIR$/docs/index.rst" />
+      <change beforePath="$PROJECT_DIR$/saiorm/MySQL.py" afterPath="$PROJECT_DIR$/saiorm/MySQL.py" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -14,47 +15,25 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="x_torndb.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/saiorm/x_torndb.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="440">
-              <caret line="25" column="7" lean-forward="false" selection-start-line="25" selection-start-column="7" selection-end-line="25" selection-end-column="7" />
-              <folding>
-                <element signature="e#45#109#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
       <file leaf-file-name="MySQL.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/saiorm/MySQL.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="245">
-              <caret line="188" column="34" lean-forward="false" selection-start-line="188" selection-start-column="34" selection-end-line="188" selection-end-column="34" />
+            <state relative-caret-position="289">
+              <caret line="331" column="12" lean-forward="true" selection-start-line="331" selection-start-column="12" selection-end-line="331" selection-end-column="12" />
               <folding>
                 <element signature="e#311#1810#0" expanded="false" />
                 <element signature="e#1840#2493#0" expanded="false" />
-                <marker date="1520583765428" expanded="true" signature="5045:5063" ph="SELECT missi... missing_value" />
-                <marker date="1520583765428" expanded="true" signature="5693:5710" ph="UPDATE missing_value... " />
-                <marker date="1520583765428" expanded="true" signature="6651:6682" ph="INSERT INTO missing_value... " />
-                <marker date="1520583765428" expanded="true" signature="6843:6869" ph="INSERT INTO missing_value... " />
-                <marker date="1520583765428" expanded="true" signature="8224:8255" ph="INSERT INTO missing_value... " />
-                <marker date="1520583765428" expanded="true" signature="8332:8359" ph="INSERT INTO missing_value... " />
-                <marker date="1520583765428" expanded="true" signature="8702:8717" ph="DELETE FROM missing_value... " />
-                <marker date="1520583765428" expanded="true" signature="8962:8982" ph="UPDATE missing_value... " />
-                <marker date="1520583765428" expanded="true" signature="9263:9283" ph="UPDATE missing_value... " />
-                <marker date="1520583765428" expanded="true" signature="9762:9787" ph="SELECT * FRO... xxx" />
+                <marker date="1520593849239" expanded="true" signature="5045:5063" ph="SELECT missi... missing_value" />
+                <marker date="1520593849239" expanded="true" signature="5693:5710" ph="UPDATE missing_value... " />
+                <marker date="1520593849239" expanded="true" signature="6651:6682" ph="INSERT INTO missing_value... " />
+                <marker date="1520593849239" expanded="true" signature="6843:6869" ph="INSERT INTO missing_value... " />
+                <marker date="1520593849239" expanded="true" signature="8224:8255" ph="INSERT INTO missing_value... " />
+                <marker date="1520593849239" expanded="true" signature="8332:8359" ph="INSERT INTO missing_value... " />
+                <marker date="1520593849239" expanded="true" signature="8702:8717" ph="DELETE FROM missing_value... " />
+                <marker date="1520593849239" expanded="true" signature="8962:8982" ph="UPDATE missing_value... " />
+                <marker date="1520593849239" expanded="true" signature="9263:9283" ph="UPDATE missing_value... " />
+                <marker date="1520593849239" expanded="true" signature="9762:9787" ph="SELECT * FRO... xxx" />
               </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="test.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/test.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1914">
-              <caret line="87" column="22" lean-forward="false" selection-start-line="87" selection-start-column="22" selection-end-line="87" selection-end-column="22" />
-              <folding />
             </state>
           </provider>
         </entry>
@@ -62,18 +41,8 @@
       <file leaf-file-name="index.rst" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/docs/index.rst">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-308">
-              <caret line="43" column="30" lean-forward="true" selection-start-line="43" selection-start-column="30" selection-end-line="43" selection-end-column="30" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="README.rst" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/README.rst">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="374">
-              <caret line="17" column="4" lean-forward="false" selection-start-line="17" selection-start-column="4" selection-end-line="17" selection-end-column="4" />
+            <state relative-caret-position="198">
+              <caret line="216" column="23" lean-forward="true" selection-start-line="216" selection-start-column="23" selection-end-line="216" selection-end-column="23" />
               <folding />
             </state>
           </provider>
@@ -394,7 +363,14 @@
       <option name="project" value="LOCAL" />
       <updated>1520583774045</updated>
     </task>
-    <option name="localTasksCounter" value="24" />
+    <task id="LOCAL-00024" summary="modify document">
+      <created>1520593590569</created>
+      <option name="number" value="00024" />
+      <option name="presentableId" value="LOCAL-00024" />
+      <option name="project" value="LOCAL" />
+      <updated>1520593590569</updated>
+    </task>
+    <option name="localTasksCounter" value="25" />
     <servers />
   </component>
   <component name="ToolWindowManager">
@@ -438,7 +414,8 @@
     <MESSAGE value="Modify document" />
     <MESSAGE value="add shorthand" />
     <MESSAGE value="document" />
-    <option name="LAST_COMMIT_MESSAGE" value="document" />
+    <MESSAGE value="modify document" />
+    <option name="LAST_COMMIT_MESSAGE" value="modify document" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -488,16 +465,16 @@
           <folding>
             <element signature="e#311#1810#0" expanded="false" />
             <element signature="e#1840#2493#0" expanded="false" />
-            <marker date="1520583765428" expanded="true" signature="5045:5063" ph="SELECT missi... missing_value" />
-            <marker date="1520583765428" expanded="true" signature="5693:5710" ph="UPDATE missing_value... " />
-            <marker date="1520583765428" expanded="true" signature="6651:6682" ph="INSERT INTO missing_value... " />
-            <marker date="1520583765428" expanded="true" signature="6843:6869" ph="INSERT INTO missing_value... " />
-            <marker date="1520583765428" expanded="true" signature="8224:8255" ph="INSERT INTO missing_value... " />
-            <marker date="1520583765428" expanded="true" signature="8332:8359" ph="INSERT INTO missing_value... " />
-            <marker date="1520583765428" expanded="true" signature="8702:8717" ph="DELETE FROM missing_value... " />
-            <marker date="1520583765428" expanded="true" signature="8962:8982" ph="UPDATE missing_value... " />
-            <marker date="1520583765428" expanded="true" signature="9263:9283" ph="UPDATE missing_value... " />
-            <marker date="1520583765428" expanded="true" signature="9762:9787" ph="SELECT * FRO... xxx" />
+            <marker date="1520593849239" expanded="true" signature="5045:5063" ph="SELECT missi... missing_value" />
+            <marker date="1520593849239" expanded="true" signature="5693:5710" ph="UPDATE missing_value... " />
+            <marker date="1520593849239" expanded="true" signature="6651:6682" ph="INSERT INTO missing_value... " />
+            <marker date="1520593849239" expanded="true" signature="6843:6869" ph="INSERT INTO missing_value... " />
+            <marker date="1520593849239" expanded="true" signature="8224:8255" ph="INSERT INTO missing_value... " />
+            <marker date="1520593849239" expanded="true" signature="8332:8359" ph="INSERT INTO missing_value... " />
+            <marker date="1520593849239" expanded="true" signature="8702:8717" ph="DELETE FROM missing_value... " />
+            <marker date="1520593849239" expanded="true" signature="8962:8982" ph="UPDATE missing_value... " />
+            <marker date="1520593849239" expanded="true" signature="9263:9283" ph="UPDATE missing_value... " />
+            <marker date="1520593849239" expanded="true" signature="9762:9787" ph="SELECT * FRO... xxx" />
           </folding>
         </state>
       </provider>
@@ -535,16 +512,16 @@
           <folding>
             <element signature="e#311#1810#0" expanded="false" />
             <element signature="e#1840#2493#0" expanded="false" />
-            <marker date="1520583765428" expanded="true" signature="5045:5063" ph="SELECT missi... missing_value" />
-            <marker date="1520583765428" expanded="true" signature="5693:5710" ph="UPDATE missing_value... " />
-            <marker date="1520583765428" expanded="true" signature="6651:6682" ph="INSERT INTO missing_value... " />
-            <marker date="1520583765428" expanded="true" signature="6843:6869" ph="INSERT INTO missing_value... " />
-            <marker date="1520583765428" expanded="true" signature="8224:8255" ph="INSERT INTO missing_value... " />
-            <marker date="1520583765428" expanded="true" signature="8332:8359" ph="INSERT INTO missing_value... " />
-            <marker date="1520583765428" expanded="true" signature="8702:8717" ph="DELETE FROM missing_value... " />
-            <marker date="1520583765428" expanded="true" signature="8962:8982" ph="UPDATE missing_value... " />
-            <marker date="1520583765428" expanded="true" signature="9263:9283" ph="UPDATE missing_value... " />
-            <marker date="1520583765428" expanded="true" signature="9762:9787" ph="SELECT * FRO... xxx" />
+            <marker date="1520593849239" expanded="true" signature="5045:5063" ph="SELECT missi... missing_value" />
+            <marker date="1520593849239" expanded="true" signature="5693:5710" ph="UPDATE missing_value... " />
+            <marker date="1520593849239" expanded="true" signature="6651:6682" ph="INSERT INTO missing_value... " />
+            <marker date="1520593849239" expanded="true" signature="6843:6869" ph="INSERT INTO missing_value... " />
+            <marker date="1520593849239" expanded="true" signature="8224:8255" ph="INSERT INTO missing_value... " />
+            <marker date="1520593849239" expanded="true" signature="8332:8359" ph="INSERT INTO missing_value... " />
+            <marker date="1520593849239" expanded="true" signature="8702:8717" ph="DELETE FROM missing_value... " />
+            <marker date="1520593849239" expanded="true" signature="8962:8982" ph="UPDATE missing_value... " />
+            <marker date="1520593849239" expanded="true" signature="9263:9283" ph="UPDATE missing_value... " />
+            <marker date="1520593849239" expanded="true" signature="9762:9787" ph="SELECT * FRO... xxx" />
           </folding>
         </state>
       </provider>
@@ -726,29 +703,29 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/saiorm/MySQL.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="245">
-          <caret line="188" column="34" lean-forward="false" selection-start-line="188" selection-start-column="34" selection-end-line="188" selection-end-column="34" />
+        <state relative-caret-position="289">
+          <caret line="331" column="12" lean-forward="true" selection-start-line="331" selection-start-column="12" selection-end-line="331" selection-end-column="12" />
           <folding>
             <element signature="e#311#1810#0" expanded="false" />
             <element signature="e#1840#2493#0" expanded="false" />
-            <marker date="1520583765428" expanded="true" signature="5045:5063" ph="SELECT missi... missing_value" />
-            <marker date="1520583765428" expanded="true" signature="5693:5710" ph="UPDATE missing_value... " />
-            <marker date="1520583765428" expanded="true" signature="6651:6682" ph="INSERT INTO missing_value... " />
-            <marker date="1520583765428" expanded="true" signature="6843:6869" ph="INSERT INTO missing_value... " />
-            <marker date="1520583765428" expanded="true" signature="8224:8255" ph="INSERT INTO missing_value... " />
-            <marker date="1520583765428" expanded="true" signature="8332:8359" ph="INSERT INTO missing_value... " />
-            <marker date="1520583765428" expanded="true" signature="8702:8717" ph="DELETE FROM missing_value... " />
-            <marker date="1520583765428" expanded="true" signature="8962:8982" ph="UPDATE missing_value... " />
-            <marker date="1520583765428" expanded="true" signature="9263:9283" ph="UPDATE missing_value... " />
-            <marker date="1520583765428" expanded="true" signature="9762:9787" ph="SELECT * FRO... xxx" />
+            <marker date="1520593849239" expanded="true" signature="5045:5063" ph="SELECT missi... missing_value" />
+            <marker date="1520593849239" expanded="true" signature="5693:5710" ph="UPDATE missing_value... " />
+            <marker date="1520593849239" expanded="true" signature="6651:6682" ph="INSERT INTO missing_value... " />
+            <marker date="1520593849239" expanded="true" signature="6843:6869" ph="INSERT INTO missing_value... " />
+            <marker date="1520593849239" expanded="true" signature="8224:8255" ph="INSERT INTO missing_value... " />
+            <marker date="1520593849239" expanded="true" signature="8332:8359" ph="INSERT INTO missing_value... " />
+            <marker date="1520593849239" expanded="true" signature="8702:8717" ph="DELETE FROM missing_value... " />
+            <marker date="1520593849239" expanded="true" signature="8962:8982" ph="UPDATE missing_value... " />
+            <marker date="1520593849239" expanded="true" signature="9263:9283" ph="UPDATE missing_value... " />
+            <marker date="1520593849239" expanded="true" signature="9762:9787" ph="SELECT * FRO... xxx" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/docs/index.rst">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-308">
-          <caret line="43" column="30" lean-forward="true" selection-start-line="43" selection-start-column="30" selection-end-line="43" selection-end-column="30" />
+        <state relative-caret-position="198">
+          <caret line="216" column="23" lean-forward="true" selection-start-line="216" selection-start-column="23" selection-end-line="216" selection-end-column="23" />
           <folding />
         </state>
       </provider>

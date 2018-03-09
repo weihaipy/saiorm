@@ -18,6 +18,8 @@ Method **insert, select, update, delete** should be executed **finally**.
 select and get method will return data only.
 Other method will return a dict,including lastrowid, rowcount, rownumber, sql.
 
+Method last_sql is the latest executed sql.
+
 Initialization
 ~~~~~~~~~~~~~~
 
@@ -210,9 +212,9 @@ Method Shorthand
 
 | t equals to table
 | w equals to where
-| o equals to order_by
+| ob equals to order_by
 | l equals to limit
-| g equals to group_by
+| gb equals to group_by
 | j equals to join
 | ij equals to inner_join
 | lj equals to left_join

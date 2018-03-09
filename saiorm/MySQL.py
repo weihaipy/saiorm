@@ -326,9 +326,9 @@ class CoherentDB(object):
     # shorthand
     t = table
     w = where
-    o = order_by
+    ob = order_by
     l = limit
-    g = group_by
+    gb = group_by
     j = join
     ij = inner_join
     lj = left_join
