@@ -3,17 +3,17 @@
 import saiorm
 
 saiorm.set_db(saiorm.Connection(host="127.0.0.1", port=3306, database="x", user="root", password="root"))
-DB = saiorm.CoherentDB
+DB = saiorm.CoherentDB()
 
 
 def test_sql():
-    res = DB("xxx").select()
+    res = DB.table("xxx").select()
     print(res)
 
-    res = DB("xxx").order_by("id DESC").get()
+    res = DB.table("xxx").order_by("id DESC").get()
     print(res)
 
-    res = DB("xxx").where({
+    res = DB.table("xxx").where({
         "a": 1,
         "b": 2,
         "c": ("ABS({})", "2"),
@@ -21,10 +21,10 @@ def test_sql():
     }).select("e,f")
     print(res)
 
-    res = DB().select("now()")
+    res = DB.select("now()")
     print(res)
 
-    res = DB("xxx").where({
+    res = DB.table("xxx").where({
         "a": 1,
         "b": 2,
         "c": ("ABS({})", "2"),
@@ -35,30 +35,33 @@ def test_sql():
     })
     print(res)
 
-    res = DB("xxx").insert({
+    res = DB.table("xxx").insert({
         "a": "1",
         "b": "2",
     })
     print(res)
 
-    res = DB("xxx").insert({
+    res = DB.table("xxx").insert({
         "fields": ["a", "b"],
         "values": ["1", "2"],
     })
     print(res)
 
     # use list
-    res = DB("xxx").insert_many([{
+    res = DB.table("xxx").insert_many([{
         "a": "1",
         "b": "2",
     }, {
         "a": "3",
         "b": "4",
+    }, {
+        "a": "5",
+        "b": "6",
     }])
     print(res)
 
     # use dict
-    res = DB("xxx").insert_many({
+    res = DB.table("xxx").insert_many({
         "fields": ["a", "b"],
         "values": [
             ["1", "2"],
@@ -68,7 +71,7 @@ def test_sql():
     })
     print(res)
 
-    res = DB("xxx").where({
+    res = DB.table("xxx").where({
         "a": 1,
         "b": 2,
         "c": ("ABS({})", "2"),
@@ -76,7 +79,16 @@ def test_sql():
     }).delete()
     print(res)
 
-    # res = DB("xxx").delete()
+    res = DB.table("xxx").increase("a", 1)
+    print(res)
+
+    res = DB.table("xxx").get_fields_name()
+    print(res)
+
+    res = DB.table("xxx").get_fields_name()
+    print(res)
+
+    # res = DB.table("xxx").delete()
     # print(res)
     #
     # res = DB("xxx", strict=False).delete()

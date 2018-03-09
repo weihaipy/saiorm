@@ -10,23 +10,45 @@ The goal is tb be an asynchronous framework,but not now.
 Basic knowledge
 ~~~~~~~~~~~~~~~
 
-Command insert / select / update / delete should be executed finally.
+**Saiorm support MySQL only,now.**
 
-They must be used in the end of your code.
+Method table should be executed at first,it will reset all attributes.
+
+Method insert, select, update, delete should be executed finally.
+
+Select and get method will return a dict,include data, column_names, sql.
+
+Other method and get will return a dict,include lastrowid, rowcount, rownumber, sql.
+
+Initialization
+~~~~~~~~~~~~~~
+
+import saiorm
+
+.. code::python
+
+    saiorm.set_db(saiorm.Connection(host="127.0.0.1", port=3306, database="", user="", password=""))
+    DB = saiorm.CoherentDB()  # with no table name prefix
+    # DB = saiorm.CoherentDB(table_name_prefix="abc_") # with table name prefix
+
 
 Usage for select and get
-~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+1. select will return all data
+2. get will modify _limit attribute automatically,and return the latest line only.
+**If you call get method, limit method will be overwrite**
 
 .. code:: python
 
     # select all fields
-    DB("table").select()
+    DB.select()
 
     # get the latest line
-    DB("table").order_by("id DESC").get()
+    DB.order_by("id DESC").get()
 
     # call mysql function with param(param should be str)
-    DB("table").where({
+    DB.where({
         "a": 1,
         "b": 2,
         "c": ("ABS({})", "2"),
@@ -37,7 +59,7 @@ Usage for select and get
     DB().select("now()")
 
 
-will transform to
+will transform to SQL
 
 .. code:: sql
 
@@ -54,7 +76,7 @@ If you want use native function,you can pass a tuple.
 
 .. code:: python
 
-    DB("table").where({
+    DB.where({
         "a": 1,
         "b": 2,
         "c": ("ABS({})", "2"),
@@ -65,7 +87,7 @@ If you want use native function,you can pass a tuple.
     })
 
 
-will transform to
+will transform to SQL
 
 .. code:: sql
 
@@ -80,20 +102,20 @@ insert function support two kinds of data
 .. code:: python
 
     # use dict 1 natural
-    DB("table").insert({
+    DB.insert({
         "a": "1",
         "b": "2",
     })
 
     # use dict 2
-    DB("table").insert({
+    DB.insert({
         "fields": ["a", "b"],
         "values": ["1", "2"],
 
     })
 
     # use natural dict in list, SQL statement will in one line
-    DB("table").insert_many([{
+    DB.insert_many([{
         "a": "1",
         "b": "2",
     }, {
@@ -102,7 +124,7 @@ insert function support two kinds of data
     }])
 
     # use split dict in list, SQL statement will in one line
-    DB("table").insert_many({
+    DB.insert_many({
         "fields": ["a", "b"],
         "values": [
             ["1", "2"],
@@ -112,7 +134,7 @@ insert function support two kinds of data
     })
 
 
-will transform to
+will transform to SQL
 
 .. code:: sql
 
@@ -131,17 +153,17 @@ By default, delete must have where condition,or you can pass strict=False when i
 
 .. code:: python
 
-    DB("table").where({
+    DB.where({
         "a": 1,
         "b": 2,
         "c": ("ABS({})", "2"),
         "d": "now()",
     }).delete()
 
-    DB("table").delete()  -- will not execute
+    DB.delete()  -- will not execute
     DB("table", strict=False).delete()
 
-will transform to
+will transform to SQL
 
 .. code:: sql
 

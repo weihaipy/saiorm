@@ -154,6 +154,20 @@ class Connection(object):
         finally:
             cursor.close()
 
+    def query_with_detail(self, query, *parameters, **kwparameters):
+        """同事返回结果和语句"""
+        cursor = self._cursor()
+        try:
+            self._execute(cursor, query, parameters, kwparameters)
+            column_names = [d[0] for d in cursor.description]
+            return {
+                "data": [Row(zip(column_names, row)) for row in cursor],
+                "column_names": column_names,
+                "sql": cursor._executed  # 执行的语句
+            }
+        finally:
+            cursor.close()
+
     def execute_with_detail(self, query, *parameters, **kwparameters):
         # 同时返回 lastrowid  rowcount rownumber
         cursor = self._cursor()
@@ -279,7 +293,7 @@ class SequenceDB(Connection):
     >>>insert("user","username,nickname,{'reg_time':'now()'}", username, nickname)
     将会被转换为：
     INSERT INTO user (username, nickname, reg_time) value (%s,%s,%s,now())', username, nickname
-    
+
     2,带参数使用 mysql 函数(函数里要使用%s作为占位符)：
     >>>insert('log',"user_id,{'ip': 'inet_aton(%s)'},uri,action_no",user_id,ip, uri,action_no)
     todo 字典形式比较复杂考虑简化,使用等号

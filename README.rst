@@ -7,7 +7,7 @@ It will take you have a easy way to use SQl database.
 
 The goal is tb be an asynchronous framework,but not now.
 
-**IT DO NOT WORK NOW! NEARLY TO BE USED**
+**YOU could test it**
 
 Documentation
 -------------

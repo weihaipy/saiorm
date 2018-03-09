@@ -10,6 +10,7 @@ todo 表前缀没做
 异步的支持略复杂,先不实现,只是用普通方式实现功能.
 
 """
+import logging
 
 db = None  # 应该是个已连接的 x_torndb.Connection,使用中覆盖
 
@@ -22,10 +23,13 @@ def set_db(database):
 class CoherentDB():
     """支持连贯操作"""
 
-    def __init__(self, table_name="", debug=False, strict=True):
+    def __init__(self, table_name_prefix="", debug=False, strict=True, cache_fields_name=True):
+        self.table_name_prefix = table_name_prefix
         self.debug = debug
         self.strict = strict
-        self.table_name = table_name  # 为空可以直接使用 mysql 函数,如 now()
+        self._cache_fields_name = cache_fields_name # when call get_fields_name
+        self._cached_fields_name = {}  # cached fields name
+        self._table = ""
         self._where = ""
         self._order_by = ""
         self._group_by = ""
@@ -34,7 +38,32 @@ class CoherentDB():
         self._left_join = ""
         self._right_join = ""
         self._on = ""
-        # self.last_sql = "" # 最后执行的 SQL 语句
+        self.last_sql = ""  # latest executed sql
+
+    def _reset(self):
+        """reset param when call again"""
+        self._table = ""
+        self._where = ""
+        self._order_by = ""
+        self._group_by = ""
+        self._limit = ""
+        self._inner_join = ""
+        self._left_join = ""
+        self._right_join = ""
+        self._on = ""
+        self.last_sql = ""  # latest executed sql
+
+    def table(self, table_name=""):
+        """
+        If table_name is empty,use DB().select("now()") will run SELECT now()
+        """
+        self._reset()  # reset param
+        # check table name prefix
+        if self.table_name_prefix and not table_name.startswith(self.table_name_prefix):
+            table_name += self.table_name_prefix
+
+        self._table = table_name
+        return self
 
     def where(self, condition):
         self._where = condition
@@ -73,14 +102,10 @@ class CoherentDB():
         return self
 
     def __gen_condition(self):
-        """
-        生成条件
-        :return: str
-        """
+        """generate query condition"""
         res = ""
         if self._where:
             where = self._where
-            # 字典参数的整理一下
             if isinstance(self._where, dict):
                 where = ""
                 for k in self._where.keys():
@@ -90,7 +115,7 @@ class CoherentDB():
                     s = " {}={} AND".format(k, str(v))
                     where += s
                 if where:
-                    where = where[:-3]
+                    where = where[:-3]  # trim the last  AND character
             res += "WHERE" + where
 
         if self._on:
@@ -109,9 +134,9 @@ class CoherentDB():
             res += " GROUP BY " + self._group_by
         return res
 
-    def __gen_kv_with_native(self, dict_data):
+    def __gen_kv_str(self, dict_data):
         """
-        生成字段键值对的形式,用于 select
+        generate str ike filed_name = %s and values,use for select and update
         :return: tuple
         """
         fields = ""
@@ -132,14 +157,21 @@ class CoherentDB():
         return fields, values
 
     def select(self, fields="*"):
-        if self.table_name:
-            sql = "SELECT {} FROM {} {};".format(fields, self.table_name, self.__gen_condition())
+        """
+        fields is fields or native sql function,
+        ,use DB().select("now()") will run SELECT now()
+        """
+        if self._table and fields:
+            sql = "SELECT {} FROM {} {};".format(fields, self._table, self.__gen_condition())
         else:
             sql = "SELECT {};".format(fields)  # 用于直接执行 mysql 函数
 
-        return db.query(sql)
+        res = db.query_with_detail(sql)
+        self.last_sql = res["sql"]
+        return res["data"]
 
     def get(self, fields="*"):
+        """will replace self._limit to 1"""
         self._limit = "1"
         return self.select(fields)
 
@@ -147,19 +179,28 @@ class CoherentDB():
         if not dict_data:
             return
 
-        fields, values = self.__gen_kv_with_native(dict_data)
-        sql = "UPDATE {} SET {} {};".format(self.table_name, fields, self.__gen_condition())
+        fields, values = self.__gen_kv_str(dict_data)
+        sql = "UPDATE {} SET {} {};".format(self._table, fields, self.__gen_condition())
         values = tuple(values)
-        return db.update(sql, *values)
+        res = db.execute_with_detail(sql, *values)
+        self.last_sql = res["sql"]
+        return res
 
     def insert(self, dict_data=None):
-        # 插入单行
+        """
+        insert one line,support rwo kinds data::
+
+        1. dict with key fields and values,the values of keys are list or tuple
+        respectively all field name and value
+
+        2. dict, field name and value
+
+        """
         if not dict_data:
             return
 
         # todo 原生函数的未处理
 
-        # 区分传递的字典结构
         keys = dict_data.keys()
         if "fields" in keys and "values" in keys:  # 字段名和值分开传
             fields = ",".join(dict_data["fields"])
@@ -170,15 +211,21 @@ class CoherentDB():
 
         values_sign = ",".join(["%s" for i in values])
         if fields:
-            sql = "INSERT INTO {} ({}) VALUES ({});".format(self.table_name, fields, values_sign,
+            sql = "INSERT INTO {} ({}) VALUES ({});".format(self._table, fields, values_sign,
                                                             self.__gen_condition())
         else:
-            sql = "INSERT INTO {} VALUES ({});".format(self.table_name, values_sign, self.__gen_condition())
+            sql = "INSERT INTO {} VALUES ({});".format(self._table, values_sign, self.__gen_condition())
         values = tuple(values)
-        return db.execute_with_detail(sql, *values)
+        res = db.execute_with_detail(sql, *values)
+        self.last_sql = res["sql"]
+        return res
 
     def insert_many(self, dict_data=None):
-        # 插入多行
+        """
+        insert one line,,support rwo kinds data,such as insert,
+        but the values should be wraped with list or tuple
+
+        """
         if not dict_data:
             return
 
@@ -192,42 +239,65 @@ class CoherentDB():
             keys = dict_data_item_1.keys()
             fields = ",".join(keys)
             values = [tuple(i.values()) for i in dict_data]  # 字典的 values 先转换
-            values_sign = ",".join(["%s" for i in keys])
+            values_sign = ",".join(["%s" for f in keys])
         elif isinstance(dict_data, dict):  # 字段名和值分开传
-            if dict_data.get("fields"):  # 允许不指定字段
+            keys = dict_data.get("fields")
+            if keys:  # 允许不指定字段
                 fields = ",".join(dict_data["fields"])
             values = list([v for v in dict_data["values"]])  # 字典的 values 先转换
-            values_sign = ",".join(["%s" for v in values])
+            values_sign = ",".join(["%s" for f in keys])
         else:
-            raise ValueError("Param Error")
+            logging.error("Param should be list or tuple or dict")
+            return
 
         if fields:
-            sql = "INSERT INTO {} ({}) VALUES ({});".format(self.table_name, fields, values_sign)
+            sql = "INSERT INTO {} ({}) VALUES ({});".format(self._table, fields, values_sign)
         else:
-            sql = "INSERT INTO {}  VALUES ({});".format(self.table_name, values_sign)
+            sql = "INSERT INTO {}  VALUES ({});".format(self._table, values_sign)
 
-        # todo TypeError: not enough arguments for format string 但是查看了一下,没问题
-
-        # values = [tuple(i) for i in values]/
-        print("------------insert  many------")
-        print("sql:", sql)
-        print("values::", values)
-        return db.executemany_with_detail(sql, values)
+        res = db.executemany_with_detail(sql, values)
+        self.last_sql = res["sql"]
+        return res
 
     def delete(self):
         if self.strict and not self._where:  # 没有 where 条件禁止执行
-            if self.debug:
-                print("没有 where 条件,不可以 delete ")
+            logging.warning("with no where condition,can not delete")
             return
 
-        sql = "DELETE FROM {} {};".format(self.table_name, self.__gen_condition())
-        return db.execute_with_detail(sql)
+        sql = "DELETE FROM {} {};".format(self._table, self.__gen_condition())
 
-    def increase(self, field, step):
-        # 数字字段增加
-        # todo 执行  update 执行 update BBD set cs=cs+1
-        pass
+        res = db.execute_with_detail(sql)
+        self.last_sql = res["sql"]
+        return res
 
-    def decrease(self, field, step):
-        # 数字字段减少
-        pass
+    def increase(self, field, step=1):
+        """number field Increase """
+        sql = "UPDATE {} SET {}={}+{}".format(self._table, field, field, str(step))
+        # print(sql)
+        # raise
+        res = db.execute_with_detail(sql)
+        self.last_sql = res["sql"]
+        return res
+
+    def decrease(self, field, step=1):
+        """number field decrease """
+        sql = "UPDATE {} SET {}={}-{}".format(self._table, field, field, str(step))
+        res = db.execute_with_detail(sql)
+        self.last_sql = res["sql"]
+        return res
+
+    def get_fields_name(self):
+        """return all fields of table"""
+        if not self._table:
+            return []
+
+        if self._cache_fields_name and self._cached_fields_name.get(self._table):
+            return self._cached_fields_name.get(self._table)
+        else:
+            res = db.query_with_detail("SELECT * FROM xxx LIMIT 1")
+            fields_name = res["column_names"]
+            self._cached_fields_name[self._table] = fields_name
+
+            return fields_name
+
+
