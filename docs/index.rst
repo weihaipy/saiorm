@@ -12,9 +12,9 @@ Basic knowledge
 
 **Saiorm support MySQL only,now.**
 
-Method table should be executed at first,it will reset all attributes.
+Method **table** should be executed **at first**,it will reset all attributes.
 
-Method insert, select, update, delete should be executed finally.
+Method **insert, select, update, delete** should be executed **finally**.
 
 Select and get method will return a dict,include data, column_names, sql.
 
@@ -23,9 +23,9 @@ Other method and get will return a dict,include lastrowid, rowcount, rownumber, 
 Initialization
 ~~~~~~~~~~~~~~
 
-import saiorm
+.. code:: python
 
-.. code::python
+    import saiorm
 
     saiorm.set_db(saiorm.Connection(host="127.0.0.1", port=3306, database="", user="", password=""))
     DB = saiorm.CoherentDB()  # with no table name prefix
