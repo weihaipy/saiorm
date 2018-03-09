@@ -129,19 +129,6 @@ class CoherentDB(object):
         """
         self.db = ConnectionPlus(**config_dict)
 
-    def _reset(self):
-        """reset param when call again"""
-        self._table = ""
-        self._where = ""
-        self._order_by = ""
-        self._group_by = ""
-        self._limit = ""
-        self._inner_join = ""
-        self._left_join = ""
-        self._right_join = ""
-        self._on = ""
-        self.last_sql = ""  # latest executed sql
-
     def table(self, table_name=""):
         """
         If table_name is empty,use DB().select("now()") will run SELECT now()
@@ -189,61 +176,6 @@ class CoherentDB(object):
     def on(self, condition):
         self._on = condition
         return self
-
-    def __gen_condition(self):
-        """generate query condition"""
-        res = ""
-        if self._where:
-            where = self._where
-            if isinstance(self._where, dict):
-                where = ""
-                for k in self._where.keys():
-                    v = self._where[k]
-                    if isinstance(v, tuple) or isinstance(v, list):
-                        v = v[0].format(*v[1:])
-                    s = " {}={} AND".format(k, str(v))
-                    where += s
-                if where:
-                    where = where[:-3]  # trim the last  AND character
-            res += "WHERE" + where
-
-        if self._on:
-            if self._inner_join:
-                res += " INNER JOIN {} ON {}".format(self._inner_join, self._on)
-            elif self._left_join:
-                res += " LEFT JOIN {} ON {}".format(self._left_join, self._on)
-            elif self._right_join:
-                res += " RIGHT JOIN {} ON {}".format(self._right_join, self._on)
-
-        if self._order_by:
-            res += " ORDER BY " + self._order_by
-        if self._limit:
-            res += " LIMIT " + str(self._limit)
-        if self._group_by:
-            res += " GROUP BY " + self._group_by
-        return res
-
-    def __gen_kv_str(self, dict_data):
-        """
-        generate str ike filed_name = %s and values,use for select and update
-        :return: tuple
-        """
-        fields = ""
-        values = []
-        for k in dict_data.keys():
-            v = dict_data[k]
-            # 改用 where 的方法
-            # if v.startswith("="):  # 使用 mysql 原生函数的
-            #     v = v[1:]
-            #     fields += k + "=" + v + ","
-            # else:
-            #     fields += k + ","
-            fields += k + "=%s,"
-            values.append(v)
-        if fields:
-            fields = fields[:-1]
-
-        return fields, values
 
     def select(self, fields="*"):
         """
@@ -391,6 +323,92 @@ class CoherentDB(object):
             self._cached_fields_name[self._table] = fields_name
 
             return fields_name
+
+    # shorthand
+    t = table
+    w = where
+    o = order_by
+    l = limit
+    g = group_by
+    j = join
+    ij = inner_join
+    lj = left_join
+    rj = right_join
+    s = select
+    i = insert
+    im = insert_many
+    u = update
+    d = delete
+    inc = increase
+    dec = decrease
+
+    def _reset(self):
+        """reset param when call again"""
+        self._table = ""
+        self._where = ""
+        self._order_by = ""
+        self._group_by = ""
+        self._limit = ""
+        self._inner_join = ""
+        self._left_join = ""
+        self._right_join = ""
+        self._on = ""
+        self.last_sql = ""  # latest executed sql
+
+    def __gen_condition(self):
+        """generate query condition"""
+        res = ""
+        if self._where:
+            where = self._where
+            if isinstance(self._where, dict):
+                where = ""
+                for k in self._where.keys():
+                    v = self._where[k]
+                    if isinstance(v, tuple) or isinstance(v, list):
+                        v = v[0].format(*v[1:])
+                    s = " {}={} AND".format(k, str(v))
+                    where += s
+                if where:
+                    where = where[:-3]  # trim the last  AND character
+            res += "WHERE" + where
+
+        if self._on:
+            if self._inner_join:
+                res += " INNER JOIN {} ON {}".format(self._inner_join, self._on)
+            elif self._left_join:
+                res += " LEFT JOIN {} ON {}".format(self._left_join, self._on)
+            elif self._right_join:
+                res += " RIGHT JOIN {} ON {}".format(self._right_join, self._on)
+
+        if self._order_by:
+            res += " ORDER BY " + self._order_by
+        if self._limit:
+            res += " LIMIT " + str(self._limit)
+        if self._group_by:
+            res += " GROUP BY " + self._group_by
+        return res
+
+    def __gen_kv_str(self, dict_data):
+        """
+        generate str ike filed_name = %s and values,use for select and update
+        :return: tuple
+        """
+        fields = ""
+        values = []
+        for k in dict_data.keys():
+            v = dict_data[k]
+            # 改用 where 的方法
+            # if v.startswith("="):  # 使用 mysql 原生函数的
+            #     v = v[1:]
+            #     fields += k + "=" + v + ","
+            # else:
+            #     fields += k + ","
+            fields += k + "=%s,"
+            values.append(v)
+        if fields:
+            fields = fields[:-1]
+
+        return fields, values
 
 
 class PositionDB(ConnectionPlus):

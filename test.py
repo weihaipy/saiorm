@@ -3,7 +3,7 @@
 import saiorm
 
 DB = saiorm.CoherentDB()
-DB.set_db({"host": "127.0.0.1", "port": 3306, "database": "x", "user": "root", "password": "root"})
+DB.config_db({"host": "127.0.0.1", "port": 3306, "database": "x", "user": "root", "password": "root"})
 
 
 def test_sql():

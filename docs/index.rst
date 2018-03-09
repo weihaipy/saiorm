@@ -52,7 +52,7 @@ select and get receive a fields param.
     }).select("zz,xx")
 
     # call mysql function with no param
-    DB().select("now()")
+    DB.select("now()")
 
 
 will transform to SQL
