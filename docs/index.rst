@@ -4,12 +4,7 @@ Welcome to saiorm /saɪɔ:m/,塞翁
 Saiorm is a simple library for accessing database.
 It will take you have a easy way to use SQl database.
 
-Bases on pymysql and torndb.
-
-The goal is tb be an asynchronous framework,but not now.
-
-Basic knowledge
-~~~~~~~~~~~~~~~
+Bases on pymysql and torndb.The goal is tb be an asynchronous framework,but not now.
 
 **Saiorm support MySQL only,now.**
 
@@ -29,7 +24,7 @@ Initialization
 
     DB = saiorm.CoherentDB()  # with no table name prefix
     # DB = saiorm.CoherentDB(table_name_prefix="abc_") # with table name prefix
-    DB.set_db({"host": "", "port": 3306, "database": "", "user": "", "password": ""})
+    DB.connect({"host": "", "port": 3306, "database": "", "user": "", "password": ""})
 
 Usage for select and get
 ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -171,7 +166,7 @@ will transform to SQL
 Usage for increase
 ~~~~~~~~~~~~~~~~
 
-For numerical field increase
+Numerical field increase
 
 .. code:: sql
 
@@ -181,7 +176,7 @@ For numerical field increase
 Usage for decrease
 ~~~~~~~~~~~~~~~~
 
-For numerical field decrease
+Numerical field decrease
 
 .. code:: sql
 
@@ -196,13 +191,3 @@ Get all fields name of the table and cache them(by default)
 .. code:: sql
 
     DB.table("xxx").get_fields_name()
-
-
-For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
-
-Plan
-~~~~
-
-I will support MySQL first,and then PostgreSQL etc. maybe.
-
-

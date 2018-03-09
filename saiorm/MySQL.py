@@ -96,7 +96,7 @@ class CoherentDB(object):
     """
     Implement database coherent operation.
     
-    After initialization with table name,use set_db to set connected database.
+    After initialization with table name,use config_db to set connected database.
     """
 
     def __init__(self, table_name_prefix="", debug=False, strict=True,
@@ -120,7 +120,7 @@ class CoherentDB(object):
         self._right_join = ""
         self._on = ""
 
-    def set_db(self, driver="MySQL", config_dict=None):
+    def connect(self, driver="MySQL", config_dict=None):
         """
         set a connected torndb.Connection
 
