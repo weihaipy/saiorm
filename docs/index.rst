@@ -4,9 +4,12 @@ Welcome to saiorm /saɪɔ:m/,塞翁
 Saiorm is a simple library for accessing database.
 It will take you have a easy way to use SQl database.
 
-Bases on pymysql and torndb.The goal is tb be an asynchronous framework,but not now.
+**require**
+python3, pymysql, torndb.
 
-**Saiorm support MySQL only,now.**
+The goal is tb be an asynchronous framework,but not now.
+
+**Saiorm support MySQL only now.**
 
 Method **table** should be executed **at first**,it will reset all attributes.
 
@@ -192,6 +195,15 @@ Get all fields name of the table and cache them(by default)
 
     DB.table("xxx").get_fields_name()
 
+
+Other usage
+~~~~~~~~~~~
+
+Get the latest SQL
+
+.. code:: python
+
+    DB.last_sql
 
 Method Shorthand
 ~~~~~~~~~~~~~~~~

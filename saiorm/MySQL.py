@@ -120,11 +120,10 @@ class CoherentDB(object):
         self._right_join = ""
         self._on = ""
 
-    def connect(self, driver="MySQL", config_dict=None):
+    def connect(self, config_dict=None):
         """
         set a connected torndb.Connection
 
-        :param driver: str, database type
         :param config_dict: dict,config to connect database
         """
         self.db = ConnectionPlus(**config_dict)
@@ -415,10 +414,6 @@ class PositionDB(ConnectionPlus):
     """
     Implement database operation by position argument.
 
-    | **OLD CODE,NOT RECOMMENDED**
-    | **老代码,不够直观,不推荐现在使用,即使可以正常运行也不推荐**
-
-    表名,字段,条件等按顺序一次传入,能简化 SQL 语句
     把 select/insert/update/delete 这几个常用操作包装为函数，简化输入，可以方便添加表前缀。
     表前缀只需在初始化类的时候候传入 prefix_sign 即可,默认为 "###"。
     这几个常用 sql 语句拆分为表名，字段，条件三部分，最后把这三部分拼接为 torndb 所需的形式。

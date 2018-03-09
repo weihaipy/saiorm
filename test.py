@@ -3,7 +3,7 @@
 import saiorm
 
 DB = saiorm.CoherentDB()
-DB.config_db({"host": "127.0.0.1", "port": 3306, "database": "x", "user": "root", "password": "root"})
+DB.connect({"host": "127.0.0.1", "port": 3306, "database": "x", "user": "root", "password": "root"})
 
 
 def test_sql():
@@ -85,8 +85,7 @@ def test_sql():
     res = DB.table("xxx").decrease("a", 1)
     print(res)
 
-    res = DB.table("xxx").get_fields_name()
-    print(res)
+    print(DB.last_sql)
 
     res = DB.table("xxx").get_fields_name()
     print(res)
