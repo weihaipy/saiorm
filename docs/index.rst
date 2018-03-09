@@ -5,18 +5,18 @@ Saiorm is a simple library for accessing database.
 It will take you have a easy way to use SQl database.
 
 **require**
-python3, pymysql, torndb.
+python3, pymysql.
 
-The goal is tb be an asynchronous framework,but not now.
+The goal is to be an asynchronous framework,but not now.
 
 **Saiorm support MySQL only now.**
 
-Method **table** should be executed **at first**,it will reset all attributes.
+Method **table** should be executed **first**,it will reset all attributes.
 
 Method **insert, select, update, delete** should be executed **finally**.
 
-Select and get method will return a dict,include data, column_names, sql.
-Other method and get will return a dict,include lastrowid, rowcount, rownumber, sql.
+select and get method will return data only.
+Other method will return a dict,including lastrowid, rowcount, rownumber, sql.
 
 Initialization
 ~~~~~~~~~~~~~~
