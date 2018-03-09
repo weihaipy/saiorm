@@ -222,8 +222,6 @@ class CoherentDB(object):
         if not dict_data:
             return
 
-        # todo 原生函数的未处理
-
         keys = dict_data.keys()
         if "fields" in keys and "values" in keys:  # 字段名和值分开传
             fields = ",".join(dict_data["fields"])
@@ -358,6 +356,10 @@ class CoherentDB(object):
         """generate query condition"""
         res = ""
         if self._where:
+
+            # TODO self._where 对于 < <= > >= IN 等的支持需要提高,
+            # 可以写在字典的值的开头,IN 的需要单独处理一下
+
             where = self._where
             if isinstance(self._where, dict):
                 where = ""
