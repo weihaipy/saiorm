@@ -82,6 +82,9 @@ def test_sql():
     res = DB.table("xxx").increase("a", 1)
     print(res)
 
+    res = DB.table("xxx").decrease("a", 1)
+    print(res)
+
     res = DB.table("xxx").get_fields_name()
     print(res)
 

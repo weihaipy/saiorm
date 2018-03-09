@@ -42,13 +42,13 @@ Usage for select and get
 .. code:: python
 
     # select all fields
-    DB.select()
+    DB.table("table").select()
 
     # get the latest line
-    DB.order_by("id DESC").get()
+    DB.table("table").order_by("id DESC").get()
 
     # call mysql function with param(param should be str)
-    DB.where({
+    DB.table("table").where({
         "a": 1,
         "b": 2,
         "c": ("ABS({})", "2"),
@@ -76,7 +76,7 @@ If you want use native function,you can pass a tuple.
 
 .. code:: python
 
-    DB.where({
+    DB.table("table").where({
         "a": 1,
         "b": 2,
         "c": ("ABS({})", "2"),
@@ -102,20 +102,20 @@ insert function support two kinds of data
 .. code:: python
 
     # use dict 1 natural
-    DB.insert({
+    DB.table("table").insert({
         "a": "1",
         "b": "2",
     })
 
     # use dict 2
-    DB.insert({
+    DB.table("table").insert({
         "fields": ["a", "b"],
         "values": ["1", "2"],
 
     })
 
     # use natural dict in list, SQL statement will in one line
-    DB.insert_many([{
+    DB.table("table").insert_many([{
         "a": "1",
         "b": "2",
     }, {
@@ -124,7 +124,7 @@ insert function support two kinds of data
     }])
 
     # use split dict in list, SQL statement will in one line
-    DB.insert_many({
+    DB.table("table").insert_many({
         "fields": ["a", "b"],
         "values": [
             ["1", "2"],
@@ -153,15 +153,14 @@ By default, delete must have where condition,or you can pass strict=False when i
 
 .. code:: python
 
-    DB.where({
+    DB.table("table").where({
         "a": 1,
         "b": 2,
         "c": ("ABS({})", "2"),
         "d": "now()",
     }).delete()
 
-    DB.delete()  -- will not execute
-    DB("table", strict=False).delete()
+    DB.table("table").delete()  -- will not execute, or set strict=False when initialization
 
 will transform to SQL
 
@@ -170,12 +169,42 @@ will transform to SQL
     DELETE FROM table WHERE a=1 AND b=2 AND c=ABS(2) AND d=now() ;
     DELETE FROM table ;
 
+Usage for increase
+~~~~~~~~~~~~~~~~
+
+For numerical field increase
+
+.. code:: sql
+
+    res = DB.table("xxx").increase("a", 1)
+    print(res)
+
+Usage for decrease
+~~~~~~~~~~~~~~~~
+
+For numerical field decrease
+
+.. code:: sql
+
+    res = DB.table("xxx").decrease("a", 1)
+    print(res)
+
+Usage for get_fields_name
+~~~~~~~~~~~~~~~~
+
+Get all fields name of the table and cache them(by default)
+
+.. code:: sql
+
+    res = DB.table("xxx").get_fields_name()
+    print(res)
+
 
 For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
 
 Plan
 ~~~~
 
-I will support MySQL first,and then PostgreSQL etc.
+I will support MySQL first,and then PostgreSQL etc. maybe.
 
 
