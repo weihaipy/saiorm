@@ -27,10 +27,9 @@ Initialization
 
     import saiorm
 
-    saiorm.set_db(saiorm.Connection(host="127.0.0.1", port=3306, database="", user="", password=""))
     DB = saiorm.CoherentDB()  # with no table name prefix
     # DB = saiorm.CoherentDB(table_name_prefix="abc_") # with table name prefix
-
+    DB.set_db({"host": "", "port": 3306, "database": "", "user": "", "password": ""})
 
 Usage for select and get
 ~~~~~~~~~~~~~~~~~~~~~~~~
