@@ -187,7 +187,6 @@ Numerical field decrease
 
     DB.table("xxx").decrease("a", 1)
 
-
 Usage for get_fields_name
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
