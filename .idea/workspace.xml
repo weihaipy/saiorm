@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="e2547caf-800a-444f-838c-ef6fb39afda2" name="Default" comment="ugly code">
+    <list default="true" id="e2547caf-800a-444f-838c-ef6fb39afda2" name="Default" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change beforePath="$PROJECT_DIR$/docs/index.rst" afterPath="$PROJECT_DIR$/docs/index.rst" />
     </list>
@@ -29,8 +29,8 @@
       <file leaf-file-name="MySQL.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/saiorm/MySQL.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="452">
-              <caret line="338" column="20" lean-forward="true" selection-start-line="327" selection-start-column="4" selection-end-line="338" selection-end-column="20" />
+            <state relative-caret-position="342">
+              <caret line="342" column="18" lean-forward="true" selection-start-line="339" selection-start-column="4" selection-end-line="342" selection-end-column="18" />
               <folding>
                 <element signature="e#311#1810#0" expanded="false" />
                 <element signature="e#1840#2493#0" expanded="false" />
@@ -52,8 +52,8 @@
       <file leaf-file-name="index.rst" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/docs/index.rst">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="143">
-              <caret line="197" column="0" lean-forward="true" selection-start-line="197" selection-start-column="0" selection-end-line="197" selection-end-column="0" />
+            <state relative-caret-position="363">
+              <caret line="210" column="20" lean-forward="true" selection-start-line="210" selection-start-column="20" selection-end-line="210" selection-end-column="20" />
               <folding />
             </state>
           </provider>
@@ -356,7 +356,14 @@
       <option name="project" value="LOCAL" />
       <updated>1520581541179</updated>
     </task>
-    <option name="localTasksCounter" value="20" />
+    <task id="LOCAL-00020" summary="document">
+      <created>1520581633519</created>
+      <option name="number" value="00020" />
+      <option name="presentableId" value="LOCAL-00020" />
+      <option name="project" value="LOCAL" />
+      <updated>1520581633519</updated>
+    </task>
+    <option name="localTasksCounter" value="21" />
     <servers />
   </component>
   <component name="ToolWindowManager">
@@ -633,8 +640,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/saiorm/MySQL.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="452">
-          <caret line="338" column="20" lean-forward="true" selection-start-line="327" selection-start-column="4" selection-end-line="338" selection-end-column="20" />
+        <state relative-caret-position="342">
+          <caret line="342" column="18" lean-forward="true" selection-start-line="339" selection-start-column="4" selection-end-line="342" selection-end-column="18" />
           <folding>
             <element signature="e#311#1810#0" expanded="false" />
             <element signature="e#1840#2493#0" expanded="false" />
@@ -654,8 +661,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/docs/index.rst">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="143">
-          <caret line="197" column="0" lean-forward="true" selection-start-line="197" selection-start-column="0" selection-end-line="197" selection-end-column="0" />
+        <state relative-caret-position="363">
+          <caret line="210" column="20" lean-forward="true" selection-start-line="210" selection-start-column="20" selection-end-line="210" selection-end-column="20" />
           <folding />
         </state>
       </provider>

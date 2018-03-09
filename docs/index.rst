@@ -208,3 +208,7 @@ Method Shorthand
 | s equals to select
 | i equals to insert
 | im equals to insert_many
+| u equals to update
+| d equals to delete
+| inc equals to increase
+| dec equals to decrease
