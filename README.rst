@@ -19,4 +19,7 @@ Task
 ----
 
 - [x] transform to sql
-- [ ] tun sql query
+- [x] run MySQL query
+- [ ] run PostgreSQL query
+- [ ] run SQLserver query
+- [ ] run Oracle Database query

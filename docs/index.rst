@@ -2,8 +2,9 @@ Welcome to saiorm /saɪɔ:m/,塞翁
 ===============================
 
 Saiorm is a simple library for accessing database.
-
 It will take you have a easy way to use SQl database.
+
+Bases on pymysql and torndb.
 
 The goal is tb be an asynchronous framework,but not now.
 
@@ -17,7 +18,6 @@ Method **table** should be executed **at first**,it will reset all attributes.
 Method **insert, select, update, delete** should be executed **finally**.
 
 Select and get method will return a dict,include data, column_names, sql.
-
 Other method and get will return a dict,include lastrowid, rowcount, rownumber, sql.
 
 Initialization
@@ -37,7 +37,9 @@ Usage for select and get
 
 1. select will return all data
 2. get will modify _limit attribute automatically,and return the latest line only.
-**If you call get method, limit method will be overwrite**
+**If you call get method, limit method will be overwrited**
+
+select and get receive a fields param.
 
 .. code:: python
 
@@ -141,9 +143,7 @@ will transform to SQL
     INSERT INTO table (a,b) VALUES (%s,%s);
     INSERT INTO table (a,b) VALUES (%s,%s);
     INSERT INTO table (a,b) VALUES (%s,%s);
-    INSERT INTO table (a,b) VALUES (%s,%s); -- repeat
     INSERT INTO table (a,b) VALUES (%s,%s,%s);
-    INSERT INTO table (a,b) VALUES (%s,%s,%s); -- repeat
 
 
 Usage for delete
@@ -160,7 +160,7 @@ By default, delete must have where condition,or you can pass strict=False when i
         "d": "now()",
     }).delete()
 
-    DB.table("table").delete()  -- will not execute, or set strict=False when initialization
+    DB.table("table").delete()  # will not execute, or set strict=False when initialization
 
 will transform to SQL
 
@@ -176,8 +176,8 @@ For numerical field increase
 
 .. code:: sql
 
-    res = DB.table("xxx").increase("a", 1)
-    print(res)
+    DB.table("xxx").increase("a", 1)
+
 
 Usage for decrease
 ~~~~~~~~~~~~~~~~
@@ -186,8 +186,8 @@ For numerical field decrease
 
 .. code:: sql
 
-    res = DB.table("xxx").decrease("a", 1)
-    print(res)
+    DB.table("xxx").decrease("a", 1)
+
 
 Usage for get_fields_name
 ~~~~~~~~~~~~~~~~
@@ -196,8 +196,7 @@ Get all fields name of the table and cache them(by default)
 
 .. code:: sql
 
-    res = DB.table("xxx").get_fields_name()
-    print(res)
+    DB.table("xxx").get_fields_name()
 
 
 For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).

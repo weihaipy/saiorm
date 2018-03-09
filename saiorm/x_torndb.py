@@ -16,6 +16,7 @@ except:
 version = "0.1"
 version_info = (0, 1, 0, 0)
 
+# todo 计划吧 Connection 改用 新的 torndb,吧新加的几个方法用新类实现一下
 
 class Connection(object):
     """
@@ -64,20 +65,20 @@ class Connection(object):
         """Closes the existing database connection and re-opens it.
         改用 pymysql 实现"""
         self.close()
-        self._db = connect(**self._db_args)  # todo 改异步
+        self._db = connect(**self._db_args)
         self._db.autocommit(True)
 
     def iter(self, query, *parameters, **kwparameters):
         """Returns an iterator for the given query and parameters."""
         self._ensure_connected()
-        cursor = cursors.SSCursor(self._db)  # todo 改异步
+        cursor = cursors.SSCursor(self._db)
         try:
             self._execute(cursor, query, parameters, kwparameters)
             column_names = [d[0] for d in cursor.description]
             for row in cursor:
                 yield Row(zip(column_names, row))
         finally:
-            cursor.close()  # todo 改异步
+            cursor.close()
 
     def query(self, query, *parameters, **kwparameters):
         """Returns a row list for the given query and parameters."""
@@ -223,8 +224,7 @@ class Connection(object):
             __PRINT_SQL = kwparameters.get("__PRINT_SQL")
             if __PRINT_SQL:
                 del kwparameters["__PRINT_SQL"]
-                res = cursor.execute(query, kwparameters or parameters)  # todo 改异步
-                print(cursor._executed)
+                res = cursor.execute(query, kwparameters or parameters)
             else:
                 res = cursor.execute(query, kwparameters or parameters)
             return res
