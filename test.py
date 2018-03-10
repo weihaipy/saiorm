@@ -2,7 +2,7 @@
 # -*- coding:utf-8 -*-
 import saiorm
 
-DB = saiorm.CoherentDB()
+DB = saiorm.init()
 DB.connect({"host": "127.0.0.1", "port": 3306, "database": "x", "user": "root", "password": "root"})
 
 # test mysql function

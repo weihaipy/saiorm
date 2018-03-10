@@ -19,3 +19,7 @@ Task
 - [ ] Support PostgreSQL
 - [ ] Support SQLserver
 - [ ] Support Oracle Database
+
+If you want to support other database,just implement with the same API
+
+like Saiorm.MySQL.CoherentDB and add a few driver code to Saiorm.init.

@@ -39,8 +39,8 @@ Initialization
 
     import saiorm
 
-    DB = saiorm.CoherentDB()  # with no table name prefix
-    # DB = saiorm.CoherentDB(table_name_prefix="abc_") # with table name prefix
+    DB = saiorm.init()  # with no table name prefix
+    # DB = saiorm.init(table_name_prefix="abc_") # with table name prefix
     DB.connect({"host": "", "port": 3306, "database": "", "user": "", "password": ""})
     table = DB.table("xxx")
 
