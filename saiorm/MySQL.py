@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
 """
-todo 参数里的 原生函数没做,insert 的部分在支持多种数据库时可能会导致复杂度太高
-
 异步的支持略复杂,先不实现,只是用普通方式实现功能.
 
 """
@@ -56,11 +54,28 @@ class CoherentDB(object):
         """
         self.db = ConnectionMySQL(**config_dict)
 
+    def execute(self, *args, **kwargs):
+        """execute SQL"""
+        res = self.db.execute_return_detail(*args, **kwargs)
+        self._reset()  # reset param
+        return res
+
+    def executemany(self, *args, **kwargs):
+        """execute SQL with many lines"""
+        res = self.db.executemany_return_detail(*args, **kwargs)
+        self._reset()  # reset param
+        return res
+
+    def query(self, *args, **kwargs):
+        """query SQL"""
+        res = self.db.query_return_detail(*args, **kwargs)
+        self._reset()  # reset param
+        return res
+
     def table(self, table_name=""):
         """
         If table_name is empty,use DB().select("now()") will run SELECT now()
         """
-        self._reset()  # reset param
         # check table name prefix
         if self.table_name_prefix and not table_name.startswith(self.table_name_prefix):
             table_name += self.table_name_prefix
@@ -109,12 +124,14 @@ class CoherentDB(object):
         fields is fields or native sql function,
         ,use DB().select("now()") will run SELECT now()
         """
+        condition_values = []
         if self._table and fields:
-            sql = "SELECT {} FROM {} {};".format(fields, self._table, self.__gen_condition())
+            condition_sql, condition_values = self.__parse_condition()
+            sql = "SELECT {} FROM {} {};".format(fields, self._table, condition_sql)
         else:
             sql = "SELECT {};".format(fields)  # 用于直接执行 mysql 函数
 
-        res = self.db.query_return_detail(sql)
+        res = self.query(sql, *condition_values)
         self.last_sql = res["sql"]
         if self.grace_result:
             res["data"] = [GraceDict(i) for i in res["data"]]
@@ -123,17 +140,18 @@ class CoherentDB(object):
 
     def get(self, fields="*"):
         """will replace self._limit to 1"""
-        self._limit = "1"
+        self._limit = 1
         return self.select(fields)
 
     def update(self, dict_data=None):
         if not dict_data:
             return
-
         fields, values = self.__gen_kv_str(dict_data)
-        sql = "UPDATE {} SET {} {};".format(self._table, fields, self.__gen_condition())
+        condition_sql, condition_values = self.__parse_condition()
+        sql = "UPDATE {} SET {} {};".format(self._table, fields, condition_sql)
+        values += condition_values
         values = tuple(values)
-        res = self.db.execute_return_detail(sql, *values)
+        res = self.execute(sql, *values)
         self.last_sql = res["sql"]
         return res
 
@@ -160,12 +178,11 @@ class CoherentDB(object):
 
         values_sign = ",".join(["%s" for i in values])
         if fields:
-            sql = "INSERT INTO {} ({}) VALUES ({});".format(self._table, fields, values_sign,
-                                                            self.__gen_condition())
+            sql = "INSERT INTO {} ({}) VALUES ({});".format(self._table, fields, values_sign)
         else:
-            sql = "INSERT INTO {} VALUES ({});".format(self._table, values_sign, self.__gen_condition())
+            sql = "INSERT INTO {} VALUES ({});".format(self._table, values_sign)
         values = tuple(values)
-        res = self.db.execute_return_detail(sql, *values)
+        res = self.execute(sql, *values)
         self.last_sql = res["sql"]
         return res
 
@@ -204,18 +221,18 @@ class CoherentDB(object):
         else:
             sql = "INSERT INTO {}  VALUES ({});".format(self._table, values_sign)
 
-        res = self.db.executemany_return_detail(sql, values)
+        res = self.executemany(sql, values)
         self.last_sql = res["sql"]
         return res
 
     def delete(self):
         if self.strict and not self._where:  # 没有 where 条件禁止执行
-            logging.warning("with no where condition,can not delete")
+            logging.warning("without where condition,can not delete")
             return
 
-        sql = "DELETE FROM {} {};".format(self._table, self.__gen_condition())
-
-        res = self.db.execute_return_detail(sql)
+        condition_sql, condition_values = self.__parse_condition()
+        sql = "DELETE FROM {} {};".format(self._table, condition_sql)
+        res = self.execute(sql, *condition_values)
         self.last_sql = res["sql"]
         return res
 
@@ -224,14 +241,14 @@ class CoherentDB(object):
         sql = "UPDATE {} SET {}={}+{}".format(self._table, field, field, str(step))
         # print(sql)
         # raise
-        res = self.db.execute_return_detail(sql)
+        res = self.execute(sql)
         self.last_sql = res["sql"]
         return res
 
     def decrease(self, field, step=1):
         """number field decrease """
         sql = "UPDATE {} SET {}={}-{}".format(self._table, field, field, str(step))
-        res = self.db.execute_return_detail(sql)
+        res = self.execute(sql)
         self.last_sql = res["sql"]
         return res
 
@@ -269,7 +286,7 @@ class CoherentDB(object):
 
     def _reset(self):
         """reset param when call again"""
-        self._table = ""
+        # self._table = ""
         self._where = ""
         self._order_by = ""
         self._group_by = ""
@@ -280,59 +297,90 @@ class CoherentDB(object):
         self._on = ""
         self.last_sql = ""  # latest executed sql
 
-    def __gen_condition(self):
-        """generate query condition"""
-        # todo 改为不拼接字符串
-        res = ""
+    def __parse_condition(self):
+        """
+        generate query condition
+
+        **ATTENTION**
+
+        You must check the parameters to prevent injection vulnerabilities
+
+        """
+        sql = ""
+        sql_values = []
         if self._where:
             where = self._where
             if isinstance(self._where, dict):
                 where = ""
                 for k in self._where.keys():
-                    s = ""
                     v = self._where[k]
-                    sign = "="
                     if is_array(v):
-                        # v_len = len(v)
-                        v0 = v[0].replace(" ", "")
+                        v_len = len(v)
+                        v0 = v[0]
+                        v0_entity = v0.replace(" ", "")
                         lge = ("<", "<=", ">", ">=", "!=")
-                        if v0 in lge:  # < <= > >= !=
-                            lge_index = lge.index(v0)
+                        if v0_entity in lge:  # < <= > >= !=
+                            lge_index = lge.index(v0_entity)
                             sign = lge[lge_index]
-                            s = " {}{}{} AND".format(k, sign, str(v[1]))
-                        elif v0.lower() == "in":  # IN
-                            s = " {} IN ({}) AND".format(k, str(v[1]))
-                        elif v0.lower() == "between":  # BETWEEN
-                            s = " {} BETWEEN {} AND {} AND".format(k, v[1], v[2])
-                        else:  # native mysql function
-                            s = " {}{}{} AND".format(k, sign, v[0].format(*v[1:]))
+                            v1 = v[1]
+                            if isinstance(v1, str) and v1.startswith("`"):
+                                # native mysql function starts with `,only one param
+                                # join string direct
+                                v1 = v1.replace("`", "")
+                                if "?" in v1:
+                                    v1 = v0.replace("?", v[2])
+                                where += " {}{}{} AND".format(k, sign, v1)
+                            else:
+                                where += " {}{}%s AND".format(k, sign)
+                                sql_values.append(v[1])
+                        elif v_len >= 2 and v0_entity.lower() == "in":  # IN
+                            # join string direct
+                            v1 = v[1]
+                            if v1:
+                                if is_array(v1):
+                                    v1 = ",".join(v1)
+                                where += " {} IN ({}) AND".format(k, v1)
+                        elif v0_entity.lower() == "between" and v_len == 3:  # BETWEEN
+                            where += " {} BETWEEN %s AND %s AND".format(k)
+                            sql_values += [v[1], v[2]]
+                        elif isinstance(v0, str) and v0.startswith("`"):
+                            # native mysql function starts with `,only one param
+                            # join string direct
+                            v0 = v0.replace("`", "")
+                            if "?" in v0:
+                                v0 = v0.replace("?", v[1])
+                            where += " {}={} AND".format(k, v0)
+                    else:
+                        where += " {}={} AND".format(k, v)
 
-                    where += s
-                if where:
-                    where = where[:-3]  # trim the last AND character
-            res += "WHERE" + where
+            if where:
+                sql += "WHERE" + where[:-3]  # trim the last AND character
 
         if self._on:
             if self._inner_join:
-                res += " INNER JOIN {} ON {}".format(self._inner_join, self._on)
+                sql += " INNER JOIN {} ON {}".format(self._inner_join, self._on)
             elif self._left_join:
-                res += " LEFT JOIN {} ON {}".format(self._left_join, self._on)
+                sql += " LEFT JOIN {} ON {}".format(self._left_join, self._on)
             elif self._right_join:
-                res += " RIGHT JOIN {} ON {}".format(self._right_join, self._on)
+                sql += " RIGHT JOIN {} ON {}".format(self._right_join, self._on)
 
         if self._order_by:
-            res += " ORDER BY " + self._order_by
+            sql += " ORDER BY " + self._order_by
+
         if self._limit:
-            res += " LIMIT " + str(self._limit)
+            sql += " LIMIT " + str(self._limit)
+
         if self._group_by:
-            res += " GROUP BY " + self._group_by
-        return res
+            sql += " GROUP BY " + self._group_by
+
+        return sql, sql_values
 
     def __gen_kv_str(self, dict_data):
         """
         generate str ike filed_name = %s and values,use for select and update
         :return: tuple
         """
+        # todo  原生 mysql 函数的用法, 类似 where 的处理方式
         fields = ""
         values = []
         for k in dict_data.keys():
@@ -382,7 +430,7 @@ class PositionDB(ConnectionMySQL):
     insert, update, delete and their many function returns tuple with lastrowid and rowcount.
 
     **Usage**::
-    1,call mysql function with no param：
+    1,call mysql function without param：
     >>>insert("user","username,nickname,{'reg_time':'now()'}", username, nickname)
     will transform to:
 

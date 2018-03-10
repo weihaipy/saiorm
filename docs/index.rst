@@ -11,16 +11,29 @@ The goal is to be an asynchronous framework,but not now.
 **require**
 python3, pymysql.
 
-Method **table** should be executed **first**,it will reset all attributes.
+**Method**
 
-Method **insert, select, update, delete** should be executed **finally**.
+::
 
-select and get method will return data only.
-Other method will return a dict,including lastrowid, rowcount, rownumber, sql.
+    - Method **insert, select, update, delete, execute, executemany, increase, decrease** should be executed **finally**,
+    they will take effect immediately.
 
-Method last_sql is the latest executed sql.
+    - Method **last_sql** is the latest executed sql.
 
-Method where could be dict or str type.
+    - Method get_fields_name get a list of table's all fields name, cache them by default.
+
+    - Method **where** could be dict or str type.
+
+    - Method **select** and **get** will return data only.
+    Method **update**, **delete**, **execute** will return a dict,including lastrowid, rowcount, rownumber, sql.
+
+**ATTENTION**
+
+::
+
+    1. Saiorm wont't convert value type in condition(where,limit,order_by,
+    group_by, various join),if you want to use value passed from user,you must
+    check it, because it's easily to triggering injection vulnerability.
 
 Initialization
 ~~~~~~~~~~~~~~
@@ -32,7 +45,24 @@ Initialization
     DB = saiorm.CoherentDB()  # with no table name prefix
     # DB = saiorm.CoherentDB(table_name_prefix="abc_") # with table name prefix
     DB.connect({"host": "", "port": 3306, "database": "", "user": "", "password": ""})
-    table = DB.table("table_name") 
+
+Usage for call mysql function
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+You must call **table** to set a empty table name if DB has been called
+with table name.
+
+.. code:: python
+
+    DB.table().select("now()")
+    DB.table().select("sum(1+2)")
+
+will transform to SQL
+
+.. code:: sql
+    SELECT now();
+    SELECT sum(1+2);
+
 
 Usage for select and get
 ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -52,28 +82,22 @@ select and get receive a fields param.
     table.order_by("id DESC").get()
 
     # kinds of params
-    res = table.where({
+    table.where({
         "a": 1,
         "b": ("BETWEEN", "1", "2"),
-        "c": ("ABS({})", "2"),
+        "c": ("ABS(?)", "2"),  %s or ?
         "d": ("!=", 0),
         "e": ("IN", "1,2,3"),
         "f": "now()",
     }).select("e,f")
 
-    # call mysql function with no param
-    table.select("now()")
-
-
 will transform to SQL
 
 .. code:: sql
 
-    SELECT * FROM table ;
-    SELECT * FROM table  ORDER BY id DESC LIMIT 1;
-    SELECT e,f FROM xxx WHERE b BETWEEN 1 AND 2 AND c=ABS(2) AND d!=0 AND e IN (1,2,3) ;
-    SELECT now();
-
+    SELECT * FROM xxx ;
+    SELECT * FROM xxx  ORDER BY id DESC LIMIT 1;
+    SELECT e,f FROM xxx WHERE b BETWEEN '1' AND '2' AND d!=0 AND e IN (1,2,3) ;
 
 Usage for update
 ~~~~~~~~~~~~~~~~
@@ -88,8 +112,8 @@ If you want use native function,you can pass a tuple.
         "c": ("ABS({})", "2"),
         "d": "now()",
     }).update({
-        "x": "1",
-        "y": "2",
+        "e": "1",
+        "f": "2",
     })
 
 
@@ -97,7 +121,7 @@ will transform to SQL
 
 .. code:: sql
 
-    UPDATE table SET x=%s,y=%s WHERE a=1 AND b=2 AND c=ABS(2) AND d=now() ;
+    UPDATE xxx SET x=%s,y=%s WHERE a=1 AND b=2 AND c=ABS(2) AND d=now() ;
 
 
 Usage for insert
@@ -109,45 +133,47 @@ insert function support two kinds of data
 
     # use dict 1 natural
     table.insert({
-        "a": "1",
-        "b": "2",
-    })
+		"a": "1",
+		"b": "2",
+	})
 
     # use dict 2
     table.insert({
-        "fields": ["a", "b"],
-        "values": ["1", "2"],
-
-    })
+		"fields": ["a", "b"],
+		"values": ["1", "2"],
+	})
 
     # use natural dict in list, SQL statement will in one line
     table.insert_many([{
-        "a": "1",
-        "b": "2",
-    }, {
-        "a": "3",
-        "b": "4",
-    }])
+		"a": "1",
+		"b": "2",
+	}, {
+		"a": "3",
+		"b": "4",
+	}, {
+		"a": "5",
+		"b": "6",
+	}])
 
     # use split dict in list, SQL statement will in one line
     table.insert_many({
-        "fields": ["a", "b"],
-        "values": [
-            ["1", "2"],
-            ["3", "4"],
-            ["5", "6"]
-        ]
-    })
+		"fields": ["a", "b"],
+		"values": [
+			["1", "2"],
+			["3", "4"],
+			["5", "6"]
+		]
+	})
 
 
 will transform to SQL
 
 .. code:: sql
 
-    INSERT INTO table (a,b) VALUES (%s,%s);
-    INSERT INTO table (a,b) VALUES (%s,%s);
-    INSERT INTO table (a,b) VALUES (%s,%s);
-    INSERT INTO table (a,b) VALUES (%s,%s,%s);
+    INSERT INTO xxx (a,b) VALUES ('1','2');
+    INSERT INTO xxx (a,b) VALUES ('1','2');
+    INSERT INTO xxx (a,b) VALUES ('1','2'),('3','4'),('5','6')
+    INSERT INTO xxx (a,b) VALUES ('1','2'),('3','4'),('5','6')
 
 
 Usage for delete
@@ -158,11 +184,11 @@ By default, delete must have where condition,or you can pass strict=False when i
 .. code:: python
 
     table.where({
-        "a": 1,
-        "b": 2,
-        "c": ("ABS({})", "2"),
-        "d": "now()",
-    }).delete()
+		"a": "1",
+		"b": "2",
+		"c": ("ABS(?)", "2"),
+		"d": "now()",
+	}).delete()
 
     table.delete()  # will not execute, or set strict=False when initialization
 
@@ -170,8 +196,8 @@ will transform to SQL
 
 .. code:: sql
 
-    DELETE FROM table WHERE a=1 AND b=2 AND c=ABS(2) AND d=now() ;
-    DELETE FROM table ;
+    DELETE FROM xxx WHERE a=1 AND b=2 AND c=ABS(2) AND d=now() ;
+    DELETE FROM xxx ;
 
 Usage for increase
 ~~~~~~~~~~~~~~~~
@@ -202,25 +228,6 @@ will transform to SQL
 .. code:: sql
 
     UPDATE xxx SET a=a-1
-
-Usage for get_fields_name
-~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Get a list of table's all fields name, cache them by default.
-
-.. code:: python
-
-    table.get_fields_name()
-
-
-Other usage
-~~~~~~~~~~~
-
-Get the latest SQL
-
-.. code:: python
-
-    DB.last_sql
 
 Method Shorthand
 ~~~~~~~~~~~~~~~~
