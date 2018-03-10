@@ -10,86 +10,14 @@ import ast
 import logging
 
 try:
-    import x_torndb
+    from . import utility
 except ImportError:
-    from . import x_torndb
+    import utility
 
-torndb = x_torndb
-Row = torndb.Row
-
-
-class ConnectionPlus(torndb.Connection):
-    def query_return_detail(self, query, *parameters, **kwparameters):
-        """return_detail"""
-        cursor = self._cursor()
-        try:
-            self._execute(cursor, query, parameters, kwparameters)
-            column_names = [d[0] for d in cursor.description]
-            return {
-                "data": [Row(zip(column_names, row)) for row in cursor],
-                "column_names": column_names,
-                "sql": cursor._executed  # 执行的语句
-            }
-        finally:
-            cursor.close()
-
-    def execute_return_detail(self, query, *parameters, **kwparameters):
-        """return_detail"""
-        cursor = self._cursor()
-        try:
-            self._execute(cursor, query, parameters, kwparameters)
-            return {
-                "lastrowid": cursor.lastrowid,  # 影响的主键id
-                "rowcount": cursor.rowcount,  # 影响的行数
-                "rownumber": cursor.rownumber,  # 行号
-                "sql": cursor._executed  # 执行的语句
-            }
-        finally:
-            cursor.close()
-
-    def executemany_return_detail(self, query, parameters):
-        """return_detail"""
-        cursor = self._cursor()
-        try:
-            cursor.executemany(query, parameters)
-            return {
-                "lastrowid": cursor.lastrowid,  # 影响的主键id
-                "rowcount": cursor.rowcount,  # 影响的行数
-                "rownumber": cursor.rownumber,  # 行号
-                "sql": cursor._executed  # 执行的语句
-            }
-        finally:
-            cursor.close()
-
-
-class GraceDict(dict):
-    """
-    Return empty string instead of throw KeyError when key is not exist.
-
-    Friendly for web development.
-    """
-
-    def __missing__(self, name):
-        # 用于 d[key]形式,没有键的情况
-        return ""
-
-    def __getitem__(self, name):
-        # 用于 d[key]形式,键值为None的情况
-        v = super(GraceDict, self).__getitem__(name)
-        if v is not None:
-            return v
-        else:
-            return ""
-
-    def get(self, key, default=""):
-        # 用于 d.get(key) 的形式
-        if key in self:
-            r = "" if self[key] is None else self[key]
-            return r
-        elif default:
-            return default
-        else:
-            return ""
+ConnectionMySQL = utility.ConnectionMySQL
+GraceDict = utility.GraceDict
+Row = utility.Row
+is_array = utility.is_array
 
 
 class CoherentDB(object):
@@ -126,7 +54,7 @@ class CoherentDB(object):
 
         :param config_dict: dict,config to connect database
         """
-        self.db = ConnectionPlus(**config_dict)
+        self.db = ConnectionMySQL(**config_dict)
 
     def table(self, table_name=""):
         """
@@ -255,7 +183,7 @@ class CoherentDB(object):
         values_sign = ""  # 参数的占位符
 
         # 列表或元祖的结构必须一样
-        if isinstance(dict_data, list) or isinstance(dict_data, tuple):
+        if is_array(dict_data):
             dict_data_item_1 = dict_data[0]  # 应该是字典
             keys = dict_data_item_1.keys()
             fields = ",".join(keys)
@@ -354,23 +282,35 @@ class CoherentDB(object):
 
     def __gen_condition(self):
         """generate query condition"""
+        # todo 改为不拼接字符串
         res = ""
         if self._where:
-
-            # TODO self._where 对于 < <= > >= IN 等的支持需要提高,
-            # 可以写在字典的值的开头,IN 的需要单独处理一下
-
             where = self._where
             if isinstance(self._where, dict):
                 where = ""
+
                 for k in self._where.keys():
+                    s = ""
                     v = self._where[k]
-                    if isinstance(v, tuple) or isinstance(v, list):
-                        v = v[0].format(*v[1:])
-                    s = " {}={} AND".format(k, str(v))
+                    sign = "="
+                    if is_array(v):
+                        # v_len = len(v)
+                        v0 = v[0].replace(" ", "")
+                        lge = ("<", "<=", ">", ">=", "!=")
+                        if v0 in lge:  # < <= > >= !=
+                            lge_index = lge.index(v0)
+                            sign = lge[lge_index]
+                            s = " {}{}{} AND".format(k, sign, str(v[1]))
+                        elif v0.lower() == "in":  # IN
+                            s = " {} IN ({}) AND".format(k, str(v[1]))
+                        elif v0.lower() == "between":  # BETWEEN
+                            s = " {} BETWEEN {} AND {} AND".format(k, v[1], v[2])
+                        else:  # native mysql function
+                            s = " {}{}{} AND".format(k, sign, v[0].format(*v[1:]))
+
                     where += s
                 if where:
-                    where = where[:-3]  # trim the last  AND character
+                    where = where[:-3]  # trim the last AND character
             res += "WHERE" + where
 
         if self._on:
@@ -412,7 +352,7 @@ class CoherentDB(object):
         return fields, values
 
 
-class PositionDB(ConnectionPlus):
+class PositionDB(ConnectionMySQL):
     """
     Implement database operation by position argument.
 

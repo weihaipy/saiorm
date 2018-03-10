@@ -15,11 +15,15 @@ def test_sql():
 
     res = DB.table("xxx").where({
         "a": 1,
-        "b": 2,
+        "b": ("BETWEEN", "1", "2"),
         "c": ("ABS({})", "2"),
-        "d": "now()",
+        "d": ("!=", 0),
+        "e": ("IN", "1,2,3"),
+        "f": "now()",
     }).select("e,f")
     print(res)
+    print(DB.last_sql)
+    return
 
     res = DB.select("now()")
     print(res)
@@ -72,8 +76,8 @@ def test_sql():
     print(res)
 
     res = DB.table("xxx").where({
-        "a": 1,
-        "b": 2,
+        "a": "1",
+        "b": "2",
         "c": ("ABS({})", "2"),
         "d": "now()",
     }).delete()
@@ -84,8 +88,6 @@ def test_sql():
 
     res = DB.table("xxx").decrease("a", 1)
     print(res)
-
-    print(DB.last_sql)
 
     res = DB.table("xxx").get_fields_name()
     print(res)

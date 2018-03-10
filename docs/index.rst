@@ -4,12 +4,12 @@ Welcome to saiorm /saɪɔ:m/,塞翁
 Saiorm is a simple library for accessing database.
 It will take you have a easy way to use SQl database.
 
-**require**
-python3, pymysql.
-
 The goal is to be an asynchronous framework,but not now.
 
 **Saiorm support MySQL only now.**
+
+**require**
+python3, pymysql.
 
 Method **table** should be executed **first**,it will reset all attributes.
 
@@ -19,6 +19,8 @@ select and get method will return data only.
 Other method will return a dict,including lastrowid, rowcount, rownumber, sql.
 
 Method last_sql is the latest executed sql.
+
+Method where could be dict or str type.
 
 Initialization
 ~~~~~~~~~~~~~~
@@ -49,12 +51,14 @@ select and get receive a fields param.
     DB.table("table").order_by("id DESC").get()
 
     # call mysql function with param(param should be str)
-    DB.table("table").where({
+    res = DB.table("xxx").where({
         "a": 1,
-        "b": 2,
+        "b": ("BETWEEN", "1", "2"),
         "c": ("ABS({})", "2"),
-        "d": "now()",
-    }).select("zz,xx")
+        "d": ("!=", 0),
+        "e": ("IN", "1,2,3"),
+        "f": "now()",
+    }).select("e,f")
 
     # call mysql function with no param
     DB.select("now()")
@@ -66,7 +70,7 @@ will transform to SQL
 
     SELECT * FROM table ;
     SELECT * FROM table  ORDER BY id DESC LIMIT 1;
-    SELECT zz,xx FROM table WHERE a=1 AND b=2 AND c=ABS(2) AND d=now() ;
+    SELECT e,f FROM xxx WHERE b BETWEEN 1 AND 2 AND c=ABS(2) AND d!=0 AND e IN (1,2,3) ;
     SELECT now();
 
 
