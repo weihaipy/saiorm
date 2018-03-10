@@ -11,25 +11,26 @@ The goal is to be an asynchronous framework,but not now.
 **require**
 python3, pymysql.
 
-**Method**
+**Method:**
 
 - Method **insert, select, update, delete, execute, executemany, increase, decrease**
 should be executed **finally**,they will take effect immediately.
 
-- Method **last_sql** is the latest executed sql.
+- Method **last_sql** return the latest executed sql.
 
-- Method get_fields_name get a list of all fields name, cache them by default.
+- Method **get_fields_name** get a list of all fields name, cache them by default.
 
 - Method **where** could be dict or str type.
 
 - Method **select** and **get** will return data only.
-Method **update**, **delete**, **execute** will return a dict,including lastrowid, rowcount, rownumber, sql.
+
+- Method **update**, **delete**, **execute** will return a dict,including lastrowid, rowcount, rownumber, sql.
 
 **ATTENTION**
 
 1. Saiorm does not convert value type in condition(where,limit,order_by,
 group_by, various join),if you want to use value passed from user,you must
-check it, because it's easily to triggering injection vulnerability.
+check them, because it's easily to triggering injection vulnerability.
 
 Initialization
 ~~~~~~~~~~~~~~
@@ -42,7 +43,7 @@ Initialization
     # DB = saiorm.CoherentDB(table_name_prefix="abc_") # with table name prefix
     DB.connect({"host": "", "port": 3306, "database": "", "user": "", "password": ""})
 
-Usage for call mysql function only
+Usage for calling mysql function only
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 You must call **table** to set a empty table name if DB has been called
@@ -56,6 +57,7 @@ with table name.
 will transform to SQL
 
 .. code:: sql
+
     SELECT now();
     SELECT sum(1+2);
 
@@ -64,10 +66,11 @@ Usage for select and get
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
 1. select will return all data
-2. get will modify _limit attribute automatically,and return the latest line only.
+
+2. get will modify _limit attribute automatically,then return the latest line only.
 **If you call get method, limit method will be overwrited**
 
-select and get receive a fields param.
+3. select and get receive a fields param.
 
 .. code:: python
 
@@ -171,11 +174,12 @@ will transform to SQL
     INSERT INTO xxx (a,b) VALUES ('1','2'),('3','4'),('5','6')
     INSERT INTO xxx (a,b) VALUES ('1','2'),('3','4'),('5','6')
 
+If use split dict,key fields id not necessary,it will insert by order of table struct.
 
 Usage for delete
 ~~~~~~~~~~~~~~~~
 
-By default, delete must have where condition,or you can pass strict=False when initialization.
+By default, **delete** must have **where** condition,or you can pass strict=False when initialization.
 
 .. code:: python
 
