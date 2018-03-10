@@ -133,37 +133,37 @@ insert function support two kinds of data
 
     # use dict 1 natural
     table.insert({
-		"a": "1",
-		"b": "2",
-	})
+        "a": "1",
+        "b": "2",
+    })
 
     # use dict 2
     table.insert({
-		"fields": ["a", "b"],
-		"values": ["1", "2"],
-	})
+        "fields": ["a", "b"],
+        "values": ["1", "2"],
+    })
 
     # use natural dict in list, SQL statement will in one line
     table.insert_many([{
-		"a": "1",
-		"b": "2",
-	}, {
-		"a": "3",
-		"b": "4",
-	}, {
-		"a": "5",
-		"b": "6",
-	}])
+        "a": "1",
+        "b": "2",
+    }, {
+        "a": "3",
+        "b": "4",
+    }, {
+        "a": "5",
+        "b": "6",
+    }])
 
     # use split dict in list, SQL statement will in one line
     table.insert_many({
-		"fields": ["a", "b"],
-		"values": [
-			["1", "2"],
-			["3", "4"],
-			["5", "6"]
-		]
-	})
+        "fields": ["a", "b"],
+        "values": [
+            ["1", "2"],
+            ["3", "4"],
+            ["5", "6"]
+        ]
+    })
 
 
 will transform to SQL
