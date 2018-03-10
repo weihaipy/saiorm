@@ -28,7 +28,7 @@ print(DB.last_sql)
 res = table.where({
     "a": 1,
     "b": ("BETWEEN", "1", "2"),
-    "c": ("ABS(?)", "2"),  # %s or ?
+    "c": ("ABS(?)", "2"),
     "d": ("!=", 0),
     "e": ("IN", "1,2,3"),
     "f": "now()",

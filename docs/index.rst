@@ -13,27 +13,23 @@ python3, pymysql.
 
 **Method**
 
-::
+- Method **insert, select, update, delete, execute, executemany, increase, decrease**
+should be executed **finally**,they will take effect immediately.
 
-    - Method **insert, select, update, delete, execute, executemany, increase, decrease** should be executed **finally**,
-    they will take effect immediately.
+- Method **last_sql** is the latest executed sql.
 
-    - Method **last_sql** is the latest executed sql.
+- Method get_fields_name get a list of all fields name, cache them by default.
 
-    - Method get_fields_name get a list of table's all fields name, cache them by default.
+- Method **where** could be dict or str type.
 
-    - Method **where** could be dict or str type.
-
-    - Method **select** and **get** will return data only.
-    Method **update**, **delete**, **execute** will return a dict,including lastrowid, rowcount, rownumber, sql.
+- Method **select** and **get** will return data only.
+Method **update**, **delete**, **execute** will return a dict,including lastrowid, rowcount, rownumber, sql.
 
 **ATTENTION**
 
-::
-
-    1. Saiorm wont't convert value type in condition(where,limit,order_by,
-    group_by, various join),if you want to use value passed from user,you must
-    check it, because it's easily to triggering injection vulnerability.
+1. Saiorm does not convert value type in condition(where,limit,order_by,
+group_by, various join),if you want to use value passed from user,you must
+check it, because it's easily to triggering injection vulnerability.
 
 Initialization
 ~~~~~~~~~~~~~~
@@ -46,8 +42,8 @@ Initialization
     # DB = saiorm.CoherentDB(table_name_prefix="abc_") # with table name prefix
     DB.connect({"host": "", "port": 3306, "database": "", "user": "", "password": ""})
 
-Usage for call mysql function
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Usage for call mysql function only
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 You must call **table** to set a empty table name if DB has been called
 with table name.
@@ -81,11 +77,11 @@ select and get receive a fields param.
     # get the latest line
     table.order_by("id DESC").get()
 
-    # kinds of params
+    # kinds of params in where
     table.where({
         "a": 1,
         "b": ("BETWEEN", "1", "2"),
-        "c": ("ABS(?)", "2"),  %s or ?
+        "c": ("ABS(?)", "2"),
         "d": ("!=", 0),
         "e": ("IN", "1,2,3"),
         "f": "now()",
@@ -228,6 +224,30 @@ will transform to SQL
 .. code:: sql
 
     UPDATE xxx SET a=a-1
+
+where condition
+~~~~~~~~~~~~~~~
+
+.. code:: python
+
+    table.where({
+        "a": 1,
+        "b": ("BETWEEN", "1", "2"),
+        "c": ("ABS(?)", "2"),
+        "d": ("!=", 0),
+        "e": ("IN", "1,2,3"),
+        "f": "now()",
+    }).select("e,f")
+
+- must check param to prevent injection vulnerabilities.
+
+- call native mysql function,param placeholder could be {} or ?.
+
+- condition will be equals to value,or pass a tuple or list.
+
+- use IN or BETWEEN should pass a tuple or list.
+
+- pass string type is allowed,you should join param into this string.
 
 Method Shorthand
 ~~~~~~~~~~~~~~~~
