@@ -32,6 +32,7 @@ Initialization
     DB = saiorm.CoherentDB()  # with no table name prefix
     # DB = saiorm.CoherentDB(table_name_prefix="abc_") # with table name prefix
     DB.connect({"host": "", "port": 3306, "database": "", "user": "", "password": ""})
+    table = DB.table("table_name") 
 
 Usage for select and get
 ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -45,13 +46,13 @@ select and get receive a fields param.
 .. code:: python
 
     # select all fields
-    DB.table("table").select()
+    table.select()
 
     # get the latest line
-    DB.table("table").order_by("id DESC").get()
+    table.order_by("id DESC").get()
 
-    # call mysql function with param(param should be str)
-    res = DB.table("xxx").where({
+    # kinds of params
+    res = table.where({
         "a": 1,
         "b": ("BETWEEN", "1", "2"),
         "c": ("ABS({})", "2"),
@@ -61,7 +62,7 @@ select and get receive a fields param.
     }).select("e,f")
 
     # call mysql function with no param
-    DB.select("now()")
+    table.select("now()")
 
 
 will transform to SQL
@@ -81,7 +82,7 @@ If you want use native function,you can pass a tuple.
 
 .. code:: python
 
-    DB.table("table").where({
+    table.where({
         "a": 1,
         "b": 2,
         "c": ("ABS({})", "2"),
@@ -107,20 +108,20 @@ insert function support two kinds of data
 .. code:: python
 
     # use dict 1 natural
-    DB.table("table").insert({
+    table.insert({
         "a": "1",
         "b": "2",
     })
 
     # use dict 2
-    DB.table("table").insert({
+    table.insert({
         "fields": ["a", "b"],
         "values": ["1", "2"],
 
     })
 
     # use natural dict in list, SQL statement will in one line
-    DB.table("table").insert_many([{
+    table.insert_many([{
         "a": "1",
         "b": "2",
     }, {
@@ -129,7 +130,7 @@ insert function support two kinds of data
     }])
 
     # use split dict in list, SQL statement will in one line
-    DB.table("table").insert_many({
+    table.insert_many({
         "fields": ["a", "b"],
         "values": [
             ["1", "2"],
@@ -156,14 +157,14 @@ By default, delete must have where condition,or you can pass strict=False when i
 
 .. code:: python
 
-    DB.table("table").where({
+    table.where({
         "a": 1,
         "b": 2,
         "c": ("ABS({})", "2"),
         "d": "now()",
     }).delete()
 
-    DB.table("table").delete()  # will not execute, or set strict=False when initialization
+    table.delete()  # will not execute, or set strict=False when initialization
 
 will transform to SQL
 
@@ -177,28 +178,39 @@ Usage for increase
 
 Numerical field increase
 
+.. code:: python
+
+    table.increase("a", 1)
+
+will transform to SQL
+
 .. code:: sql
 
-    DB.table("xxx").increase("a", 1)
-
+    UPDATE xxx SET a=a+1
 
 Usage for decrease
 ~~~~~~~~~~~~~~~~
 
 Numerical field decrease
 
+.. code:: python
+
+    table.decrease("a", 1)
+
+will transform to SQL
+
 .. code:: sql
 
-    DB.table("xxx").decrease("a", 1)
+    UPDATE xxx SET a=a-1
 
 Usage for get_fields_name
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Get all fields name of the table and cache them(by default)
+Get a list of table's all fields name, cache them by default.
 
-.. code:: sql
+.. code:: python
 
-    DB.table("xxx").get_fields_name()
+    table.get_fields_name()
 
 
 Other usage

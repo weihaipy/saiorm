@@ -5,15 +5,19 @@ import saiorm
 DB = saiorm.CoherentDB()
 DB.connect({"host": "127.0.0.1", "port": 3306, "database": "x", "user": "root", "password": "root"})
 
+DB_table = DB.table("xxx")
+
 
 def test_sql():
-    res = DB.table("xxx").select()
-    print(res)
+    res = DB_table.select()
+    # print(res)
+    print(DB.last_sql)
 
-    res = DB.table("xxx").order_by("id DESC").get()
-    print(res)
+    res = DB_table.order_by("id DESC").get()
+    # print(res)
+    print(DB.last_sql)
 
-    res = DB.table("xxx").where({
+    res = DB_table.where({
         "a": 1,
         "b": ("BETWEEN", "1", "2"),
         "c": ("ABS({})", "2"),
@@ -21,14 +25,14 @@ def test_sql():
         "e": ("IN", "1,2,3"),
         "f": "now()",
     }).select("e,f")
-    print(res)
+    # print(res)
     print(DB.last_sql)
-    return
 
     res = DB.select("now()")
-    print(res)
+    # print(res)
+    print(DB.last_sql)
 
-    res = DB.table("xxx").where({
+    res = DB_table.where({
         "a": 1,
         "b": 2,
         "c": ("ABS({})", "2"),
@@ -37,22 +41,25 @@ def test_sql():
         "e": "1",
         "f": "2",
     })
-    print(res)
+    # print(res)
+    print(DB.last_sql)
 
-    res = DB.table("xxx").insert({
+    res = DB_table.insert({
         "a": "1",
         "b": "2",
     })
-    print(res)
+    # print(res)
+    print(DB.last_sql)
 
-    res = DB.table("xxx").insert({
+    res = DB_table.insert({
         "fields": ["a", "b"],
         "values": ["1", "2"],
     })
-    print(res)
+    # print(res)
+    print(DB.last_sql)
 
     # use list
-    res = DB.table("xxx").insert_many([{
+    res = DB_table.insert_many([{
         "a": "1",
         "b": "2",
     }, {
@@ -62,10 +69,11 @@ def test_sql():
         "a": "5",
         "b": "6",
     }])
-    print(res)
+    # print(res)
+    print(DB.last_sql)
 
     # use dict
-    res = DB.table("xxx").insert_many({
+    res = DB_table.insert_many({
         "fields": ["a", "b"],
         "values": [
             ["1", "2"],
@@ -73,30 +81,37 @@ def test_sql():
             ["5", "6"]
         ]
     })
-    print(res)
+    # print(res)
+    print(DB.last_sql)
 
-    res = DB.table("xxx").where({
+    res = DB_table.where({
         "a": "1",
         "b": "2",
         "c": ("ABS({})", "2"),
         "d": "now()",
     }).delete()
-    print(res)
-
-    res = DB.table("xxx").increase("a", 1)
-    print(res)
-
-    res = DB.table("xxx").decrease("a", 1)
-    print(res)
-
-    res = DB.table("xxx").get_fields_name()
-    print(res)
-
-    # res = DB.table("xxx").delete()
     # print(res)
+    print(DB.last_sql)
+
+    res = DB_table.increase("a", 1)
+    # print(res)
+    print(DB.last_sql)
+
+    res = DB_table.decrease("a", 1)
+    # print(res)
+    print(DB.last_sql)
+
+    res = DB_table.get_fields_name()
+    # print(res)
+    print(DB.last_sql)
+
+    # res = DB_table.delete()
+    # # print(res)
+    # print(DB.last_sql)
     #
     # res = DB("xxx", strict=False).delete()
-    # print(res)
+    # # print(res)
+    # print(DB.last_sql)
 
 
 test_sql()

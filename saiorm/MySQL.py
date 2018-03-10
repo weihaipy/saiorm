@@ -288,7 +288,6 @@ class CoherentDB(object):
             where = self._where
             if isinstance(self._where, dict):
                 where = ""
-
                 for k in self._where.keys():
                     s = ""
                     v = self._where[k]
