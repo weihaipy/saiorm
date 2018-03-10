@@ -42,6 +42,7 @@ Initialization
     DB = saiorm.CoherentDB()  # with no table name prefix
     # DB = saiorm.CoherentDB(table_name_prefix="abc_") # with table name prefix
     DB.connect({"host": "", "port": 3306, "database": "", "user": "", "password": ""})
+    table = DB.table("xxx")
 
 Usage for calling mysql function only
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -51,15 +52,15 @@ with table name.
 
 .. code:: python
 
-    DB.table().select("now()")
-    DB.table().select("sum(1+2)")
+    DB.table().select("NOW()")
+    DB.table().select("SUM(1+2)")
 
 will transform to SQL
 
 .. code:: sql
 
-    SELECT now();
-    SELECT sum(1+2);
+    SELECT NOW();
+    SELECT SUM(1+2);
 
 
 Usage for select and get
@@ -108,8 +109,8 @@ If you want use native function,you can pass a tuple.
     table.where({
         "a": 1,
         "b": 2,
-        "c": ("ABS({})", "2"),
-        "d": "now()",
+        "c": ("ABS(?)", "2"),
+        "d": "NOW()",
     }).update({
         "e": "1",
         "f": "2",
@@ -174,7 +175,7 @@ will transform to SQL
     INSERT INTO xxx (a,b) VALUES ('1','2'),('3','4'),('5','6')
     INSERT INTO xxx (a,b) VALUES ('1','2'),('3','4'),('5','6')
 
-If use split dict,key fields id not necessary,it will insert by order of table struct.
+If use split dict,key fields is not necessary,it will insert by the order of table struct.
 
 Usage for delete
 ~~~~~~~~~~~~~~~~
@@ -245,9 +246,9 @@ where condition
 
 - must check param to prevent injection vulnerabilities.
 
-- call native mysql function,param placeholder could be {} or ?.
+- when calling native mysql function the param placeholder could be ? or {}.
 
-- condition will be equals to value,or pass a tuple or list.
+- condition will be equals to value,or pass a tuple or list, and set the first item to change it.
 
 - use IN or BETWEEN should pass a tuple or list.
 

@@ -328,8 +328,9 @@ class CoherentDB(object):
                                 # join string direct
                                 v1 = v1.replace("`", "")
                                 if "?" in v1:
-                                    v1 = v0.replace("?", v[2])
-                                where += " {}{}{} AND".format(k, sign, v1)
+                                    v0 = v0.replace("?", "{}")
+                                    v = v0.format(v[1:])
+                                where += " {}{}{} AND".format(k, sign, v)
                             else:
                                 where += " {}{}%s AND".format(k, sign)
                                 sql_values.append(v[1])
@@ -348,7 +349,8 @@ class CoherentDB(object):
                             # join string direct
                             v0 = v0.replace("`", "")
                             if "?" in v0:
-                                v0 = v0.replace("?", v[1])
+                                v0 = v0.replace("?", "{}")
+                                v0 = v0.format(v[1:])
                             where += " {}={} AND".format(k, v0)
                     else:
                         where += " {}={} AND".format(k, v)

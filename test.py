@@ -6,11 +6,11 @@ DB = saiorm.CoherentDB()
 DB.connect({"host": "127.0.0.1", "port": 3306, "database": "x", "user": "root", "password": "root"})
 
 # test mysql function
-res = DB.table().select("now()")
+res = DB.table().select("NOW()")
 # print(res)
 print(DB.last_sql)
 
-res = DB.table().select("sum(1+2)")
+res = DB.table().select("SUM(1+2)")
 # print(res)
 print(DB.last_sql)
 
@@ -39,16 +39,14 @@ print(DB.last_sql)
 res = table.where({
     "a": 1,
     "b": 2,
-    "c": ("ABS({})", "2"),
-    "d": "now()",
+    "c": ("ABS(?)", "2"),
+    "d": "NOW()",
 }).update({
     "e": "1",
     "f": "2",
 })
 # print(res)
 print(DB.last_sql)
-
-raise ValueError
 
 res = table.insert({
     "a": "1",
