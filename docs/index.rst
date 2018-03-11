@@ -6,12 +6,9 @@ It will take you have a very easy way to use SQl database.
 
 .. We want it to be an asynchronous framework,but not now.
 
-Saiorm require python3 and pymysql, support MySQL only now.
-
 **Method:**
 
-- Method **insert, select, update, delete, execute, executemany, increase, decrease**
-should be executed **finally**,they will take effect immediately.
+- Method **insert, select, update, delete, execute, executemany, increase, decrease** should be executed **finally**,they will take effect immediately.
 
 - Method **last_sql** return the latest executed sql.
 
@@ -26,8 +23,10 @@ should be executed **finally**,they will take effect immediately.
 **ATTENTION**
 
 1. Saiorm does not convert value type in condition(where,limit,order_by,
-group_by, various join),if you want to use value passed from user,you must
+group_by, various join etc.),if you want to use value passed from user,you must
 check them, because it's easily to triggering injection vulnerability.
+
+2. Saiorm require python3 and pymysql, support MySQL only now.
 
 Initialization
 ~~~~~~~~~~~~~~
