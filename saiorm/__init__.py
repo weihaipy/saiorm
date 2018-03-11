@@ -2,7 +2,7 @@
 # -*- coding:utf-8 -*-
 
 
-def init(driver="MySQL", table_name_prefix=""):
+def init(driver="MySQL", **kwargs):
     if driver.lower() == "mysql":
         from .MySQL import CoherentDB
-        return CoherentDB(table_name_prefix=table_name_prefix)
+        return CoherentDB(**kwargs)

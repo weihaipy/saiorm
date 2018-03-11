@@ -97,7 +97,7 @@ will transform to SQL
 
     SELECT * FROM xxx ;
     SELECT * FROM xxx  ORDER BY id DESC LIMIT 1;
-    SELECT e,f FROM xxx WHERE b BETWEEN '1' AND '2' AND d!=0 AND e IN (1,2,3) ;
+    SELECT e,f FROM xxx WHERE a=1 AND b BETWEEN '1' AND '2' AND d!=0 AND e IN (1,2,3) ;
 
 Usage for update
 ~~~~~~~~~~~~~~~~
@@ -172,8 +172,8 @@ will transform to SQL
 
     INSERT INTO xxx (a,b) VALUES ('1','2');
     INSERT INTO xxx (a,b) VALUES ('1','2');
-    INSERT INTO xxx (a,b) VALUES ('1','2'),('3','4'),('5','6')
-    INSERT INTO xxx (a,b) VALUES ('1','2'),('3','4'),('5','6')
+    INSERT INTO xxx (a,b) VALUES ('1','2'),('3','4'),('5','6');
+    INSERT INTO xxx (a,b) VALUES ('1','2'),('3','4'),('5','6');
 
 If use split dict,key fields is not necessary,it will insert by the order of table struct.
 
@@ -185,13 +185,13 @@ By default, **delete** must have **where** condition,or you can pass strict=Fals
 .. code:: python
 
     table.where({
-		"a": "1",
-		"b": "2",
-		"c": ("ABS(?)", "2"),
-		"d": "now()",
-	}).delete()
+        "a": "1",
+        "b": "2",
+        "c": ("ABS(?)", "2"),
+        "d": "now()",
+    }).delete()
 
-    table.delete()  # will not execute, or set strict=False when initialization
+    table.delete()  # will not be executed, or set strict=False when initialization
 
 will transform to SQL
 

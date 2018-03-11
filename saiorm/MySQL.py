@@ -238,7 +238,7 @@ class CoherentDB(object):
 
     def increase(self, field, step=1):
         """number field Increase """
-        sql = "UPDATE {} SET {}={}+{}".format(self._table, field, field, str(step))
+        sql = "UPDATE {} SET {}={}+{};".format(self._table, field, field, str(step))
         # print(sql)
         # raise
         res = self.execute(sql)
@@ -247,7 +247,7 @@ class CoherentDB(object):
 
     def decrease(self, field, step=1):
         """number field decrease """
-        sql = "UPDATE {} SET {}={}-{}".format(self._table, field, field, str(step))
+        sql = "UPDATE {} SET {}={}-{};".format(self._table, field, field, str(step))
         res = self.execute(sql)
         self.last_sql = res["sql"]
         return res
@@ -260,7 +260,7 @@ class CoherentDB(object):
         if self.cache_fields_name and self._cached_fields_name.get(self._table):
             return self._cached_fields_name.get(self._table)
         else:
-            res = self.db.query_return_detail("SELECT * FROM xxx LIMIT 1")
+            res = self.db.query_return_detail("SELECT * FROM xxx LIMIT 1;")
             fields_name = res["column_names"]
             self._cached_fields_name[self._table] = fields_name
 
