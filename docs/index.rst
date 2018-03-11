@@ -2,14 +2,11 @@ Welcome to saiorm /saɪɔ:m/,塞翁
 ===============================
 
 Saiorm is a simple library for accessing database.
-It will take you have a easy way to use SQl database.
+It will take you have a very easy way to use SQl database.
 
-The goal is to be an asynchronous framework,but not now.
+.. We want it to be an asynchronous framework,but not now.
 
-**Saiorm support MySQL only now.**
-
-**require**
-python3, pymysql.
+Saiorm require python3 and pymysql, support MySQL only now.
 
 **Method:**
 
