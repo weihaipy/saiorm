@@ -14,11 +14,13 @@ It will take you have a very easy way to use SQl database.
 
 - Method **get_fields_name** get a list of all fields name, cache them by default.
 
-- Method **where** could be dict or str type.**IN** require a string or a sequence with str type.
+- Method **where** could be dict or str type. **IN** require a string or a sequence with str type.
 
-- Method **select** and **get** will return data only.
+- Method **select** and **get** return data only.
 
-- Method **update**, **delete**, **execute** will return a dict,including lastrowid, rowcount, rownumber, sql.
+- Method **update**, **delete**, **execute** return a dict,including lastrowid, rowcount, rownumber, sql.
+
+- Various method join,should use string param for method join and method where.
 
 **ATTENTION**
 
@@ -31,6 +33,8 @@ because it's easily to triggering injection vulnerability.
 
 3. Support MySQL only,you can inherit from saiorm.base.BaseDB to support other types
 of database with the same API,like siaorm.MySQL.ChainDB.
+
+4. You can add "`" as a prefix to set the field to native function in method select and update.
 
 Initialization
 ~~~~~~~~~~~~~~
@@ -46,8 +50,6 @@ Initialization
 
 Usage for calling mysql function only
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-You can add "`" as a prefix to set the field to native function in method select and update.
 
 .. code:: python
 

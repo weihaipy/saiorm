@@ -17,6 +17,8 @@ class BaseDB(object):
     Implement database chain  operation.
 
     After initialization with table name,use config_db to set connected database.
+
+    In JOIN,use ### as table name prefix placeholder.
     """
 
     def __init__(self, table_name_prefix="", debug=False, strict=True,
@@ -107,18 +109,27 @@ class BaseDB(object):
         return self
 
     def join(self, condition):
+        if self.table_name_prefix and "###" in condition:
+            condition = condition.replace("###", self.table_name_prefix)
+
         self._inner_join = condition
         return self
 
     def inner_join(self, condition):
+        if self.table_name_prefix and "###" in condition:
+            condition = condition.replace("###", self.table_name_prefix)
         self._inner_join = condition
         return self
 
     def left_join(self, condition):
+        if self.table_name_prefix and "###" in condition:
+            condition = condition.replace("###", self.table_name_prefix)
         self._left_join = condition
         return self
 
     def right_join(self, condition):
+        if self.table_name_prefix and "###" in condition:
+            condition = condition.replace("###", self.table_name_prefix)
         self._right_join = condition
         return self
 
