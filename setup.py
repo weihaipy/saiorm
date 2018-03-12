@@ -1,6 +1,6 @@
 import io
 import os
-import sys
+
 from setuptools import setup, find_packages
 
 with io.open(os.path.join("docs", 'index.rst'), encoding='utf-8') as f:
@@ -9,9 +9,11 @@ with io.open(os.path.join("docs", 'index.rst'), encoding='utf-8') as f:
 with io.open('requirements.txt') as f:
     requirements = f.readlines()
 
+version = "0.0.2"
+
 setup(
     name="saiorm",
-    version="0.0.1",
+    version=version,
     url='https://github.com/weihaipy/saiorm',
     author='James',
     author_email='xxx_828@126.com',
