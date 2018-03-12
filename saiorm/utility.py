@@ -1,58 +1,15 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
 
-try:
 
-    import x_torndb
-except ImportError:
-    from . import x_torndb
+class Row(dict):
+    """A dict that allows for object-like property access syntax."""
 
-torndb = x_torndb
-Row = torndb.Row
-
-
-class ConnectionMySQL(torndb.Connection):
-    def query_return_detail(self, query, *parameters, **kwparameters):
-        """return_detail"""
-        cursor = self._cursor()
+    def __getattr__(self, name):
         try:
-            self._execute(cursor, query, parameters, kwparameters)
-            column_names = [d[0] for d in cursor.description]
-            return {
-                "data": [Row(zip(column_names, row)) for row in cursor],
-                "column_names": column_names,
-                "sql": cursor._executed  # 执行的语句
-            }
-        finally:
-            cursor.close()
-
-    def execute_return_detail(self, query, *parameters, **kwparameters):
-        """return_detail"""
-        cursor = self._cursor()
-        try:
-            self._execute(cursor, query, parameters, kwparameters)
-            return {
-                "lastrowid": cursor.lastrowid,  # 影响的主键id
-                "rowcount": cursor.rowcount,  # 影响的行数
-                "rownumber": cursor.rownumber,  # 行号
-                "sql": cursor._executed  # 执行的语句
-            }
-        finally:
-            cursor.close()
-
-    def executemany_return_detail(self, query, parameters):
-        """return_detail"""
-        cursor = self._cursor()
-        try:
-            cursor.executemany(query, parameters)
-            return {
-                "lastrowid": cursor.lastrowid,  # 影响的主键id
-                "rowcount": cursor.rowcount,  # 影响的行数
-                "rownumber": cursor.rownumber,  # 行号
-                "sql": cursor._executed  # 执行的语句
-            }
-        finally:
-            cursor.close()
+            return self[name]
+        except KeyError:
+            raise AttributeError(name)
 
 
 class GraceDict(dict):

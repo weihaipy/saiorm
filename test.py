@@ -2,8 +2,13 @@
 # -*- coding:utf-8 -*-
 import saiorm
 
-DB = saiorm.init()
-DB.connect({"host": "127.0.0.1", "port": 3306, "database": "x", "user": "root", "password": "root"})
+# MySQL
+# DB = saiorm.init()
+# DB.connect({"host": "127.0.0.1", "port": 3306, "database": "x", "user": "root", "password": "root"})
+
+# PostgreSQL
+DB = saiorm.init(driver="PostgreSQL")
+DB.connect({"host": "127.0.0.1", "port": "5432", "database": "x", "user": "postgres", "password": "123"})
 
 # test mysql function
 res = DB.select("`NOW()")
@@ -17,11 +22,11 @@ print(DB.last_sql)
 # Normal usage
 table = DB.table("xxx")
 
-res = table.select()
+res = table.select()  # todo PostgreSQL stops here
 # print(res)
 print(DB.last_sql)
 
-res = table.order_by("id DESC").get()
+res = table.order_by("a DESC").get()
 # print(res)
 print(DB.last_sql)
 

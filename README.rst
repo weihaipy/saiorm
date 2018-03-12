@@ -16,7 +16,7 @@ Task
 
 - [x] transform to sql
 - [x] Support MySQL
-- [ ] Support PostgreSQL
+- [ ] Support PostgreSQL now
 - [ ] Support SQLserver
 - [ ] Support Oracle Database
 
