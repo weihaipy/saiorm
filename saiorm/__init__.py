@@ -4,5 +4,5 @@
 
 def init(driver="MySQL", **kwargs):
     if driver.lower() == "mysql":
-        from .MySQL import CoherentDB
-        return CoherentDB(**kwargs)
+        from .MySQL import ChainDB
+        return ChainDB(**kwargs)

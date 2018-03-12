@@ -6,11 +6,11 @@ DB = saiorm.init()
 DB.connect({"host": "127.0.0.1", "port": 3306, "database": "x", "user": "root", "password": "root"})
 
 # test mysql function
-res = DB.table().select("NOW()")
+res = DB.select("`NOW()")
 # print(res)
 print(DB.last_sql)
 
-res = DB.table().select("SUM(1+2)")
+res = DB.select("`SUM(1+2)")
 # print(res)
 print(DB.last_sql)
 
@@ -28,22 +28,21 @@ print(DB.last_sql)
 res = table.where({
     "a": 1,
     "b": ("BETWEEN", "1", "2"),
-    "c": ("ABS(?)", "2"),
+    "c": ("`ABS(?)", "2"),
     "d": ("!=", 0),
     "e": ("IN", "1,2,3"),
-    "f": "now()",
+    "f": "`NOW()",
 }).select("e,f")
 # print(res)
 print(DB.last_sql)
 
 res = table.where({
-    "a": 1,
-    "b": 2,
-    "c": ("ABS(?)", "2"),
-    "d": "NOW()",
+    "a": ("IN", ["1", "2", "3"]),
+    "b": ("`ABS(?)", "2"),
 }).update({
-    "e": "1",
-    "f": "2",
+    "c": "`ABS(2)",
+    "d": ("`ABS(?)", 3),
+    "e": "2",
 })
 # print(res)
 print(DB.last_sql)
@@ -91,8 +90,7 @@ print(DB.last_sql)
 res = table.where({
     "a": "1",
     "b": "2",
-    "c": ("ABS(?)", "2"),
-    "d": "now()",
+    "c": ("`ABS(?)", "2"),
 }).delete()
 # print(res)
 print(DB.last_sql)

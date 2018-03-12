@@ -8,13 +8,14 @@ It will take you have a very easy way to use SQl database.
 
 **Method:**
 
-- Method **insert, select, update, delete, execute, executemany, increase, decrease** should be executed **finally**,they will take effect immediately.
+- Method **insert, select, update, delete, execute, executemany, increase, decrease**
+should be executed **finally**,they will take effect immediately.
 
 - Method **last_sql** return the latest executed sql.
 
 - Method **get_fields_name** get a list of all fields name, cache them by default.
 
-- Method **where** could be dict or str type.
+- Method **where** could be dict or str type.**IN** require a string or a sequence with str type.
 
 - Method **select** and **get** will return data only.
 
@@ -22,11 +23,15 @@ It will take you have a very easy way to use SQl database.
 
 **ATTENTION**
 
-1. Saiorm does not convert value type in condition(where,limit,order_by,
-group_by, various join etc.),if you want to use value passed from user,you must
-check them, because it's easily to triggering injection vulnerability.
+1. Saiorm does not convert value type in condition(limit,order_by,group_by,
+various join etc.),method where not convert value type in native functions and IN.
+If you want to use the values passed from user,you must check them,
+because it's easily to triggering injection vulnerability.
 
-2. Saiorm require python3 and pymysql, support MySQL only now.
+2. Saiorm require python3 and pymysql.
+
+3. Support MySQL only,you can inherit from saiorm.base.BaseDB to support other types
+of data values with the same API,like siaorm.MySQL.ChainDB.
 
 Initialization
 ~~~~~~~~~~~~~~
@@ -43,13 +48,12 @@ Initialization
 Usage for calling mysql function only
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-You must call **table** to set a empty table name if DB has been called
-with table name.
+You can add "=" as a prefix to set the field to native function in method select and update.
 
 .. code:: python
 
-    DB.table().select("NOW()")
-    DB.table().select("SUM(1+2)")
+    DB.select("`NOW()")
+    DB.select("`SUM(1+2)")
 
 will transform to SQL
 
@@ -57,7 +61,6 @@ will transform to SQL
 
     SELECT NOW();
     SELECT SUM(1+2);
-
 
 Usage for select and get
 ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -78,13 +81,13 @@ Usage for select and get
     table.order_by("id DESC").get()
 
     # kinds of params in where
-    table.where({
+        table.where({
         "a": 1,
         "b": ("BETWEEN", "1", "2"),
-        "c": ("ABS(?)", "2"),
+        "c": ("`ABS(?)", "2"),
         "d": ("!=", 0),
         "e": ("IN", "1,2,3"),
-        "f": "now()",
+        "f": "`NOW()",
     }).select("e,f")
 
 will transform to SQL
@@ -93,7 +96,7 @@ will transform to SQL
 
     SELECT * FROM xxx ;
     SELECT * FROM xxx  ORDER BY id DESC LIMIT 1;
-    SELECT e,f FROM xxx WHERE a=1 AND b BETWEEN '1' AND '2' AND d!=0 AND e IN (1,2,3) ;
+    SELECT e,f FROM xxx WHERE a=1 AND b BETWEEN '1' AND '2' AND c=ABS(2) AND d!=0 AND e IN (1,2,3) AND f=NOW() ;
 
 Usage for update
 ~~~~~~~~~~~~~~~~
@@ -103,21 +106,19 @@ If you want use native function,you can pass a tuple.
 .. code:: python
 
     table.where({
-        "a": 1,
-        "b": 2,
-        "c": ("ABS(?)", "2"),
-        "d": "NOW()",
+        "a": ("IN", ["1", "2", "3"]),
+        "b": ("`ABS(?)", "2"),
     }).update({
-        "e": "1",
-        "f": "2",
+        "c": "`ABS(2)",
+        "d": ("`ABS(?)", 3),
+        "e": "2",
     })
-
 
 will transform to SQL
 
 .. code:: sql
 
-    UPDATE xxx SET x=%s,y=%s WHERE a=1 AND b=2 AND c=ABS(2) AND d=now() ;
+    UPDATE xxx SET c=ABS(2),d=ABS(3),e='2' WHERE a IN (1,2,3) AND b=ABS(2) ;
 
 
 Usage for insert
@@ -183,8 +184,7 @@ By default, **delete** must have **where** condition,or you can pass strict=Fals
     table.where({
         "a": "1",
         "b": "2",
-        "c": ("ABS(?)", "2"),
-        "d": "now()",
+        "c": ("`ABS(?)", "2"),
     }).delete()
 
     table.delete()  # will not be executed, or set strict=False when initialization
@@ -193,7 +193,7 @@ will transform to SQL
 
 .. code:: sql
 
-    DELETE FROM xxx WHERE a=1 AND b=2 AND c=ABS(2) AND d=now() ;
+    DELETE FROM xxx WHERE a='1' AND b='2' AND c=ABS(2) ;
     DELETE FROM xxx ;
 
 Usage for increase
@@ -237,12 +237,12 @@ where condition
         "c": ("ABS(?)", "2"),
         "d": ("!=", 0),
         "e": ("IN", "1,2,3"),
-        "f": "now()",
+        "f": "NOW()",
     }).select("e,f")
 
 - must check param to prevent injection vulnerabilities.
 
-- when calling native mysql function the param placeholder could be ? or {}.
+- when calling native mysql function the param placeholder could be ?.
 
 - condition will be equals to value,or pass a tuple or list, and set the first item to change it.
 
