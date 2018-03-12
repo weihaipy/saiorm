@@ -197,10 +197,10 @@ class BaseDB(object):
             return False
 
         keys = dict_data.keys()
-        if "fields" in keys and "values" in keys:  # 字段名和值分开传
+        if "fields" in keys and "values" in keys:  # split dict
             fields = ",".join(dict_data["fields"])
             values = [v for v in dict_data["values"]]
-        else:  # 普通字典
+        else:  # natural dict
             fields = ",".join(keys)
             values = dict_data.values()
 
@@ -230,8 +230,6 @@ class BaseDB(object):
             return False
 
         fields = ""  # 所有的字段
-        values = []  # 所有的参数
-        values_sign = ""  # 参数的占位符
 
         # 列表或元祖的结构必须一样
         if is_array(dict_data):
@@ -251,11 +249,9 @@ class BaseDB(object):
             return False
 
         if fields:
-            sql = "INSERT INTO {} ({}) VALUES ({});".format(self._table, fields, values_sign)
-            sel = self.gen_insert_with_fields(fields, values_sign)
+            sql = self.gen_insert_with_fields(fields, values_sign)
         else:
-            sql = "INSERT INTO {}  VALUES ({});".format(self._table, values_sign)
-            sel = self.gen_insert_without_fields(values_sign)
+            sql = self.gen_insert_without_fields(values_sign)
 
         res = self.executemany(sql, values)
         self.last_sql = res["sql"]
