@@ -8,8 +8,7 @@ It will take you have a very easy way to use SQl database.
 
 **Method:**
 
-- Method **insert, select, update, delete, execute, executemany, increase, decrease**
-should be executed **finally**,they will take effect immediately.
+- Method **insert, select, update, delete, execute, executemany, increase, decrease** should be executed **finally**,they will take effect immediately.
 
 - Method **last_sql** return the latest executed sql.
 
@@ -31,7 +30,7 @@ because it's easily to triggering injection vulnerability.
 2. Saiorm require python3 and pymysql.
 
 3. Support MySQL only,you can inherit from saiorm.base.BaseDB to support other types
-of data values with the same API,like siaorm.MySQL.ChainDB.
+of database with the same API,like siaorm.MySQL.ChainDB.
 
 Initialization
 ~~~~~~~~~~~~~~
@@ -48,7 +47,7 @@ Initialization
 Usage for calling mysql function only
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-You can add "=" as a prefix to set the field to native function in method select and update.
+You can add "`" as a prefix to set the field to native function in method select and update.
 
 .. code:: python
 
@@ -128,19 +127,19 @@ insert function support two kinds of data
 
 .. code:: python
 
-    # use dict 1 natural
+    # use natural dict
     table.insert({
         "a": "1",
         "b": "2",
     })
 
-    # use dict 2
+    # use split dict
     table.insert({
         "fields": ["a", "b"],
         "values": ["1", "2"],
     })
 
-    # use natural dict in list, SQL statement will in one line
+    # use natural dict in list, SQL will in one line
     table.insert_many([{
         "a": "1",
         "b": "2",
@@ -152,7 +151,7 @@ insert function support two kinds of data
         "b": "6",
     }])
 
-    # use split dict in list, SQL statement will in one line
+    # use split dict in list, SQL will in one line
     table.insert_many({
         "fields": ["a", "b"],
         "values": [
