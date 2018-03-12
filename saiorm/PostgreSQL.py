@@ -68,6 +68,8 @@ class ConnectionPostgreSQL(object):
         改用 psycopg2 实现"""
         self.close()
 
+        # todo. It looks like not connected.
+
         print(self._db_args)
 
         self._db = psycopg2.connect(**self._db_args)
