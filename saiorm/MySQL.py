@@ -115,7 +115,7 @@ class ChainDB(base.BaseDB):
                         if v0[0] in ("<", ">", "!"):  # < <= > >= !=
                             v1 = v[1]
                             if isinstance(v1, str) and v1.startswith("`"):
-                                # native mysql function starts with `,only one param
+                                # native mysql function starts with `
                                 # JOIN STRING DIRECT
                                 v1 = v1.replace("`", "")
                                 if "?" in v1:
@@ -136,7 +136,7 @@ class ChainDB(base.BaseDB):
                             where += " {} BETWEEN %s AND %s AND".format(k)
                             sql_values += [v[1], v[2]]
                         elif sign.startswith("`"):
-                            # native mysql function starts with ,only one param
+                            # native mysql function starts with `
                             # JOIN STRING DIRECT
                             v0 = v0.replace("`", "")
                             if "?" in v0:
@@ -146,8 +146,7 @@ class ChainDB(base.BaseDB):
                     else:
                         if isinstance(v, str) and v.startswith("`"):
                             # native mysql function
-                            v = v[1:]
-                            where += " {}={} AND".format(k, v)
+                            where += " {}={} AND".format(k, v[1:])
                         else:
                             where += " {}=%s AND".format(k)
                             sql_values.append(v)

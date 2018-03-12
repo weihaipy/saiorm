@@ -24,7 +24,7 @@ It will take you have a very easy way to use SQL database.
 
 **ATTENTION**
 
-1. Saiorm does not convert value type in condition(limit,order_by,group_by,
+1. Saiorm does not convert value type in most condition(eg.limit,order_by,group_by,
 various join etc.),method where not convert value type in native functions and IN.
 If you want to use the values passed from user,you must check them,
 because it's easily to triggering injection vulnerability.
@@ -49,7 +49,7 @@ Initialization
     table = DB.table("xxx")
 
 Usage for calling mysql function only
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code:: python
 
@@ -198,7 +198,7 @@ will transform to SQL
     DELETE FROM xxx ;
 
 Usage for increase
-~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~
 
 Numerical field increase
 
@@ -213,7 +213,7 @@ will transform to SQL
     UPDATE xxx SET a=a+1
 
 Usage for decrease
-~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~
 
 Numerical field decrease
 
@@ -235,10 +235,10 @@ where condition
     table.where({
         "a": 1,
         "b": ("BETWEEN", "1", "2"),
-        "c": ("ABS(?)", "2"),
+        "c": ("`ABS(?)", "2"),
         "d": ("!=", 0),
         "e": ("IN", "1,2,3"),
-        "f": "NOW()",
+        "f": "`NOW()",
     }).select("e,f")
 
 - must check param to prevent injection vulnerabilities.
