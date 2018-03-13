@@ -35,7 +35,7 @@ class ConnectionSQLServer(object):
 
         args = dict(
             host=host,
-            port=int(port),  # todo check
+            port=str(port),
             user=user,
             password=password,
             database=database,
@@ -66,12 +66,11 @@ class ConnectionSQLServer(object):
 
     def reconnect(self):
         """Closes the existing database connection and re-opens it.
-        改用 psycopg2 实现"""
+        改用 pymssql 实现"""
         self.close()
 
         self._db = pymssql.connect(**self._db_args)
-        # todo check
-        self._db.set_session(autocommit=True)  # psycopg2 的设置方法不一样
+        self._db.autocommit(True)
 
     def iter(self, query, *parameters, **kwparameters):
         """Returns an iterator for the given query and parameters."""
@@ -119,11 +118,18 @@ class ConnectionSQLServer(object):
         try:
             self._execute(cursor, query, parameters, kwparameters)
             column_names = [d[0] for d in cursor.description]
+            #
+            # print(dir(cursor))
+            #
+            # for i in dir(cursor):
+            #     print(i, ":::", getattr(cursor, i))
+            #
+            # raise ValueError
 
             return {
-                "data": [Row(zip(column_names, row)) for row in cursor],
+                "data": [Row(zip(column_names, row)) for row in cursor.fetchall()],
                 "column_names": column_names,
-                "sql": to_unicode(cursor.query)  # 执行的语句
+                "sql": ""  # 执行的语句
             }
         finally:
             cursor.close()
@@ -137,7 +143,7 @@ class ConnectionSQLServer(object):
                 "lastrowid": cursor.lastrowid,  # 影响的主键id
                 "rowcount": cursor.rowcount,  # 影响的行数
                 "rownumber": cursor.rownumber,  # 行号
-                "sql": to_unicode(cursor.query)  # 执行的语句
+                "sql": ""  # 执行的语句
             }
         finally:
             cursor.close()
@@ -151,7 +157,7 @@ class ConnectionSQLServer(object):
                 "lastrowid": cursor.lastrowid,  # 影响的主键id
                 "rowcount": cursor.rowcount,  # 影响的行数
                 "rownumber": cursor.rownumber,  # 行号
-                "sql": to_unicode(cursor.query)  # 执行的语句
+                "sql": ""  # 执行的语句
             }
         finally:
             cursor.close()

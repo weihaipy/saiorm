@@ -65,8 +65,7 @@ class ConnectionPostgreSQL(object):
             self._db = None
 
     def reconnect(self):
-        """Closes the existing database connection and re-opens it.
-        改用 psycopg2 实现"""
+        """Closes the existing database connection and re-opens it."""
         self.close()
 
         self._db = psycopg2.connect(**self._db_args)
