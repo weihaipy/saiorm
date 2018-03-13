@@ -1,10 +1,14 @@
 Welcome to saiorm /saɪɔ:m/,塞翁
 ===============================
 
-Saiorm is a simple library for accessing database.
-It will take you have a very easy way to use SQL database.
+Saiorm is a simple lightweight library for accessing database.It will take you have a easy way to use SQL database.
 
-.. We want it to be an asynchronous framework,but not now.
+Only translate the params to SQL statements.Implements translation of relatively simple SQL statement.
+
+Support MySQL PostgreSQL and SQL Server.you can inherit from saiorm.base.ChainDB to support other
+types of database with the same API,like siaorm.PostgreSQL.ChainDB.
+
+Saiorm require pymysql pymssql psycopg2 for each database type.
 
 **Method:**
 
@@ -24,21 +28,18 @@ It will take you have a very easy way to use SQL database.
 
 **ATTENTION**
 
+- Saiorm does not convert value type in native functions and IN and other condition(eg.limit,order_by,group_by,various join).If you want to use the values passed from user,you must check them,because it's easily to triggering injection vulnerability.
 
-- Saiorm does not convert value type in native functions and IN and other condition(eg.limit,order_by,group_by,various join).
-If you want to use the values passed from user,you must check them,because it's easily to triggering injection vulnerability.
+- You can add "`" as a prefix to set the field to native function in method select and update etc.
 
-- Support MySQL and PostgreSQL only,you can inherit from saiorm.base.ChainDB to support other
- types of database with the same API,like siaorm.PostgreSQL.ChainDB.
-
-- Saiorm require python3 pymysql psycopg2.
-
-- You can add "`" as a prefix to set the field to native function in method select and update.
+- **SQL Server** will not get latest sql,always empty string.
 
 Initialization
 ~~~~~~~~~~~~~~
 
-saiorm.init() use MySQL by default,you could set database type by param driver explicitly.
+saiorm.init() use MySQL by default,you could set database type by param **driver** explicitly.
+
+If use **SQL Server**,you should pass **primary_key** to method table,because SQL Server do not support limit,we will use primary_key to implement method limit.
 
 use MySQL:
 
@@ -60,8 +61,17 @@ use PostgreSQL:
     DB.connect({"host": "", "port": "5432", "database": "", "user": "", "password": ""})
     table = DB.table("xxx")
 
+use SQL Server:
+
+.. code:: python
+
+    DB = saiorm.init(driver="SQLServer")   # without table name prefix
+    # DB = saiorm.init(driver="SQLServer", table_name_prefix="abc_") # with table name prefix
+    DB.connect({"host": "", "port": "1433", "database": "", "user": "", "password": ""})
+    table = DB.table("xxx", primary_key="id")  # For LIMIT implement with SQL Server
+
 Usage for calling native function only
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code:: python
 
@@ -76,14 +86,13 @@ will be transformed to SQL:
     SELECT SUM(1+2);
 
 Usage for select and get
-~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
-1. select will return all data
+- select and get receive a fields param.
 
-2. get will modify _limit attribute automatically,then return the latest line only.
-**If you call get method, limit method will be overwrited**
+- select will return all data.
 
-3. select and get receive a fields param.
+- get will overwrite method limit automatically,then return the latest line only.
 
 .. code:: python
 

@@ -5,15 +5,17 @@ import saiorm
 # MySQL
 # DB = saiorm.init()
 # DB.connect({"host": "127.0.0.1", "port": 3306, "database": "x", "user": "root", "password": "root"})
+# table = DB.table("xxx")
 
 # PostgreSQL
 # DB = saiorm.init(driver="PostgreSQL")
 # DB.connect({"host": "127.0.0.1", "port": "5432", "database": "x", "user": "postgres", "password": "123"})
-
+# table = DB.table("xxx")
 
 # SQLServer
 DB = saiorm.init(driver="SQLServer")
 DB.connect({"host": "127.0.0.1", "port": "1433", "database": "x", "user": "root", "password": "123"})
+table = DB.table("xxx", primary_key="id")  # For LIMIT implement with SQL Server
 
 # test mysql function
 res = DB.select("`ABS(-2)")
@@ -25,13 +27,15 @@ res = DB.select("`SUM(1+2)")
 print(DB.last_sql)
 
 # Normal usage
-table = DB.table("xxx")
-
 res = table.select()
 # print(res)
 print(DB.last_sql)
 
 res = table.order_by("a DESC").get()
+# print(res)
+print(DB.last_sql)
+
+res = table.limit("1,3").select("id,a")
 # print(res)
 print(DB.last_sql)
 

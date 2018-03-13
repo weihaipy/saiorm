@@ -118,13 +118,6 @@ class ConnectionSQLServer(object):
         try:
             self._execute(cursor, query, parameters, kwparameters)
             column_names = [d[0] for d in cursor.description]
-            #
-            # print(dir(cursor))
-            #
-            # for i in dir(cursor):
-            #     print(i, ":::", getattr(cursor, i))
-            #
-            # raise ValueError
 
             return {
                 "data": [Row(zip(column_names, row)) for row in cursor.fetchall()],
@@ -166,3 +159,68 @@ class ConnectionSQLServer(object):
 class ChainDB(base.ChainDB):
     def connect(self, config_dict=None):
         self.db = ConnectionSQLServer(**config_dict)
+
+    def select(self, fields="*"):
+        """
+        fields is fields or native sql function,
+        ,use DB().select("=now()") will run SELECT now()
+
+        :param primary_key: str, for SQL Server only
+        """
+        condition_values = []
+        pre_sql = ""
+        pre_where = ""
+
+        if fields.startswith("`"):  # native function
+            sql = self.gen_select_without_fields(fields[1:])
+        else:
+            if self._limit:
+                _limit = str(self._limit)
+
+                if "," not in _limit:
+                    pre_sql = "SELECT TOP {} {} FROM {} ".format(_limit, fields, self._table)
+                else:
+                    m, n = _limit.split(",")
+                    if self._where:
+                        # todo 解决语句拼接方法
+                        param = {
+                            "m": m,
+                            # "n": n,
+                            "fields": fields,
+                            "table": self._table,
+                            "pk": self._primary_key
+                        }
+                        pre_where = "WHERE {pk} NOT IN (SELECT TOP {m}-1 {pk} FROM {table})".format(param)
+                        self._where = None  # clean self._where
+                    else:
+                        param = {
+                            "m": m,
+                            "n": n,
+                            "fields": fields,
+                            "table": self._table,
+                            "pk": self._primary_key
+                        }
+                        pre_sql = "SELECT TOP ({n}-{m}+1) {fields} FROM {table} " \
+                                  "WHERE {pk} NOT IN (SELECT TOP {m}-1 {pk} FROM {table})".format(**param)
+                self._limit = None  # clean self._limit
+
+            else:
+                pre_sql = "SELECT {} FROM {} ".format(fields, self._table)
+
+            condition_sql, condition_values = self.parse_condition()
+
+            if condition_sql.startswith("WHERE") and pre_where:
+                condition_sql = condition_sql.replace("WHERE", pre_where + " ")
+
+            sql = pre_sql + condition_sql
+
+        res = self.query(sql, *condition_values)
+        self.last_sql = res["sql"]
+        if self.grace_result:
+            res["data"] = [GraceDict(i) for i in res["data"]]
+
+        return res["data"]
+
+    def gen_get_fields_name(self):
+        """get one line from table"""
+        return "SELECT TOP 1 * FROM {};".format(self._table)

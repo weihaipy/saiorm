@@ -19,10 +19,12 @@ class BaseDB(object):
     After initialization with table name,use config_db to set connected database.
 
     In JOIN,use ### as table name prefix placeholder.
+
+    If use SQL Server, param primary_key is necessary,used in the LIMIT implement tec.
     """
 
     def __init__(self, table_name_prefix="", debug=False, strict=True,
-                 cache_fields_name=True, grace_result=True):
+                 cache_fields_name=True, grace_result=True, primary_key=""):
         self.db = None
         self.table_name_prefix = table_name_prefix
         self.debug = debug
@@ -33,6 +35,7 @@ class BaseDB(object):
         self.grace_result = grace_result
 
         self._table = ""
+        self._primary_key = primary_key  # For SQL Server
         self._where = ""
         self._order_by = ""
         self._group_by = ""
@@ -81,7 +84,7 @@ class BaseDB(object):
         self._reset()  # reset param
         return res
 
-    def table(self, table_name=""):
+    def table(self, table_name="", primary_key=""):
         """
         If table_name is empty,use DB().select("now()") will run SELECT now()
         """
@@ -90,6 +93,7 @@ class BaseDB(object):
             table_name += self.table_name_prefix
 
         self._table = table_name
+        self._primary_key = primary_key
         return self
 
     def where(self, condition):
@@ -134,8 +138,6 @@ class BaseDB(object):
         return self
 
     def select(self, fields="*"):
-        # raise NotImplementedError("You must implement it in subclass")
-
         """
         fields is fields or native sql function,
         ,use DB().select("=now()") will run SELECT now()
@@ -212,7 +214,7 @@ class BaseDB(object):
             sql = self.gen_insert_with_fields(fields, values_sign)
         else:
             sql = self.gen_insert_without_fields(values_sign)
-        values = tuple(values)
+        values = tuple([tuple(i) for i in values])
         res = self.execute(sql, *values)
         self.last_sql = res["sql"]
         return res
@@ -258,6 +260,8 @@ class BaseDB(object):
             sql = self.gen_insert_with_fields(fields, values_sign)
         else:
             sql = self.gen_insert_without_fields(values_sign)
+
+        values = tuple([tuple(i) for i in values])
 
         res = self.executemany(sql, values)
         self.last_sql = res["sql"]
