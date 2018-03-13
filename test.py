@@ -11,7 +11,7 @@ DB = saiorm.init(driver="PostgreSQL")
 DB.connect({"host": "127.0.0.1", "port": "5432", "database": "x", "user": "postgres", "password": "123"})
 
 # test mysql function
-res = DB.select("`NOW()")
+res = DB.select("`ABS(-2)")
 # print(res)
 print(DB.last_sql)
 
@@ -22,7 +22,7 @@ print(DB.last_sql)
 # Normal usage
 table = DB.table("xxx")
 
-res = table.select()  # todo PostgreSQL stops here
+res = table.select()
 # print(res)
 print(DB.last_sql)
 
@@ -36,7 +36,7 @@ res = table.where({
     "c": ("`ABS(?)", "2"),
     "d": ("!=", 0),
     "e": ("IN", "1,2,3"),
-    "f": "`NOW()",
+    "f": "`ABS(-2)",
 }).select("e,f")
 # print(res)
 print(DB.last_sql)
