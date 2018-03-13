@@ -173,7 +173,8 @@ will be transformed to SQL:
     INSERT INTO xxx (a,b) VALUES ('1','2'),('3','4'),('5','6');
     INSERT INTO xxx (a,b) VALUES ('1','2'),('3','4'),('5','6');
 
-If pass split dict to insert_many,key fields is not necessary,it will insert by the order of table struct.
+If pass split dict to insert or insert_many,fields is not necessary,
+if the dict has values only,it will insert by the order of table struct.
 
 Usage for delete
 ~~~~~~~~~~~~~~~~

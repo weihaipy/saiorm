@@ -200,6 +200,9 @@ class BaseDB(object):
         if "fields" in keys and "values" in keys:  # split dict
             fields = ",".join(dict_data["fields"])
             values = [v for v in dict_data["values"]]
+        elif "values" in keys and len(keys) == 1:  # split dict without fields
+            fields = None
+            values = [v for v in dict_data["values"]]
         else:  # natural dict
             fields = ",".join(keys)
             values = dict_data.values()
@@ -241,7 +244,10 @@ class BaseDB(object):
         elif isinstance(dict_data, dict):  # 字段名和值分开传
             keys = dict_data.get("fields")
             if keys:
-                fields = ",".join(dict_data["fields"])
+                if "values" in keys and len(keys) == 1:  # split dict without fields
+                    fields = None
+                else:
+                    fields = ",".join(dict_data["fields"])
             values = list([v for v in dict_data["values"]])  # 字典的 values 先转换
             values_sign = ",".join(["%s" for f in keys])
         else:
