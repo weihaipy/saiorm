@@ -48,7 +48,7 @@ use MySQL:
 
     import saiorm
 
-    DB = saiorm.init()  # with no table name prefix
+    DB = saiorm.init()  # without table name prefix
     # DB = saiorm.init(table_name_prefix="abc_") # mysql with table name prefix
     DB.connect({"host": "", "port": 3306, "database": "", "user": "", "password": ""})
     table = DB.table("xxx")
@@ -57,7 +57,7 @@ use PostgreSQL:
 
 .. code:: python
 
-    DB = saiorm.init(driver="PostgreSQL")   # with no table name prefix
+    DB = saiorm.init(driver="PostgreSQL")   # without table name prefix
     # DB = saiorm.init(driver="PostgreSQL", table_name_prefix="abc_") # with table name prefix
     DB.connect({"host": "", "port": "5432", "database": "", "user": "", "password": ""})
     table = DB.table("xxx")
