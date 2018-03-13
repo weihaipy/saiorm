@@ -21,6 +21,8 @@ class BaseDB(object):
     In JOIN,use ### as table name prefix placeholder.
 
     If use SQL Server, param primary_key is necessary,used in the LIMIT implement tec.
+
+    TODO support FULL OUTER JOIN and FULL JOIN.
     """
 
     def __init__(self, table_name_prefix="", debug=False, strict=True,

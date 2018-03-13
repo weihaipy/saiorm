@@ -19,8 +19,9 @@ Task
 - [x] Support PostgreSQL
 - [x] Support SQL Server, not return the latest query
 - [ ] Support Oracle Database
+- [ ] Support MongoDB
 
-If you want to support other database,just implement with the same API
+If you want to support other database,just implement like siaorm.PostgreSQL.ChainDB.
 
 like Saiorm.PostgreSQL.CoherentDB and add a few driver code to Saiorm.init.
 

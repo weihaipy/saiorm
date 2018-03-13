@@ -200,14 +200,16 @@ class ChainDB(base.ChainDB):
                         pre_sql = "SELECT TOP ({n}-{m}+1) {fields} FROM {table} " \
                                   "WHERE {pk} NOT IN (SELECT TOP {m}-1 {pk} FROM {table})".format(**param)
                 self._limit = None  # clean self._limit
-
             else:
                 pre_sql = "SELECT {} FROM {} ".format(fields, self._table)
 
             condition_sql, condition_values = self.parse_condition()
 
-            if condition_sql.startswith("WHERE") and pre_where:
-                condition_sql = condition_sql.replace("WHERE", pre_where + " ")
+            if pre_where:
+                if condition_sql.startswith("WHERE"):
+                    condition_sql = pre_where + " AND " + condition_sql[len("WHERE"):]
+                else:
+                    condition_sql = pre_where + " AND " + condition_sql
 
             sql = pre_sql + condition_sql
 
