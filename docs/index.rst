@@ -14,18 +14,18 @@ It will take you have a very easy way to use SQL database.
 
 - Method **get_fields_name** get a list of all fields name, cache them by default.
 
-- Method **where** could be dict or str type. **IN** require a string or a sequence with str type.
+- Method **where** receive dict or str type. **IN** require a string or a sequence with str.
 
 - Method **select** and **get** return data only.
 
 - Method **update**, **delete**, **execute** return a dict,including lastrowid, rowcount, rownumber, sql.
 
-- Various method join,should use string param for method join and method where.
+- Use various method **join**,should use string for method join and method where.
 
 **ATTENTION**
 
-1. Saiorm does not convert value type in most condition(eg.limit,order_by,group_by,
-various join etc.),method where not convert value type in native functions and IN.
+1. Saiorm does not convert value type in native functions and IN and other condition
+(eg.limit,order_by,group_by,various join).
 If you want to use the values passed from user,you must check them,
 because it's easily to triggering injection vulnerability.
 
@@ -56,7 +56,7 @@ Usage for calling mysql function only
     DB.select("`NOW()")
     DB.select("`SUM(1+2)")
 
-will transform to SQL
+will be transformed to SQL:
 
 .. code:: sql
 
@@ -91,7 +91,7 @@ Usage for select and get
         "f": "`NOW()",
     }).select("e,f")
 
-will transform to SQL
+will be transformed to SQL:
 
 .. code:: sql
 
@@ -115,7 +115,7 @@ If you want use native function,you can pass a tuple.
         "e": "2",
     })
 
-will transform to SQL
+will be transformed to SQL:
 
 .. code:: sql
 
@@ -164,7 +164,7 @@ insert function support two kinds of data
     })
 
 
-will transform to SQL
+will be transformed to SQL:
 
 .. code:: sql
 
@@ -190,7 +190,7 @@ By default, **delete** must have **where** condition,or you can pass strict=Fals
 
     table.delete()  # will not be executed, or set strict=False when initialization
 
-will transform to SQL
+will be transformed to SQL:
 
 .. code:: sql
 
@@ -206,7 +206,7 @@ Numerical field increase
 
     table.increase("a", 1)
 
-will transform to SQL
+will be transformed to SQL:
 
 .. code:: sql
 
@@ -221,7 +221,7 @@ Numerical field decrease
 
     table.decrease("a", 1)
 
-will transform to SQL
+will be transformed to SQL:
 
 .. code:: sql
 
