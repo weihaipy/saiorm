@@ -164,8 +164,6 @@ class ChainDB(base.ChainDB):
         """
         fields is fields or native sql function,
         ,use DB().select("=now()") will run SELECT now()
-
-        :param primary_key: str, for SQL Server only
         """
         condition_values = []
         pre_sql = ""
@@ -174,6 +172,7 @@ class ChainDB(base.ChainDB):
         if fields.startswith("`"):  # native function
             sql = self.gen_select_without_fields(fields[1:])
         else:
+            # implement LIMIT here
             if self._limit:
                 _limit = str(self._limit)
 
@@ -182,10 +181,8 @@ class ChainDB(base.ChainDB):
                 else:
                     m, n = _limit.split(",")
                     if self._where:
-                        # todo 解决语句拼接方法
                         param = {
                             "m": m,
-                            # "n": n,
                             "fields": fields,
                             "table": self._table,
                             "pk": self._primary_key
