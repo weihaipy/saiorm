@@ -44,3 +44,20 @@ class GraceDict(dict):
 
 def is_array(obj):
     return isinstance(obj, tuple) or isinstance(obj, list)
+
+
+def to_unicode(value):
+    """
+    Converts a string argument to a unicode string.
+
+    If the argument is already a unicode string, it is returned unchanged.
+    Otherwise it must be a bytes or bytearray string and is decoded as utf8.
+    """
+    if isinstance(value, str):
+        return value
+    if not isinstance(value, (bytes, bytearray)):
+        print(value)
+        raise TypeError(
+            "Expected str, bytes, bytearray; got %r" % type(value)
+        )
+    return value.decode("utf-8")

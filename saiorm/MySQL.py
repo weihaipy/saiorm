@@ -24,6 +24,7 @@ torndb = x_torndb
 Row = torndb.Row
 GraceDict = utility.GraceDict
 is_array = utility.is_array
+to_unicode = utility.to_unicode
 
 
 class ConnectionMySQL(torndb.Connection):
@@ -36,7 +37,7 @@ class ConnectionMySQL(torndb.Connection):
             return {
                 "data": [Row(zip(column_names, row)) for row in cursor],
                 "column_names": column_names,
-                "sql": cursor._executed  # 执行的语句
+                "sql": to_unicode(cursor._executed)  # 执行的语句
             }
         finally:
             cursor.close()
@@ -50,7 +51,7 @@ class ConnectionMySQL(torndb.Connection):
                 "lastrowid": cursor.lastrowid,  # 影响的主键id
                 "rowcount": cursor.rowcount,  # 影响的行数
                 "rownumber": cursor.rownumber,  # 行号
-                "sql": cursor._executed  # 执行的语句
+                "sql": to_unicode(cursor._executed)  # 执行的语句
             }
         finally:
             cursor.close()
@@ -64,7 +65,7 @@ class ConnectionMySQL(torndb.Connection):
                 "lastrowid": cursor.lastrowid,  # 影响的主键id
                 "rowcount": cursor.rowcount,  # 影响的行数
                 "rownumber": cursor.rownumber,  # 行号
-                "sql": cursor._executed  # 执行的语句
+                "sql": to_unicode(cursor._executed)  # 执行的语句
             }
         finally:
             cursor.close()
