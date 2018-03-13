@@ -4,7 +4,7 @@ saiorm
 `Saiorm <https://weihaipy.github.io/saiorm>`_  is a simple library for accessing database.
 It will take you have a easy way to use SQL database.
 
-The goal is to be an asynchronous framework,but not now.
+.. The goal is to be an asynchronous framework,but not now.
 
 Documentation
 -------------
@@ -16,10 +16,10 @@ Task
 
 - [x] transform to SQL
 - [x] Support MySQL
-- [ ] Support PostgreSQL now
+- [x] Support PostgreSQL
 - [ ] Support SQLserver
 - [ ] Support Oracle Database
 
 If you want to support other database,just implement with the same API
 
-like Saiorm.MySQL.CoherentDB and add a few driver code to Saiorm.init.
+like Saiorm.PostgreSQL.CoherentDB and add a few driver code to Saiorm.init.

@@ -3,12 +3,12 @@
 import saiorm
 
 # MySQL
-DB = saiorm.init()
-DB.connect({"host": "127.0.0.1", "port": 3306, "database": "x", "user": "root", "password": "root"})
+# DB = saiorm.init()
+# DB.connect({"host": "127.0.0.1", "port": 3306, "database": "x", "user": "root", "password": "root"})
 
 # PostgreSQL
-# DB = saiorm.init(driver="PostgreSQL")
-# DB.connect({"host": "127.0.0.1", "port": "5432", "database": "x", "user": "postgres", "password": "123"})
+DB = saiorm.init(driver="PostgreSQL")
+DB.connect({"host": "127.0.0.1", "port": "5432", "database": "x", "user": "postgres", "password": "123"})
 
 # test mysql function
 res = DB.select("`ABS(-2)")

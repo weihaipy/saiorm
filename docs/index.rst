@@ -31,24 +31,37 @@ because it's easily to triggering injection vulnerability.
 
 2. Saiorm require python3 and pymysql.
 
-3. Support MySQL only,you can inherit from saiorm.base.BaseDB to support other types
-of database with the same API,like siaorm.MySQL.ChainDB.
+3. Support MySQL and PostgreSQL only,you can inherit from saiorm.base.BaseDB to support other types
+of database with the same API,like siaorm.PostgreSQL.ChainDB.
 
 4. You can add "`" as a prefix to set the field to native function in method select and update.
 
 Initialization
 ~~~~~~~~~~~~~~
 
+saiorm.init() use MySQL by default,you could set database type by param driver explicitly.
+
+use MySQL:
+
 .. code:: python
 
     import saiorm
 
     DB = saiorm.init()  # with no table name prefix
-    # DB = saiorm.init(table_name_prefix="abc_") # with table name prefix
+    # DB = saiorm.init(table_name_prefix="abc_") # mysql with table name prefix
     DB.connect({"host": "", "port": 3306, "database": "", "user": "", "password": ""})
     table = DB.table("xxx")
 
-Usage for calling mysql function only
+use PostgreSQL:
+
+.. code:: python
+
+    DB = saiorm.init(driver="PostgreSQL")   # with no table name prefix
+    # DB = saiorm.init(driver="PostgreSQL", table_name_prefix="abc_") # with table name prefix
+    DB.connect({"host": "", "port": "5432", "database": "", "user": "", "password": ""})
+    table = DB.table("xxx")
+
+Usage for calling native function only
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code:: python
