@@ -82,7 +82,7 @@ Usage for select and get
     table.order_by("id DESC").get()
 
     # kinds of params in where
-        table.where({
+    table.where({
         "a": 1,
         "b": ("BETWEEN", "1", "2"),
         "c": ("`ABS(?)", "2"),
