@@ -153,8 +153,9 @@ class ChainDB(base.BaseDB):
         sql = ""
         sql_values = []
         if self._where:
-            where = self._where
-            if isinstance(self._where, dict):
+            if isinstance(self._where, str):
+                sql += "WHERE" + self._where
+            elif isinstance(self._where, dict):
                 where = ""
                 for k in self._where.keys():
                     v = self._where[k]
