@@ -3,40 +3,20 @@
 import saiorm
 
 # MySQL
-# DB = saiorm.init()
-# DB.connect({"host": "127.0.0.1", "port": 3306, "database": "x", "user": "root", "password": "root"})
-# table = DB.table("xxx")
+DB = saiorm.init()
+DB.connect({"host": "127.0.0.1", "port": 3306, "database": "x", "user": "root", "password": "root"})
+table = DB.table("xxx")
 
 # PostgreSQL
 # DB = saiorm.init(driver="PostgreSQL")
 # DB.connect({"host": "127.0.0.1", "port": "5432", "database": "x", "user": "postgres", "password": "123"})
 # table = DB.table("xxx")
 
-# import _mssql
-#
-# conn = _mssql.connect(server='127.0.0.1', user='root', password='123', \
-#                       database='x')
-#
-# employeedata = conn.execute_row("SELECT * FROM xxx")
-#
-# print("conn::", conn)
-# for i in dir(conn):
-#     print(i, getattr(conn, i))
-#
-# print("-"*30)
-# print("get_header::", conn.get_header())
-# print("get_iterator::", conn.get_iterator())
-
-
-# print("employeedata::", employeedata)
-
-# raise ValueError
-
 # SQLServer
-DB = saiorm.init(driver="SQLServer")
-DB.connect({"host": "127.0.0.1", "port": "1433", "database": "x", "user": "root", "password": "123"},
-           return_sql=True)
-table = DB.table("xxx", primary_key="id")  # For LIMIT implement with SQL Server
+# DB = saiorm.init(driver="SQLServer")
+# DB.connect({"host": "127.0.0.1", "port": "1433", "database": "x", "user": "root", "password": "123"},
+#            return_sql=True)
+# table = DB.table("xxx", primary_key="id")  # For LIMIT implement with SQL Server
 
 # test mysql function
 res = DB.select("`ABS(-2)")
