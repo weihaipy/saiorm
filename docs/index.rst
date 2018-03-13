@@ -24,17 +24,18 @@ It will take you have a very easy way to use SQL database.
 
 **ATTENTION**
 
-1. Saiorm does not convert value type in native functions and IN and other condition
+
+- Saiorm does not convert value type in native functions and IN and other condition
 (eg.limit,order_by,group_by,various join).
 If you want to use the values passed from user,you must check them,
 because it's easily to triggering injection vulnerability.
 
-2. Saiorm require python3 and pymysql.
+- Support MySQL and PostgreSQL only,you can inherit from saiorm.base.BaseDB to support other
+ types of database with the same API,like siaorm.PostgreSQL.ChainDB.
 
-3. Support MySQL and PostgreSQL only,you can inherit from saiorm.base.BaseDB to support other types
-of database with the same API,like siaorm.PostgreSQL.ChainDB.
+- Saiorm require python3 pymysql psycopg2.
 
-4. You can add "`" as a prefix to set the field to native function in method select and update.
+- You can add "`" as a prefix to set the field to native function in method select and update.
 
 Initialization
 ~~~~~~~~~~~~~~
