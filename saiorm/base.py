@@ -341,3 +341,158 @@ class BaseDB(object):
 
     def parse_condition(self):
         raise NotImplementedError("You must implement it in subclass")
+
+
+class ChainDB(BaseDB):
+    """
+    Common SQL class,Most basic SQL statements are same as each other.
+
+    Implement the different only.
+    """
+
+    def gen_select_with_fields(self, fields, condition):
+        return "SELECT {} FROM {} {};".format(fields, self._table, condition)
+
+    def gen_select_without_fields(self, fields):
+        return "SELECT {};".format(fields)
+
+    def split_update_fields_value(self, dict_data):
+        """
+        generate str ike filed_name = %s and values,use for update
+        :return: tuple
+        """
+        fields = ""
+        values = []
+        for k in dict_data.keys():
+            v = dict_data[k]
+
+            if isinstance(v, str):
+                if v.startswith("`"):  # native function without param
+                    v = v[1:]
+                    fields += "{}={},".format(k, v)
+                else:
+                    fields += k + "=%s,"
+                    values.append(v)
+            elif is_array(v):  # native function with param
+                v0 = v[0]
+                if v0.startswith("`"):
+                    v0 = v0[1:]
+                v0 = v0.replace("?", "%s")
+                fields += "{}={},".format(k, v0)
+                values.append(v[1])
+
+        if fields:
+            fields = fields[:-1]
+
+        return fields, values
+
+    def gen_update(self, fields, condition):
+        return "UPDATE {} SET {} {};".format(self._table, fields, condition)
+
+    def gen_insert_with_fields(self, fields, values_sign):
+        return "INSERT INTO {} ({}) VALUES ({});".format(self._table, fields, values_sign)
+
+    def gen_insert_without_fields(self, values_sign):
+        return "INSERT INTO {} VALUES ({});".format(self._table, values_sign)
+
+    def gen_insert_many_with_fields(self, fields, values_sign):
+        return "INSERT INTO {} ({}) VALUES ({});".format(self._table, fields, values_sign)
+
+    def gen_insert_many_without_fields(self, values_sign):
+        return "INSERT INTO {}  VALUES ({});".format(self._table, values_sign)
+
+    def gen_delete(self, condition):
+        return "DELETE FROM {} {};".format(self._table, condition)
+
+    def gen_increase(self, field, step):
+        """number field Increase """
+        return "UPDATE {} SET {}={}+{};".format(self._table, field, field, step)
+
+    def gen_decrease(self, field, step=1):
+        """number field decrease """
+        return "UPDATE {} SET {}={}-{};".format(self._table, field, field, str(step))
+
+    def gen_get_fields_name(self):
+        """get one line from table"""
+        return "SELECT * FROM {} LIMIT 1;".format(self._table)
+
+    def parse_condition(self):
+        """
+        generate query condition
+
+        **ATTENTION**
+
+        You must check the parameters to prevent injection vulnerabilities
+
+        """
+        sql = ""
+        sql_values = []
+        if self._where:
+            if isinstance(self._where, str):
+                sql += "WHERE" + self._where
+            elif isinstance(self._where, dict):
+                where = ""
+                for k in self._where.keys():
+                    v = self._where[k]
+                    if is_array(v):
+                        v0 = v[0]
+                        sign = v0.strip()
+
+                        if v0[0] in ("<", ">", "!"):  # < <= > >= !=
+                            v1 = v[1]
+                            if isinstance(v1, str) and v1.startswith("`"):
+                                # native mysql function starts with `
+                                # JOIN STRING DIRECT
+                                v1 = v1.replace("`", "")
+                                if "?" in v1:
+                                    v0 = v0.replace("?", "{}")
+                                    v = v0.format(*v[1:])
+                                where += " {}{}{} AND".format(k, sign, v)
+                            else:
+                                where += " {}{}%s AND".format(k, sign)
+                                sql_values.append(v[1])
+                        elif sign.lower() == "in":  # IN
+                            # JOIN STRING DIRECT
+                            v1 = v[1]
+                            if v1:
+                                if is_array(v1):
+                                    v1 = ",".join(v1)
+                                where += " {} IN ({}) AND".format(k, v1)
+                        elif sign.lower() == "between":  # BETWEEN
+                            where += " {} BETWEEN %s AND %s AND".format(k)
+                            sql_values += [v[1], v[2]]
+                        elif sign.startswith("`"):
+                            # native mysql function starts with `
+                            # JOIN STRING DIRECT
+                            v0 = v0.replace("`", "")
+                            if "?" in v0:
+                                v0 = v0.replace("?", "{}")
+                                v0 = v0.format(*v[1:])
+                            where += " {}={} AND".format(k, v0)
+                    else:
+                        if isinstance(v, str) and v.startswith("`"):
+                            # native mysql function
+                            where += " {}={} AND".format(k, v[1:])
+                        else:
+                            where += " {}=%s AND".format(k)
+                            sql_values.append(v)
+                if where:
+                    sql += "WHERE" + where[:-3]  # trim the last AND character
+
+        if self._inner_join:
+            sql += " INNER JOIN {} ON {}".format(self._inner_join, self._on)
+        elif self._left_join:
+            sql += " LEFT JOIN {} ON {}".format(self._left_join, self._on)
+        elif self._right_join:
+            sql += " RIGHT JOIN {} ON {}".format(self._right_join, self._on)
+
+        if self._order_by:
+            sql += " ORDER BY " + self._order_by
+
+        if self._limit:
+            sql += " LIMIT " + str(self._limit)
+
+        if self._group_by:
+            sql += " GROUP BY " + self._group_by
+
+        return sql, sql_values
