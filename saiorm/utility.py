@@ -56,7 +56,6 @@ def to_unicode(value):
     if isinstance(value, str):
         return value
     if not isinstance(value, (bytes, bytearray)):
-        print(value)
         raise TypeError(
             "Expected str, bytes, bytearray; got %r" % type(value)
         )

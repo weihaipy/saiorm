@@ -17,7 +17,7 @@ Task
 - [x] transform to SQL
 - [x] Support MySQL
 - [x] Support PostgreSQL
-- [ ] Support SQLserver
+- [ ] Support SQLserver now
 - [ ] Support Oracle Database
 
 If you want to support other database,just implement with the same API
