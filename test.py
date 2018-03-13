@@ -12,9 +12,30 @@ import saiorm
 # DB.connect({"host": "127.0.0.1", "port": "5432", "database": "x", "user": "postgres", "password": "123"})
 # table = DB.table("xxx")
 
+# import _mssql
+#
+# conn = _mssql.connect(server='127.0.0.1', user='root', password='123', \
+#                       database='x')
+#
+# employeedata = conn.execute_row("SELECT * FROM xxx")
+#
+# print("conn::", conn)
+# for i in dir(conn):
+#     print(i, getattr(conn, i))
+#
+# print("-"*30)
+# print("get_header::", conn.get_header())
+# print("get_iterator::", conn.get_iterator())
+
+
+# print("employeedata::", employeedata)
+
+# raise ValueError
+
 # SQLServer
 DB = saiorm.init(driver="SQLServer")
-DB.connect({"host": "127.0.0.1", "port": "1433", "database": "x", "user": "root", "password": "123"})
+DB.connect({"host": "127.0.0.1", "port": "1433", "database": "x", "user": "root", "password": "123"},
+           return_sql=True)
 table = DB.table("xxx", primary_key="id")  # For LIMIT implement with SQL Server
 
 # test mysql function
@@ -61,6 +82,7 @@ res = table.where({
 # print(res)
 print(DB.last_sql)
 
+# todo mmsql de insert 不能都转为元组,可能导致别的问题
 res = table.insert({
     "a": "1",
     "b": "2",

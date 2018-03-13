@@ -28,10 +28,13 @@ to_unicode = utility.to_unicode
 
 class ConnectionSQLServer(object):
     def __init__(self, host, port, database, user=None, password=None,
-                 max_idle_time=7 * 3600):
+                 max_idle_time=7 * 3600, return_sql=False):
         self.host = host
         self.database = database
         self.max_idle_time = float(max_idle_time)
+        self._return_sql = return_sql
+
+        print("return_sql::", return_sql)
 
         args = dict(
             host=host,
@@ -104,12 +107,12 @@ class ConnectionSQLServer(object):
         try:
             return cursor.execute(query, kwparameters or parameters)
         except Exception as e:
-            logging.error("Error connecting to SQLServer on %s", self.host)
+            logging.error("Error connecting to MySQL on %s", self.host)
             logging.error("Error query: %s", query)
             logging.error("Error parameters: %s", parameters)
             logging.error("Error kwparameters: %s", kwparameters)
             self.close()
-            print("SQLServer Error Info:", e)
+            print("Mysql Error Info:", e)
             raise
 
     def query_return_detail(self, query, *parameters, **kwparameters):
@@ -117,12 +120,20 @@ class ConnectionSQLServer(object):
         cursor = self._cursor()
         try:
             self._execute(cursor, query, parameters, kwparameters)
-            column_names = [d[0] for d in cursor.description]
-
+            if self._return_sql:
+                sql = query.replace("%s", "{}").format(*parameters)
+            else:
+                sql = ""
+            if cursor.description:
+                column_names = [d[0] for d in cursor.description]
+                data = [Row(zip(column_names, row)) for row in cursor.fetchall()]
+            else:
+                column_names = []
+                data = []
             return {
-                "data": [Row(zip(column_names, row)) for row in cursor.fetchall()],
+                "data": data,
                 "column_names": column_names,
-                "sql": ""  # 执行的语句
+                "sql": sql  # 执行的语句
             }
         finally:
             cursor.close()
@@ -132,11 +143,15 @@ class ConnectionSQLServer(object):
         cursor = self._cursor()
         try:
             self._execute(cursor, query, parameters, kwparameters)
+            if self._return_sql:
+                sql = query.replace("%s", "{}").format(*parameters)
+            else:
+                sql = ""
             return {
                 "lastrowid": cursor.lastrowid,  # 影响的主键id
                 "rowcount": cursor.rowcount,  # 影响的行数
                 "rownumber": cursor.rownumber,  # 行号
-                "sql": ""  # 执行的语句
+                "sql": sql  # 执行的语句
             }
         finally:
             cursor.close()
@@ -146,19 +161,41 @@ class ConnectionSQLServer(object):
         cursor = self._cursor()
         try:
             cursor.executemany(query, parameters)
+            if self._return_sql:
+                sql = query.replace("%s", "{}").format(*parameters)
+            else:
+                sql = ""
             return {
                 "lastrowid": cursor.lastrowid,  # 影响的主键id
                 "rowcount": cursor.rowcount,  # 影响的行数
                 "rownumber": cursor.rownumber,  # 行号
-                "sql": ""  # 执行的语句
+                "sql": sql  # 执行的语句
             }
         finally:
             cursor.close()
 
 
 class ChainDB(base.ChainDB):
-    def connect(self, config_dict=None):
+    def __init__(self, table_name_prefix="", debug=False, strict=True,
+                 cache_fields_name=True, grace_result=True, primary_key=""):
+        self._primary_key = primary_key  # For SQL Server
+        self._return_sql = None
+        super().__init__(table_name_prefix=table_name_prefix, debug=debug, strict=strict,
+                         cache_fields_name=cache_fields_name, grace_result=grace_result)
+
+    def connect(self, config_dict=None, return_sql=False):
+        config_dict["return_sql"] = return_sql
+
+        print("return_sql:2:", return_sql)
         self.db = ConnectionSQLServer(**config_dict)
+
+    def table(self, table_name="", primary_key=""):
+        """
+        If table_name is empty,use DB().select("now()") will run SELECT now()
+        """
+        self._primary_key = primary_key
+        super().table(table_name=table_name)
+        return self
 
     def select(self, fields="*"):
         """

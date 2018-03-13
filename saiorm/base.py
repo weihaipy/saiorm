@@ -26,7 +26,7 @@ class BaseDB(object):
     """
 
     def __init__(self, table_name_prefix="", debug=False, strict=True,
-                 cache_fields_name=True, grace_result=True, primary_key=""):
+                 cache_fields_name=True, grace_result=True):
         self.db = None
         self.table_name_prefix = table_name_prefix
         self.debug = debug
@@ -37,7 +37,7 @@ class BaseDB(object):
         self.grace_result = grace_result
 
         self._table = ""
-        self._primary_key = primary_key  # For SQL Server
+
         self._where = ""
         self._order_by = ""
         self._group_by = ""
@@ -86,7 +86,7 @@ class BaseDB(object):
         self._reset()  # reset param
         return res
 
-    def table(self, table_name="", primary_key=""):
+    def table(self, table_name=""):
         """
         If table_name is empty,use DB().select("now()") will run SELECT now()
         """
@@ -95,7 +95,6 @@ class BaseDB(object):
             table_name += self.table_name_prefix
 
         self._table = table_name
-        self._primary_key = primary_key
         return self
 
     def where(self, condition):
@@ -216,7 +215,7 @@ class BaseDB(object):
             sql = self.gen_insert_with_fields(fields, values_sign)
         else:
             sql = self.gen_insert_without_fields(values_sign)
-        values = tuple([tuple(i) for i in values])
+
         res = self.execute(sql, *values)
         self.last_sql = res["sql"]
         return res
@@ -236,23 +235,22 @@ class BaseDB(object):
         if not dict_data:
             return False
 
-        fields = ""  # 所有的字段
+        fields = ""  # all fields
 
-        # 列表或元祖的结构必须一样
         if is_array(dict_data):
-            dict_data_item_1 = dict_data[0]  # 应该是字典
+            dict_data_item_1 = dict_data[0]  # should be dict
             keys = dict_data_item_1.keys()
             fields = ",".join(keys)
-            values = [tuple(i.values()) for i in dict_data]  # 字典的 values 先转换
+            values = [tuple(i.values()) for i in dict_data]
             values_sign = ",".join(["%s" for f in keys])
-        elif isinstance(dict_data, dict):  # 字段名和值分开传
+        elif isinstance(dict_data, dict):  # split dict
             keys = dict_data.get("fields")
             if keys:
                 if "values" in keys and len(keys) == 1:  # split dict without fields
                     fields = None
                 else:
                     fields = ",".join(dict_data["fields"])
-            values = list([v for v in dict_data["values"]])  # 字典的 values 先转换
+            values = list([v for v in dict_data["values"]])
             values_sign = ",".join(["%s" for f in keys])
         else:
             logging.error("Param should be list or tuple or dict")
@@ -263,7 +261,7 @@ class BaseDB(object):
         else:
             sql = self.gen_insert_without_fields(values_sign)
 
-        values = tuple([tuple(i) for i in values])
+        values = tuple([tuple(i) for i in values])  # SQL Server support tuple only
 
         res = self.executemany(sql, values)
         self.last_sql = res["sql"]
