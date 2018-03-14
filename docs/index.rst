@@ -1,7 +1,7 @@
 Welcome to saiorm /saɪɔ:m/,塞翁
 ===============================
 
-Saiorm is a simple lightweight library for accessing database.It will take you have a easy way to use SQL database.
+Saiorm is a simple lightweight compatible library for accessing database.It will take you have a easy way to use database,including SQL and NoSQL.
 
 Support MySQL, PostgreSQL, SQL Server and MongoDB.
 
@@ -60,8 +60,6 @@ Initialization
 
 saiorm.init() use MySQL by default,you could set database type by param **driver** explicitly.
 
-If use **SQL Server**,you should pass **primary_key** to method table,because SQL Server do not support limit,we will use primary_key to implement method limit.
-
 use MySQL:
 
 .. code:: python
@@ -83,6 +81,8 @@ use PostgreSQL:
     table = DB.table("xxx")
 
 use SQL Server(has some difference):
+
+If use **SQL Server**,you should pass **primary_key** to method table,because SQL Server do not support limit,we will use primary_key to implement method limit.
 
 .. code:: python
 
