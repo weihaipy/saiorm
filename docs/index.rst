@@ -289,17 +289,19 @@ will be transformed to SQL:
 Method limit
 ~~~~~~~~~~~~
 
+Param should be str type.
+
 basic usage:
 
 .. code:: python
 
-    table.limit(number)
+    table.limit("number")
 
 with offset:
 
 .. code:: python
 
-    table.limit(offset, number)
+    table.limit("offset, number")
 
 Method where
 ~~~~~~~~~~~~
@@ -317,13 +319,13 @@ Method where
 
 - must check param to prevent injection vulnerabilities.
 
-- when calling native mysql function the param placeholder could be ?.
+- when calling native function the param placeholder should be ?.
 
 - condition will be equals to value,or pass a tuple or list, and set the first item to change it.
 
 - use IN or BETWEEN should pass a tuple or list.
 
-- pass string type is allowed,you should join param into this string.
+- pass string type is allowed with SQL databases.
 
 Method shorthands
 ~~~~~~~~~~~~~~~~
