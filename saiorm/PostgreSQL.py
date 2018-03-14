@@ -99,16 +99,18 @@ class ConnectionPostgreSQL(object):
         self._ensure_connected()
         return self._db.cursor()
 
+    def _log_exception(self, exception, query, parameters):
+        """log exception when execute SQL"""
+        logging.error("Error on postgresSQL:" + self.host)
+        logging.error("Error query:", query.replace("%s", "{}").format(*parameters))
+        logging.error("Error Exception:" + str(exception))
+
     def _execute(self, cursor, query, parameters, kwparameters):
         try:
             return cursor.execute(query, kwparameters or parameters)
         except Exception as e:
-            logging.error("Error connecting to PostgreSQL on %s", self.host)
-            logging.error("Error query: %s", query)
-            logging.error("Error parameters: %s", parameters)
-            logging.error("Error kwparameters: %s", kwparameters)
+            self._log_exception(e, query, parameters)
             self.close()
-            print("PostgreSQL Error Info:", e)
             raise
 
     def query_return_detail(self, query, *parameters, **kwparameters):
@@ -151,6 +153,10 @@ class ConnectionPostgreSQL(object):
                 "rownumber": cursor.rownumber,  # 行号
                 "sql": to_unicode(cursor.query)  # 执行的语句
             }
+        except Exception as e:
+            self._log_exception(e, query, parameters)
+            self.close()
+            raise
         finally:
             cursor.close()
 

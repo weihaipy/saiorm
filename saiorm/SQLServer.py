@@ -103,16 +103,18 @@ class ConnectionSQLServer(object):
         self._ensure_connected()
         return self._db.cursor()
 
+    def _log_exception(self, exception, query, parameters):
+        """log exception when execute SQL"""
+        logging.error("Error on SQL Server:" + self.host)
+        logging.error("Error query:", query.replace("%s", "{}").format(*parameters))
+        logging.error("Error Exception:" + str(exception))
+
     def _execute(self, cursor, query, parameters, kwparameters):
         try:
             return cursor.execute(query, kwparameters or parameters)
         except Exception as e:
-            logging.error("Error connecting to MySQL on %s", self.host)
-            logging.error("Error query: %s", query)
-            logging.error("Error parameters: %s", parameters)
-            logging.error("Error kwparameters: %s", kwparameters)
+            self._log_exception(e, query, parameters)
             self.close()
-            print("Mysql Error Info:", e)
             raise
 
     def query_return_detail(self, query, *parameters, **kwparameters):
@@ -124,12 +126,9 @@ class ConnectionSQLServer(object):
                 sql = query.replace("%s", "{}").format(*parameters)
             else:
                 sql = ""
-            if cursor.description:
-                column_names = [d[0] for d in cursor.description]
-                data = [Row(zip(column_names, row)) for row in cursor.fetchall()]
-            else:
-                column_names = []
-                data = []
+            column_names = [d[0] for d in cursor.description]
+            data = [Row(zip(column_names, row)) for row in cursor.fetchall()]
+
             return {
                 "data": data,
                 "column_names": column_names,
@@ -171,6 +170,10 @@ class ConnectionSQLServer(object):
                 "rownumber": cursor.rownumber,  # 行号
                 "sql": sql  # 执行的语句
             }
+        except Exception as e:
+            self._log_exception(e, query, parameters)
+            self.close()
+            raise
         finally:
             cursor.close()
 
