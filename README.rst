@@ -1,8 +1,7 @@
 saiorm
 ======
 
-`Saiorm <https://weihaipy.github.io/saiorm>`_  is a simple library for accessing database.
-It will take you have a easy way to use SQL database.
+`Saiorm <https://weihaipy.github.io/saiorm>`_  is a simple lightweight library for accessing database.It will take you have a easy way to use SQL database.
 
 .. The goal is to be an asynchronous framework,but not now.
 
@@ -17,7 +16,7 @@ Task
 - [x] transform to SQL
 - [x] Support MySQL
 - [x] Support PostgreSQL
-- [x] Support SQL Server, not return the latest query
+- [x] Support SQL Server
 - [ ] Support Oracle Database
 - [ ] Support MongoDB
 
