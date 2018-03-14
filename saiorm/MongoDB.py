@@ -36,7 +36,6 @@ class ConnectionMongoDB(object):
         self.condition = {}  # like WHERE, ORDER BY, LIMIT etc. in SQL
         self.client = None  # Mongo client
 
-        # 确定用户名和端口号的变量名
         args = dict(
             host=host,
             port=int(port),
@@ -75,21 +74,6 @@ class ConnectionMongoDB(object):
         self._db = getattr(client, database)
         self.client = client
 
-    def _ensure_connected(self):
-        # Mysql by default closes client connections that are idle for
-        # 8 hours, but the client library does not report this fact until
-        # you try to perform a query and it fails.  Protect against this
-        # case by preemptively closing and reopening the connection
-        # if it has been idle for too long (7 hours by default).
-        if (self._db is None or
-                (time.time() - self._last_use_time > self.max_idle_time)):
-            self.reconnect()
-        self._last_use_time = time.time()
-
-    def _cursor(self):
-        self._ensure_connected()
-        return self._db.cursor()
-
     def _log_exception(self, exception, query, parameters):
         """log exception when execute query"""
         logging.error("Error on MongoDB:" + self.host)
@@ -98,9 +82,6 @@ class ConnectionMongoDB(object):
 
     def select(self, parameters):
         condition = self.condition["where"]
-        #
-        # print("condition::", condition)
-        # raise
 
         try:
             res = getattr(self._db, self.condition["table"]).find(condition)
@@ -221,53 +202,53 @@ class ChainDB(base.ChainDB):
     def increase(self, field, step=1):
         """number field Increase """
         self.set_condition()
-        return self.db.update({ $inc : {field : step})
+        return self.db.update({ $inc: {field: step})
 
-    def decrease(self, field, step=1):
-        """number field decrease """
-        self.set_condition()
-        return self.db.update(dict_data)
+        def decrease(self, field, step=1):
+            """number field decrease """
+            self.set_condition()
+            return self.db.update(dict_data)
 
-    def delete(self):
-        self.set_condition()
-        return self.db.delete()
+        def delete(self):
+            self.set_condition()
+            return self.db.delete()
 
-    def set_condition(self):
-        """
-        set condition to MongoDB
+        def set_condition(self):
+            """
+            set condition to MongoDB
 
-        """
-        res = {
-            "table": self._table,
-            "where": {},
-            "sort": {},
-            "limit": 0,
-            "offset": 0
-        }
-        sql = ""
-        sql_values = []
-        if self._where:
-            if isinstance(self._where, dict):
-                for k in self._where.keys():
-                    if not k.startswith("`"):
-                        res["where"][k] = self._where[k]
-            else:
-                logging.error("Do not support str type where condition in MongoDB")
+            """
+            res = {
+                "table": self._table,
+                "where": {},
+                "sort": {},
+                "limit": 0,
+                "offset": 0
+            }
+            sql = ""
+            sql_values = []
+            if self._where:
+                if isinstance(self._where, dict):
+                    for k in self._where.keys():
+                        if not k.startswith("`"):
+                            res["where"][k] = self._where[k]
+                else:
+                    logging.error("Do not support str type where condition in MongoDB")
 
-        if self._order_by:
-            # todo 需要转换 http://www.runoob.com/mongodb/mongodb-sort.html
-            # 降序 .sort({"likes":-1})
-            res["sort"] = self._order_by
+            if self._order_by:
+                # todo 需要转换 http://www.runoob.com/mongodb/mongodb-sort.html
+                # 降序 .sort({"likes":-1})
+                res["sort"] = self._order_by
 
-        if self._limit:
-            _limit = str(self._limit)
-            if "," not in _limit:
-                res["limit"] = self._limit
-            else:
-                m, n = _limit.split(",")
-                res["limit"] = n
-                res["offset"] = m
+            if self._limit:
+                _limit = str(self._limit)
+                if "," not in _limit:
+                    res["limit"] = self._limit
+                else:
+                    m, n = _limit.split(",")
+                    res["limit"] = n
+                    res["offset"] = m
 
-        self.db.condition = res
+            self.db.condition = res
 
-        return sql, sql_values
+            return sql, sql_values
