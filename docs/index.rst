@@ -84,7 +84,7 @@ PostgreSQL:
 
 SQL Server:
 
-You should pass **primary_key** to method table,because SQL Server does not support limit,we will use primary_key to implement method limit.
+You should pass **primary_key** to method table,because SQL Server does not support LIMIT,we will use primary_key to implement method limit.
 
 .. code:: python
 
@@ -107,8 +107,8 @@ MongoDB:
 
 **The SQL in usages following is MySQL style,it's a little different from PostgreSQL and SQL Server, especially LIMIT.**
 
-Usage for calling native function only
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Usage for calling native function
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code:: python
 
@@ -125,7 +125,7 @@ will be transformed to SQL:
 Usage for select and get
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-- select and get receive a fields param.
+- select and get receive a fields param,but invalid to MongoDB.
 
 - select will return all data.
 
@@ -321,7 +321,7 @@ Method where
 
 - when calling native function the param placeholder should be ?.
 
-- condition will be equals to value,or pass a tuple or list, and set the first item to change it.
+- condition will be equals value,or pass a tuple or list, and set the first item to change it.
 
 - use IN or BETWEEN should pass a tuple or list.
 
@@ -330,19 +330,19 @@ Method where
 Method shorthands
 ~~~~~~~~~~~~~~~~
 
-| t equals to table
-| w equals to where
-| ob equals to order_by
-| l equals to limit
-| gb equals to group_by
-| j equals to join
-| ij equals to inner_join
-| lj equals to left_join
-| rj equals to right_join
-| s equals to select
-| i equals to insert
-| im equals to insert_many
-| u equals to update
-| d equals to delete
-| inc equals to increase
-| dec equals to decrease
+| t equals table
+| w equals where
+| ob equals order_by
+| l equals limit
+| gb equals group_by
+| j equals join
+| ij equals inner_join
+| lj equals left_join
+| rj equals right_join
+| s equals select
+| i equals insert
+| im equals insert_many
+| u equals update
+| d equals delete
+| inc equals increase
+| dec equals decrease
