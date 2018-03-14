@@ -207,6 +207,14 @@ class ChainDB(base.ChainDB):
             if self._limit:
                 _limit = str(self._limit)
 
+                # used here:
+                # SELECT TOP (n-m+1) id FROM tablename
+                # WHERE id NOT IN (
+                #  SELECT TOP m-1 id FROM tablename
+                # )
+                # another way :
+                # SELECT * FROM xxx ORDER BY id OFFSET 5 ROWS FETCH NEXT 5 ROWS ONLY
+
                 if "," not in _limit:
                     pre_sql = "SELECT TOP {} {} FROM {} ".format(_limit, fields, self._table)
                 else:
