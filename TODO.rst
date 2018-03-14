@@ -1,1 +1,17 @@
-统一 limit 的用法,都用字符串?
+Support SQLite
+==============
+
+Transaction
+===========
+
+::
+
+    BEGIN
+    COMMIT
+    ROLLBACK
+
+OR / IS NOT / NOT IN in where condition
+=======================================
+
+HAVING
+======
