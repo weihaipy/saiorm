@@ -250,8 +250,15 @@ will be transformed to SQL:
 
     UPDATE xxx SET a=a-1
 
-where condition
-~~~~~~~~~~~~~~~
+Method limit
+~~~~~~~~~~~~
+
+basic usage: table.limit(number)
+
+with offset: table.limit(offset, number)
+
+Method where
+~~~~~~~~~~~~
 
 .. code:: python
 
@@ -274,7 +281,7 @@ where condition
 
 - pass string type is allowed,you should join param into this string.
 
-Method Shorthand
+Method shorthands
 ~~~~~~~~~~~~~~~~
 
 | t equals to table
