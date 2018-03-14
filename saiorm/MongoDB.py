@@ -77,16 +77,48 @@ class ConnectionMongoDB(object):
     def _log_exception(self, exception, query, parameters):
         """log exception when execute query"""
         logging.error("Error on MongoDB:" + self.host)
-        logging.error("Error query:", query + str(parameters))
+        logging.error("Error query:", query + ": " + str(parameters))
         logging.error("Error Exception:" + str(exception))
 
-    # TODO sort limit offset
     def select(self, parameters):
+        """
+        TODO if want to limit fields,must set all of the fields to hide equals to 0 explicitly
+        """
         condition = self.condition["where"]
+        sort = self.condition.get("sort", "")
+        skip = self.condition.get("skip", "")
+        limit = self.condition.get("limit", "")
+
         try:
-            res = getattr(self._db, self.condition["table"]).find(condition)
-            query = "MongoDB {}.find({})".format(self.condition["table"], str(condition)) if self._return_query else ""
-            self.condition = {}
+            eval_str = """getattr(self._db, self.condition["table"]).find(condition)"""
+            if sort:
+                eval_str += ".sort(" + str(sort) + ")"
+            if skip:
+                eval_str += ".skip(" + str(skip) + ")"
+            if sort:
+                eval_str += ".limit(" + str(limit) + ")"
+
+            res = eval(eval_str)
+
+            if self._return_query:  # generate query
+                query_str_tmpl = "MongoDB {}.find({})"
+                query_value = [self.condition["table"], str(condition)]
+                if sort:
+                    query_str_tmpl += ".sort({})"
+                    query_value.append(str(sort))
+
+                if skip:
+                    query_str_tmpl += ".skip({})"
+                    query_value.append(str(skip))
+
+                if sort:
+                    query_str_tmpl += ".limit({})"
+                    query_value.append(str(limit))
+
+                query = query_str_tmpl.format(*query_value)
+            else:
+                query = ""
+            self.condition = {}  # reset condition
             return {
                 "data": res or [],
                 "query": query
@@ -95,30 +127,16 @@ class ConnectionMongoDB(object):
             self._log_exception(e, "select", self.condition)
             raise
 
-    def get(self, parameters):
-        condition = self.condition["where"]
-        try:
-            res = getattr(self._db, self.condition["table"]).find_one(condition)
-            query = "MongoDB {}.find_one:".format(self.condition["table"], str(condition)) if self._return_query else ""
-            self.condition = {}
-            return {
-                "data": res or [],
-                "query": query
-            }
-        except Exception as e:
-            self._log_exception(e, "get", self.condition)
-            raise
-
     def insert(self, parameters):
         try:
             getattr(self._db, self.condition["table"]).insert_one(parameters)
             query = "MongoDB {}.insert_one({})".format(self.condition["table"],
                                                        str(parameters)) if self._return_query else ""
             return {
-                "lastrowid": 0,  # 影响的主键id
-                "rowcount": 0,  # 影响的行数
-                "rownumber": 0,  # 行号
-                "query": query  # 执行的语句
+                "lastrowid": 0,  # the primary key id affected
+                "rowcount": 0,  # number of rows affected
+                "rownumber": 0,  # line number
+                "query": query  # query executed
             }
         except Exception as e:
             self._log_exception(e, "insert", self.condition)
@@ -128,12 +146,12 @@ class ConnectionMongoDB(object):
         try:
             getattr(self._db, self.condition["table"]).insert_many(parameters)
             query = "MongoDB {}.insert_many({})".format(self.condition["table"],
-                                                       str(parameters)) if self._return_query else ""
+                                                        str(parameters)) if self._return_query else ""
             return {
-                "lastrowid": 0,  # 影响的主键id
-                "rowcount": 0,  # 影响的行数
-                "rownumber": 0,  # 行号
-                "query": query  # 执行的语句
+                "lastrowid": 0,  # the primary key id affected
+                "rowcount": 0,  # number of rows affected
+                "rownumber": 0,  # line number
+                "query": query  # query executed
             }
         except Exception as e:
             self._log_exception(e, "insert_many", self.condition)
@@ -147,12 +165,12 @@ class ConnectionMongoDB(object):
             # returns  {'n': 1, 'nModified': 1, 'ok': 1.0, 'updatedExisting': True}
             query = "MongoDB {}.update({}, {})".format(self.condition["table"], str(self.condition["where"]),
                                                        str(parameters)) if self._return_query else ""
-            self.condition = {}
+            self.condition = {}  # reset condition
             return {
-                "lastrowid": 0,  # 影响的主键id
-                "rowcount": res["n"],  # 影响的行数
-                "rownumber": 0,  # 行号
-                "query": query  # 执行的语句
+                "lastrowid": 0,  # the primary key id affected
+                "rowcount": res.get("nModified", res["n"]),  # number of rows affected
+                "rownumber": 0,  # line number
+                "query": query  # query executed
             }
         except Exception as e:
             self._log_exception(e, "update", self.condition)
@@ -164,17 +182,21 @@ class ConnectionMongoDB(object):
             res = getattr(self._db, self.condition["table"]).remove(condition)
             query = "MongoDB {}.remove({})".format(self.condition["table"],
                                                    str(self.condition["where"])) if self._return_query else ""
-            self.condition = {}
+            self.condition = {}  # reset condition
             # returns {'n': 2, 'ok': 1.0}
             return {
-                "lastrowid": 0,  # 影响的主键id
-                "rowcount": res["n"],  # 影响的行数
-                "rownumber": 0,  # 行号
-                "query": query  # 执行的语句
+                "lastrowid": 0,  # the primary key id affected
+                "rowcount": res.get("nRemoved", res["n"]),  # number of rows affected
+                "rownumber": 0,  # line number
+                "query": query  # query executed
             }
         except Exception as e:
             self._log_exception(e, "delete", self.condition)
             raise
+
+    def group(self):
+        # TODO use group()
+        pass
 
 
 class ChainDB(base.ChainDB):
@@ -222,8 +244,9 @@ class ChainDB(base.ChainDB):
         return res["data"]
 
     def get(self, fields="*"):
+        self._limit = 1
         self.set_condition()
-        res = self.db.get(fields)
+        res = self.db.select(fields)
         self.last_query = res["query"]
         return res["data"]
 
@@ -287,35 +310,48 @@ class ChainDB(base.ChainDB):
         res = {
             "table": self._table,
             "where": {},
-            "sort": {},
-            "limit": 0,
-            "offset": 0
+            "sort": [],  # pymongo needs list type
+            "limit": "0",
+            "skip": "0"
         }
         sql = ""
         sql_values = []
         if self._where:
+            # TODO support native function,BETWEEN,IN etc.
             if isinstance(self._where, dict):
                 for k in self._where.keys():
-                    if not k.startswith("`"):
+                    if not k.startswith(">="):
+                        res["where"][k] = {"$gte": self._where[k]}
+                    elif not k.startswith(">"):
+                        res["where"][k] = {"$gt": self._where[k]}
+                    elif not k.startswith("<="):
+                        res["where"][k] = {"$lte": self._where[k]}
+                    elif not k.startswith("<"):
+                        res["where"][k] = {"$lt": self._where[k]}
+                    elif not k.startswith("!="):
+                        res["where"][k] = {"$ne": self._where[k]}
+                    elif not k.startswith("`"):
                         res["where"][k] = self._where[k]
             else:
                 logging.error("Saiorm do not support str type where condition in MongoDB")
 
         if self._order_by:
-            _order_by = self._order_by.lower().strip()
-            if _order_by.endswith(" desc"):
-                res["sort"] = {self._order_by[:-len(" desc")]: -1}
-            else:
-                res["sort"] = {self._order_by: 1}
+            _order_by_list = self._order_by.split(",")
+            for i in _order_by_list:
+                i = i.lower().strip()
+                if i.endswith(" desc"):
+                    res["sort"].append((i[:-len(" desc")], -1))
+                else:
+                    res["sort"].append((i, 1))
 
         if self._limit:
             _limit = str(self._limit)
             if "," not in _limit:
-                res["limit"] = self._limit
+                res["limit"] = _limit
             else:
                 m, n = _limit.split(",")
                 res["limit"] = n
-                res["offset"] = m
+                res["skip"] = m
 
         self.db.condition = res
 

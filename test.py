@@ -24,28 +24,34 @@ DB = saiorm.init(driver="MongoDB")
 DB.connect({"host": "127.0.0.1", "port": "27017", "database": "x", "user": "", "password": ""}, return_query=True)
 table = DB.table("xxx")
 
-
-# test native function
-res = DB.select("`ABS(-2)")
+#
+# # test native function
+# res = DB.select("`ABS(-2)")
+# # print(res)
+# print(DB.last_query)
+#
+# res = DB.select("`SUM(1+2)")
+# # print(res)
+# print(DB.last_query)
+#
+# # Normal usage
+# res = table.select()
 # print(res)
-print(DB.last_query)
+# print(DB.last_query)
 
-res = DB.select("`SUM(1+2)")
-# print(res)
-print(DB.last_query)
+# for i in res:
+#     print(i)
 
-# Normal usage
-res = table.select()
-# print(res)
-print(DB.last_query)
+# raise
 
 res = table.order_by("a DESC").get()
 # print(res)
 print(DB.last_query)
 
 res = table.limit("1,3").select("id,a")
-# print(res)
+# print(res[0])
 print(DB.last_query)
+# raise
 
 res = table.where({
     "a": 1,
