@@ -9,7 +9,7 @@ Only translate the params to SQL statements.
 
 You can inherit from saiorm.base.ChainDB to support other types of database with the same API,like siaorm.PostgreSQL.ChainDB.
 
-Saiorm require pymysql psycopg2 pymssql pymongofor each database type.
+Saiorm require pymysql psycopg2 pymssql pymongo for each database type.
 
 **Method:**
 
@@ -62,7 +62,7 @@ Initialization
 
 saiorm.init() use MySQL by default,you could set database type by param **driver** explicitly.
 
-use MySQL:
+MySQL:
 
 .. code:: python
 
@@ -72,7 +72,7 @@ use MySQL:
     DB.connect({"host": "", "port": 3306, "database": "", "user": "", "password": ""})
     table = DB.table("xxx")
 
-use PostgreSQL:
+PostgreSQL:
 
 .. code:: python
 
@@ -82,7 +82,7 @@ use PostgreSQL:
     DB.connect({"host": "", "port": "5432", "database": "", "user": "", "password": ""})
     table = DB.table("xxx")
 
-use SQL Server(has some difference):
+SQL Server:
 
 If use **SQL Server**,you should pass **primary_key** to method table,because SQL Server do not support limit,we will use primary_key to implement method limit.
 
@@ -95,7 +95,7 @@ If use **SQL Server**,you should pass **primary_key** to method table,because SQ
     # DB.connect({"host": "", "port": "1433", "database": "", "user": "", "password": ""}, return_query=True)# can get latest query you executed
     table = DB.table("xxx", primary_key="id")  # For LIMIT implement with SQL Server
 
-use MongoDB:
+MongoDB:
 
 .. code:: python
 
