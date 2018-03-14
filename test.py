@@ -3,14 +3,14 @@
 import saiorm
 
 # MySQL
-DB = saiorm.init()
-DB.connect({"host": "127.0.0.1", "port": 3306, "database": "x", "user": "root", "password": "root"})
-table = DB.table("xxx")
+# DB = saiorm.init()
+# DB.connect({"host": "127.0.0.1", "port": 3306, "database": "x", "user": "root", "password": "root"})
+# table = DB.table("xxx")
 
 # PostgreSQL
-# DB = saiorm.init(driver="PostgreSQL")
-# DB.connect({"host": "127.0.0.1", "port": "5432", "database": "x", "user": "postgres", "password": "123"})
-# table = DB.table("xxx")
+DB = saiorm.init(driver="PostgreSQL")
+DB.connect({"host": "127.0.0.1", "port": "5432", "database": "x", "user": "postgres", "password": "123"})
+table = DB.table("xxx")
 
 # SQLServer
 # DB = saiorm.init(driver="SQLServer")
