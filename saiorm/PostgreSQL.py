@@ -39,11 +39,6 @@ class ConnectionPostgreSQL(object):
             user=user,
             password=password,
             database=database,
-            # charset=charset,
-            # use_unicode=True,
-            # init_command=('SET time_zone = "%s"' % time_zone),
-            # connect_timeout=connect_timeout,
-            # **kwargs
         )
 
         self._db = None
