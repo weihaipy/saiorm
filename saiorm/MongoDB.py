@@ -206,35 +206,35 @@ class ChainDB(base.ChainDB):
         self.db = ConnectionMongoDB(**config_dict)
 
     def execute(self, *args, **kwargs):
-        logging.warning("Saiorm do not support execute in MongoDB")
+        logging.warning("Saiorm does not support execute in MongoDB")
         return self
 
     def executemany(self, *args, **kwargs):
-        logging.warning("Saiorm do not support executemany in MongoDB")
+        logging.warning("Saiorm does not support executemany in MongoDB")
         return self
 
     def query(self, *args, **kwargs):
-        logging.warning("Saiorm do not support query in MongoDB")
+        logging.warning("Saiorm does not support query in MongoDB")
         return self
 
     def group_by(self, condition):
-        logging.warning("Saiorm do not support group_by in MongoDB")
+        logging.warning("Saiorm does not support group_by in MongoDB")
         return self
 
     def join(self, condition):
-        logging.warning("Saiorm do not support join in MongoDB")
+        logging.warning("Saiorm does not support join in MongoDB")
         return self
 
     def inner_join(self, condition):
-        logging.warning("Saiorm do not support inner_join in MongoDB")
+        logging.warning("Saiorm does not support inner_join in MongoDB")
         return self
 
     def left_join(self, condition):
-        logging.warning("Saiorm do not support left_join in MongoDB")
+        logging.warning("Saiorm does not support left_join in MongoDB")
         return self
 
     def right_join(self, condition):
-        logging.warning("Saiorm do not support right_join in MongoDB")
+        logging.warning("Saiorm does not support right_join in MongoDB")
         return self
 
     def select(self, fields="*"):
@@ -300,7 +300,7 @@ class ChainDB(base.ChainDB):
         return res
 
     def get_fields_name(self):
-        logging.warning("Saiorm do not support get_fields_name in MongoDB")
+        logging.warning("Saiorm does not support get_fields_name in MongoDB")
 
     def set_condition(self):
         """
@@ -333,7 +333,7 @@ class ChainDB(base.ChainDB):
                     elif not k.startswith("`"):
                         res["where"][k] = self._where[k]
             else:
-                logging.error("Saiorm do not support str type where condition in MongoDB")
+                logging.error("Saiorm does not support str type where condition in MongoDB")
 
         if self._order_by:
             _order_by_list = self._order_by.split(",")
