@@ -34,19 +34,12 @@ class ConnectionSQLServer(object):
         self.max_idle_time = float(max_idle_time)
         self._return_sql = return_sql
 
-        print("return_sql::", return_sql)
-
         args = dict(
             host=host,
             port=str(port),
             user=user,
             password=password,
             database=database,
-            # charset=charset,
-            # use_unicode=True,
-            # init_command=('SET time_zone = "%s"' % time_zone),
-            # connect_timeout=connect_timeout,
-            # **kwargs
         )
 
         self._db = None
@@ -188,8 +181,6 @@ class ChainDB(base.ChainDB):
 
     def connect(self, config_dict=None, return_sql=False):
         config_dict["return_sql"] = return_sql
-
-        print("return_sql:2:", return_sql)
         self.db = ConnectionSQLServer(**config_dict)
 
     def table(self, table_name="", primary_key=""):
