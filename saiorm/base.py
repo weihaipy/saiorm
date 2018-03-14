@@ -86,7 +86,7 @@ class BaseDB(object):
         self._reset()  # reset param
         return res
 
-    def table(self, table_name=""):
+    def table(self, table_name="", *args):
         """
         If table_name is empty,use DB().select("now()") will run SELECT now()
         """
