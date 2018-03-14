@@ -18,7 +18,7 @@ Task
 - [x] Support PostgreSQL
 - [x] Support SQL Server
 - [ ] Support Oracle Database
-- [ ] Support MongoDB
+- [ ] Support MongoDB now
 
 If you want to support other database,just implement like siaorm.PostgreSQL.ChainDB.
 
