@@ -121,7 +121,7 @@ class ConnectionMySQL(object):
             return {
                 "data": [Row(zip(column_names, row)) for row in cursor],
                 "column_names": column_names,
-                "query": to_unicode(cursor._executed)  # 执行的语句
+                "query": to_unicode(cursor._executed)  # query executed
             }
         finally:
             cursor.close()
@@ -132,10 +132,10 @@ class ConnectionMySQL(object):
         try:
             self._execute(cursor, query, parameters, kwparameters)
             return {
-                "lastrowid": cursor.lastrowid,  # 影响的主键id
-                "rowcount": cursor.rowcount,  # 影响的行数
-                "rownumber": cursor.rownumber,  # 行号
-                "query": to_unicode(cursor._executed)  # 执行的语句
+                "lastrowid": cursor.lastrowid,  # the primary key id affected
+                "rowcount": cursor.rowcount,  # number of rows affected
+                "rownumber": cursor.rownumber,  # line number
+                "query": to_unicode(cursor._executed)  # query executed
             }
         finally:
             cursor.close()
@@ -146,10 +146,10 @@ class ConnectionMySQL(object):
         try:
             cursor.executemany(query, parameters)
             return {
-                "lastrowid": cursor.lastrowid,  # 影响的主键id
-                "rowcount": cursor.rowcount,  # 影响的行数
-                "rownumber": cursor.rownumber,  # 行号
-                "query": to_unicode(cursor._executed)  # 执行的语句
+                "lastrowid": cursor.lastrowid,  # the primary key id affected
+                "rowcount": cursor.rowcount,  # number of rows affected
+                "rownumber": cursor.rownumber,  # line number
+                "query": to_unicode(cursor._executed)  # query executed
             }
         except Exception as e:
             self._log_exception(e, query, parameters)

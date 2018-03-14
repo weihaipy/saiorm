@@ -125,7 +125,7 @@ class ConnectionSQLServer(object):
             return {
                 "data": data,
                 "column_names": column_names,
-                "query": query  # 执行的语句
+                "query": query  # query executed
             }
         finally:
             cursor.close()
@@ -140,10 +140,10 @@ class ConnectionSQLServer(object):
             else:
                 sql = ""
             return {
-                "lastrowid": cursor.lastrowid,  # 影响的主键id
-                "rowcount": cursor.rowcount,  # 影响的行数
-                "rownumber": cursor.rownumber,  # 行号
-                "query": query  # 执行的语句
+                "lastrowid": cursor.lastrowid,  # the primary key id affected
+                "rowcount": cursor.rowcount,  # number of rows affected
+                "rownumber": cursor.rownumber,  # line number
+                "query": query  # query executed
             }
         finally:
             cursor.close()
@@ -158,10 +158,10 @@ class ConnectionSQLServer(object):
             else:
                 sql = ""
             return {
-                "lastrowid": cursor.lastrowid,  # 影响的主键id
-                "rowcount": cursor.rowcount,  # 影响的行数
-                "rownumber": cursor.rownumber,  # 行号
-                "query": query  # 执行的语句
+                "lastrowid": cursor.lastrowid,  # the primary key id affected
+                "rowcount": cursor.rowcount,  # number of rows affected
+                "rownumber": cursor.rownumber,  # line number
+                "query": query  # query executed
             }
         except Exception as e:
             self._log_exception(e, query, parameters)
