@@ -121,7 +121,7 @@ class ConnectionMySQL(object):
             return {
                 "data": [Row(zip(column_names, row)) for row in cursor],
                 "column_names": column_names,
-                "sql": to_unicode(cursor._executed)  # 执行的语句
+                "query": to_unicode(cursor._executed)  # 执行的语句
             }
         finally:
             cursor.close()
@@ -135,7 +135,7 @@ class ConnectionMySQL(object):
                 "lastrowid": cursor.lastrowid,  # 影响的主键id
                 "rowcount": cursor.rowcount,  # 影响的行数
                 "rownumber": cursor.rownumber,  # 行号
-                "sql": to_unicode(cursor._executed)  # 执行的语句
+                "query": to_unicode(cursor._executed)  # 执行的语句
             }
         finally:
             cursor.close()
@@ -149,7 +149,7 @@ class ConnectionMySQL(object):
                 "lastrowid": cursor.lastrowid,  # 影响的主键id
                 "rowcount": cursor.rowcount,  # 影响的行数
                 "rownumber": cursor.rownumber,  # 行号
-                "sql": to_unicode(cursor._executed)  # 执行的语句
+                "query": to_unicode(cursor._executed)  # 执行的语句
             }
         except Exception as e:
             self._log_exception(e, query, parameters)

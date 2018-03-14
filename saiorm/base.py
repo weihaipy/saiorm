@@ -23,6 +23,7 @@ class BaseDB(object):
     If use SQL Server, param primary_key is necessary,used in the LIMIT implement tec.
 
     TODO support FULL OUTER JOIN and FULL JOIN.
+    TODO get should return a dict
     """
 
     def __init__(self, table_name_prefix="", debug=False, strict=True,
@@ -31,7 +32,7 @@ class BaseDB(object):
         self.table_name_prefix = table_name_prefix
         self.debug = debug
         self.strict = strict
-        self.last_sql = ""  # latest executed sql
+        self.last_query = ""  # latest executed sql
         self.cache_fields_name = cache_fields_name  # when call get_fields_name
         self._cached_fields_name = {}  # cached fields name
         self.grace_result = grace_result
@@ -58,7 +59,7 @@ class BaseDB(object):
         self._left_join = ""
         self._right_join = ""
         self._on = ""
-        self.last_sql = ""  # latest executed sql
+        self.last_query = ""  # latest executed sql
 
     def connect(self, config_dict=None):
         """
@@ -151,7 +152,7 @@ class BaseDB(object):
             sql = self.gen_select_with_fields(fields, condition_sql)
 
         res = self.query(sql, *condition_values)
-        self.last_sql = res["sql"]
+        self.last_query = res["query"]
         if self.grace_result:
             res["data"] = [GraceDict(i) for i in res["data"]]
 
@@ -177,7 +178,7 @@ class BaseDB(object):
         values += condition_values
         values = tuple(values)
         res = self.execute(sql, *values)
-        self.last_sql = res["sql"]
+        self.last_query = res["query"]
         return res
 
     def gen_update(self, fields, condition):
@@ -217,7 +218,7 @@ class BaseDB(object):
             sql = self.gen_insert_without_fields(values_sign)
 
         res = self.execute(sql, *values)
-        self.last_sql = res["sql"]
+        self.last_query = res["query"]
         return res
 
     def gen_insert_with_fields(self, fields, condition):
@@ -264,7 +265,7 @@ class BaseDB(object):
         values = tuple([tuple(i) for i in values])  # SQL Server support tuple only
 
         res = self.executemany(sql, values)
-        self.last_sql = res["sql"]
+        self.last_query = res["query"]
         return res
 
     def gen_insert_many_with_fields(self, fields, condition):
@@ -281,7 +282,7 @@ class BaseDB(object):
         condition_sql, condition_values = self.parse_condition()
         sql = self.gen_delete(condition_sql)
         res = self.execute(sql, *condition_values)
-        self.last_sql = res["sql"]
+        self.last_query = res["query"]
         return res
 
     def gen_delete(self, condition):
@@ -291,7 +292,7 @@ class BaseDB(object):
         """number field Increase """
         sql = self.gen_increase(field, str(step))
         res = self.execute(sql)
-        self.last_sql = res["sql"]
+        self.last_query = res["query"]
         return res
 
     def gen_increase(self, field, step):
@@ -301,7 +302,7 @@ class BaseDB(object):
         """number field decrease """
         sql = self.gen_decrease(field, str(step))
         res = self.execute(sql)
-        self.last_sql = res["sql"]
+        self.last_query = res["query"]
         return res
 
     def gen_decrease(self, field, step):

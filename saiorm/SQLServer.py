@@ -28,11 +28,11 @@ to_unicode = utility.to_unicode
 
 class ConnectionSQLServer(object):
     def __init__(self, host, port, database, user=None, password=None,
-                 max_idle_time=7 * 3600, return_sql=False):
+                 max_idle_time=7 * 3600, return_query=False):
         self.host = host
         self.database = database
         self.max_idle_time = float(max_idle_time)
-        self._return_sql = return_sql
+        self._return_query = return_query
 
         args = dict(
             host=host,
@@ -115,7 +115,7 @@ class ConnectionSQLServer(object):
         cursor = self._cursor()
         try:
             self._execute(cursor, query, parameters, kwparameters)
-            if self._return_sql:
+            if self._return_query:
                 sql = query.replace("%s", "{}").format(*parameters)
             else:
                 sql = ""
@@ -125,7 +125,7 @@ class ConnectionSQLServer(object):
             return {
                 "data": data,
                 "column_names": column_names,
-                "sql": sql  # 执行的语句
+                "query": query  # 执行的语句
             }
         finally:
             cursor.close()
@@ -135,7 +135,7 @@ class ConnectionSQLServer(object):
         cursor = self._cursor()
         try:
             self._execute(cursor, query, parameters, kwparameters)
-            if self._return_sql:
+            if self._return_query:
                 sql = query.replace("%s", "{}").format(*parameters)
             else:
                 sql = ""
@@ -143,7 +143,7 @@ class ConnectionSQLServer(object):
                 "lastrowid": cursor.lastrowid,  # 影响的主键id
                 "rowcount": cursor.rowcount,  # 影响的行数
                 "rownumber": cursor.rownumber,  # 行号
-                "sql": sql  # 执行的语句
+                "query": query  # 执行的语句
             }
         finally:
             cursor.close()
@@ -153,7 +153,7 @@ class ConnectionSQLServer(object):
         cursor = self._cursor()
         try:
             cursor.executemany(query, parameters)
-            if self._return_sql:
+            if self._return_query:
                 sql = query.replace("%s", "{}").format(*parameters)
             else:
                 sql = ""
@@ -161,7 +161,7 @@ class ConnectionSQLServer(object):
                 "lastrowid": cursor.lastrowid,  # 影响的主键id
                 "rowcount": cursor.rowcount,  # 影响的行数
                 "rownumber": cursor.rownumber,  # 行号
-                "sql": sql  # 执行的语句
+                "query": query  # 执行的语句
             }
         except Exception as e:
             self._log_exception(e, query, parameters)
@@ -175,12 +175,12 @@ class ChainDB(base.ChainDB):
     def __init__(self, table_name_prefix="", debug=False, strict=True,
                  cache_fields_name=True, grace_result=True, primary_key=""):
         self._primary_key = primary_key  # For SQL Server
-        self._return_sql = None
+        self._return_query = None
         super().__init__(table_name_prefix=table_name_prefix, debug=debug, strict=strict,
                          cache_fields_name=cache_fields_name, grace_result=grace_result)
 
-    def connect(self, config_dict=None, return_sql=False):
-        config_dict["return_sql"] = return_sql
+    def connect(self, config_dict=None, return_query=False):
+        config_dict["return_query"] = return_query
         self.db = ConnectionSQLServer(**config_dict)
 
     def table(self, table_name="", primary_key=""):
@@ -245,7 +245,7 @@ class ChainDB(base.ChainDB):
             sql = pre_sql + condition_sql
 
         res = self.query(sql, *condition_values)
-        self.last_sql = res["sql"]
+        self.last_query = res["query"]
         if self.grace_result:
             res["data"] = [GraceDict(i) for i in res["data"]]
 
