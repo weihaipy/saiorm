@@ -255,9 +255,17 @@ will be transformed to SQL:
 Method limit
 ~~~~~~~~~~~~
 
-basic usage: table.limit(number)
+basic usage:
 
-with offset: table.limit(offset, number)
+.. code:: python
+
+    table.limit(number)
+
+with offset:
+
+.. code:: python
+
+    table.limit(offset, number)
 
 Method where
 ~~~~~~~~~~~~
