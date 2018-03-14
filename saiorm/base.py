@@ -167,7 +167,8 @@ class BaseDB(object):
     def get(self, fields="*"):
         """will replace self._limit to 1"""
         self._limit = 1
-        return self.select(fields)
+        res = self.select(fields)
+        return res[0] if res else {}  # return dit type
 
     def update(self, dict_data=None):
         if not dict_data:

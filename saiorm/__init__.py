@@ -12,5 +12,8 @@ def init(driver="MySQL", **kwargs):
     elif driver.lower().replace(" ", "") == "sqlserver":
         from .SQLServer import ChainDB
         return ChainDB(**kwargs)
+    elif driver.lower() == "mongodb":
+        from .MongoDB import ChainDB
+        return ChainDB(**kwargs)
     else:
         raise ValueError("Init saiorm with wrong database driver type")
