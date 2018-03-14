@@ -23,6 +23,7 @@ class BaseDB(object):
     If use SQL Server, param primary_key is necessary,used in the LIMIT implement tec.
 
     TODO support FULL OUTER JOIN and FULL JOIN.
+    TODO add OR in where condition
     """
 
     def __init__(self, table_name_prefix="", debug=False, strict=True,

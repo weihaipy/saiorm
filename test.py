@@ -21,7 +21,7 @@ table = DB.table("xxx")
 
 # MongoDB
 DB = saiorm.init(driver="MongoDB")
-DB.connect({"host": "127.0.0.1", "port": "27017", "database": "x", "user": "postgres", "password": "123"})
+DB.connect({"host": "127.0.0.1", "port": "27017", "database": "x", "user": "", "password": ""})
 table = DB.table("xxx")
 
 
