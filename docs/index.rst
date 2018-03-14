@@ -327,8 +327,8 @@ Method where
 
 - pass string type is allowed with SQL databases.
 
-Method shorthands
-~~~~~~~~~~~~~~~~
+Shortcuts
+~~~~~~~~~
 
 | t equals table
 | w equals where
