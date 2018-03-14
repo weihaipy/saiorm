@@ -13,12 +13,11 @@ Documentation
 Task
 ----
 
-- [x] transform to SQL
 - [x] Support MySQL
 - [x] Support PostgreSQL
 - [x] Support SQL Server
 - [ ] Support Oracle Database
-- [ ] Support MongoDB now
+- [x] Support MongoDB, support **select,get,update,insert,insert_many,delete,increase,decrease,where,limit,order_by**
 
 If you want to support other database,just implement like siaorm.PostgreSQL.ChainDB.
 

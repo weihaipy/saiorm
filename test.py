@@ -21,7 +21,7 @@ table = DB.table("xxx")
 
 # MongoDB
 DB = saiorm.init(driver="MongoDB")
-DB.connect({"host": "127.0.0.1", "port": "27017", "database": "x", "user": "", "password": ""})
+DB.connect({"host": "127.0.0.1", "port": "27017", "database": "x", "user": "", "password": ""}, return_query=True)
 table = DB.table("xxx")
 
 
@@ -69,7 +69,6 @@ res = table.where({
 # print(res)
 print(DB.last_query)
 
-# todo mmsql de insert 不能都转为元组,可能导致别的问题
 res = table.insert({
     "a": "1",
     "b": "2",
@@ -122,13 +121,13 @@ res = table.increase("a", 1)
 # print(res)
 print(DB.last_query)
 
-res = table.decrease("a", 1)
+res = table.where({"c": 1}).decrease("b", 1)
 # print(res)
 print(DB.last_query)
 
-res = table.get_fields_name()
-# print(res)
-print(DB.last_query)
+# res = table.get_fields_name()
+# # print(res)
+# print(DB.last_query)
 
 # res = table.delete()
 # # print(res)

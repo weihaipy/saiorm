@@ -80,13 +80,17 @@ class ConnectionMongoDB(object):
         logging.error("Error query:", query + str(parameters))
         logging.error("Error Exception:" + str(exception))
 
+    # TODO sort limit offset
     def select(self, parameters):
         condition = self.condition["where"]
-
         try:
             res = getattr(self._db, self.condition["table"]).find(condition)
+            query = "MongoDB {}.find({})".format(self.condition["table"], str(condition)) if self._return_query else ""
             self.condition = {}
-            return res
+            return {
+                "data": res or [],
+                "query": query
+            }
         except Exception as e:
             self._log_exception(e, "select", self.condition)
             raise
@@ -95,8 +99,12 @@ class ConnectionMongoDB(object):
         condition = self.condition["where"]
         try:
             res = getattr(self._db, self.condition["table"]).find_one(condition)
+            query = "MongoDB {}.find_one:".format(self.condition["table"], str(condition)) if self._return_query else ""
             self.condition = {}
-            return res
+            return {
+                "data": res or [],
+                "query": query
+            }
         except Exception as e:
             self._log_exception(e, "get", self.condition)
             raise
@@ -104,7 +112,8 @@ class ConnectionMongoDB(object):
     def insert(self, parameters):
         try:
             getattr(self._db, self.condition["table"]).insert_one(parameters)
-            query = "MongoDB insert" + str(parameters) if self._return_query else ""
+            query = "MongoDB {}.insert_one({})".format(self.condition["table"],
+                                                       str(parameters)) if self._return_query else ""
             return {
                 "lastrowid": 0,  # 影响的主键id
                 "rowcount": 0,  # 影响的行数
@@ -118,7 +127,8 @@ class ConnectionMongoDB(object):
     def insert_many(self, parameters):
         try:
             getattr(self._db, self.condition["table"]).insert_many(parameters)
-            query = "MongoDB insert_many" + str(parameters) if self._return_query else ""
+            query = "MongoDB {}.insert_many({})".format(self.condition["table"],
+                                                       str(parameters)) if self._return_query else ""
             return {
                 "lastrowid": 0,  # 影响的主键id
                 "rowcount": 0,  # 影响的行数
@@ -131,10 +141,12 @@ class ConnectionMongoDB(object):
 
     def update(self, parameters):
         condition = self.condition["where"]
+
         try:
             res = getattr(self._db, self.condition["table"]).update(condition, parameters)
             # returns  {'n': 1, 'nModified': 1, 'ok': 1.0, 'updatedExisting': True}
-            query = "MongoDB update" + condition if self._return_query else ""
+            query = "MongoDB {}.update({}, {})".format(self.condition["table"], str(self.condition["where"]),
+                                                       str(parameters)) if self._return_query else ""
             self.condition = {}
             return {
                 "lastrowid": 0,  # 影响的主键id
@@ -150,7 +162,8 @@ class ConnectionMongoDB(object):
         condition = self.condition["where"]
         try:
             res = getattr(self._db, self.condition["table"]).remove(condition)
-            query = "MongoDB delete" + condition if self._return_query else ""
+            query = "MongoDB {}.remove({})".format(self.condition["table"],
+                                                   str(self.condition["where"])) if self._return_query else ""
             self.condition = {}
             # returns {'n': 2, 'ok': 1.0}
             return {
@@ -165,24 +178,70 @@ class ConnectionMongoDB(object):
 
 
 class ChainDB(base.ChainDB):
-    def connect(self, config_dict=None):
+    def connect(self, config_dict=None, return_query=False):
+        if return_query:
+            config_dict["return_query"] = return_query
         self.db = ConnectionMongoDB(**config_dict)
+
+    def execute(self, *args, **kwargs):
+        logging.warning("Saiorm do not support execute in MongoDB")
+        return self
+
+    def executemany(self, *args, **kwargs):
+        logging.warning("Saiorm do not support executemany in MongoDB")
+        return self
+
+    def query(self, *args, **kwargs):
+        logging.warning("Saiorm do not support query in MongoDB")
+        return self
+
+    def group_by(self, condition):
+        logging.warning("Saiorm do not support group_by in MongoDB")
+        return self
+
+    def join(self, condition):
+        logging.warning("Saiorm do not support join in MongoDB")
+        return self
+
+    def inner_join(self, condition):
+        logging.warning("Saiorm do not support inner_join in MongoDB")
+        return self
+
+    def left_join(self, condition):
+        logging.warning("Saiorm do not support left_join in MongoDB")
+        return self
+
+    def right_join(self, condition):
+        logging.warning("Saiorm do not support right_join in MongoDB")
+        return self
 
     def select(self, fields="*"):
         self.set_condition()
-        return self.db.select(fields)
+        res = self.db.select(fields)
+        self.last_query = res["query"]
+        return res["data"]
 
     def get(self, fields="*"):
         self.set_condition()
-        return self.db.get(fields)
+        res = self.db.get(fields)
+        self.last_query = res["query"]
+        return res["data"]
 
     def update(self, dict_data=None):
         self.set_condition()
-        return self.db.update(dict_data)
+        res = self.db.update(dict_data)
+        self.last_query = res["query"]
+        return res
 
     def insert(self, dict_data=None):
         self.set_condition()
-        return self.db.insert(dict_data)
+        if "fields" in dict_data and "values" in dict_data:  # split dict
+            dict_data = {k: dict_data["values"][index]
+                         for index, k in enumerate(dict_data["fields"])}
+
+        res = self.db.insert(dict_data)
+        self.last_query = res["query"]
+        return res
 
     def insert_many(self, dict_data=None):
         self.set_condition()
@@ -193,62 +252,71 @@ class ChainDB(base.ChainDB):
                              for index, k in enumerate(dict_data["fields"])
                              for v in dict_data["values"]]
 
-        return self.db.insert_many(dict_data)
+        res = self.db.insert_many(dict_data)
+        self.last_query = res["query"]
+        return res
 
-    # todo 这两个数字加减 http://www.runoob.com/mongodb/mongodb-update.html
-    # db.col.update( { "count" : { $gt : 10 } } , { $inc : { "count" : 1} },false,false );
-    # http://blog.csdn.net/user_longling/article/details/52398667
-    # $inc 的写法怎么处理?
+    def delete(self):
+        self.set_condition()
+        res = self.db.delete()
+        self.last_query = res["query"]
+        return res
+
     def increase(self, field, step=1):
         """number field Increase """
         self.set_condition()
-        return self.db.update({ $inc: {field: step})
+        res = self.db.update({"$inc": {field: step}})
+        self.last_query = res["query"]
+        return res
 
-        def decrease(self, field, step=1):
-            """number field decrease """
-            self.set_condition()
-            return self.db.update(dict_data)
+    def decrease(self, field, step=1):
+        """number field decrease """
+        self.set_condition()
+        res = self.db.update({"$inc": {field: 0 - step}})
+        self.last_query = res["query"]
+        return res
 
-        def delete(self):
-            self.set_condition()
-            return self.db.delete()
+    def get_fields_name(self):
+        logging.warning("Saiorm do not support get_fields_name in MongoDB")
 
-        def set_condition(self):
-            """
-            set condition to MongoDB
+    def set_condition(self):
+        """
+        set condition to MongoDB
 
-            """
-            res = {
-                "table": self._table,
-                "where": {},
-                "sort": {},
-                "limit": 0,
-                "offset": 0
-            }
-            sql = ""
-            sql_values = []
-            if self._where:
-                if isinstance(self._where, dict):
-                    for k in self._where.keys():
-                        if not k.startswith("`"):
-                            res["where"][k] = self._where[k]
-                else:
-                    logging.error("Do not support str type where condition in MongoDB")
+        """
+        res = {
+            "table": self._table,
+            "where": {},
+            "sort": {},
+            "limit": 0,
+            "offset": 0
+        }
+        sql = ""
+        sql_values = []
+        if self._where:
+            if isinstance(self._where, dict):
+                for k in self._where.keys():
+                    if not k.startswith("`"):
+                        res["where"][k] = self._where[k]
+            else:
+                logging.error("Saiorm do not support str type where condition in MongoDB")
 
-            if self._order_by:
-                # todo 需要转换 http://www.runoob.com/mongodb/mongodb-sort.html
-                # 降序 .sort({"likes":-1})
-                res["sort"] = self._order_by
+        if self._order_by:
+            _order_by = self._order_by.lower().strip()
+            if _order_by.endswith(" desc"):
+                res["sort"] = {self._order_by[:-len(" desc")]: -1}
+            else:
+                res["sort"] = {self._order_by: 1}
 
-            if self._limit:
-                _limit = str(self._limit)
-                if "," not in _limit:
-                    res["limit"] = self._limit
-                else:
-                    m, n = _limit.split(",")
-                    res["limit"] = n
-                    res["offset"] = m
+        if self._limit:
+            _limit = str(self._limit)
+            if "," not in _limit:
+                res["limit"] = self._limit
+            else:
+                m, n = _limit.split(",")
+                res["limit"] = n
+                res["offset"] = m
 
-            self.db.condition = res
+        self.db.condition = res
 
-            return sql, sql_values
+        return sql, sql_values
