@@ -27,8 +27,6 @@ You can inherit from saiorm.base.ChainDB to support other types of database with
 
     You can call **execute** and **executemany** to execute SQL.
 
-    **last_query** return the latest query executed.
-
     **get_fields_name** get a list of all fields name, cache them by default.
 
     **where** can receive str type.
