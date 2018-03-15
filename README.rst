@@ -26,7 +26,7 @@ Note that MongoDB support **select,get,update,insert,insert_many,delete,increase
 TODO
 ====
 
-- SQL
+- SQL database:
 
     - Transaction::
 
