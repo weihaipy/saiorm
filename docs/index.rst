@@ -1,7 +1,7 @@
 Welcome to saiorm /saɪɔ:m/,塞翁
 ===============================
 
-Saiorm is a lightweight library for accessing database.It will take you have a easy way to use database,including SQL and NoSQL.
+Saiorm is a lightweight library for accessing database.It will take you have a easy way to use kinds of database with the same API,including SQL and NoSQL.
 
 Support MySQL, PostgreSQL, SQL Server ,SQLite and MongoDB,require pymysql psycopg2 pymssql sqlite3 pymongo  for each database type.
 
