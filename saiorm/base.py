@@ -34,9 +34,9 @@ class BaseDB(object):
         self.cache_fields_name = cache_fields_name  # when call get_fields_name
         self._cached_fields_name = {}  # cached fields name
         self.grace_result = grace_result
+        self.param_place_holder = "%s"  # SQLite will use ?
 
         self._table = ""
-
         self._where = ""
         self._order_by = ""
         self._group_by = ""
@@ -210,7 +210,7 @@ class BaseDB(object):
             fields = ",".join(keys)
             values = dict_data.values()
 
-        values_sign = ",".join(["%s" for i in values])
+        values_sign = ",".join([self.param_place_holder for i in values])
         if fields:
             sql = self.gen_insert_with_fields(fields, values_sign)
         else:
@@ -242,7 +242,7 @@ class BaseDB(object):
             keys = dict_data_item_1.keys()
             fields = ",".join(keys)
             values = [tuple(i.values()) for i in dict_data]
-            values_sign = ",".join(["%s" for f in keys])
+            values_sign = ",".join([self.param_place_holder for f in keys])
         elif isinstance(dict_data, dict):  # split dict
             keys = dict_data.get("fields")
             if keys:
@@ -251,7 +251,7 @@ class BaseDB(object):
                 else:
                     fields = ",".join(dict_data["fields"])
             values = list([v for v in dict_data["values"]])
-            values_sign = ",".join(["%s" for f in keys])
+            values_sign = ",".join([self.param_place_holder for f in keys])
         else:
             logging.error("Param should be list or tuple or dict")
             return False
@@ -343,7 +343,7 @@ class BaseDB(object):
     inc = increase
     dec = decrease
 
-    def parse_where(self):
+    def parse_where_condition(self):
         """
         parse where condition
 
@@ -355,7 +355,7 @@ class BaseDB(object):
         """
         parse all condition
 
-        Calling parse_where first is a good idea.
+        Calling parse_where_condition first is a good idea.
         """
         raise NotImplementedError("You must implement it in subclass")
 
@@ -388,13 +388,13 @@ class ChainDB(BaseDB):
                     v = v[1:]
                     fields += "{}={},".format(k, v)
                 else:
-                    fields += k + "=%s,"
+                    fields += k + "=" + self.param_place_holder + ","
                     values.append(v)
             elif is_array(v):  # native function with param
                 v0 = v[0]
                 if v0.startswith("`"):
                     v0 = v0[1:]
-                v0 = v0.replace("?", "%s")
+                v0 = v0.replace("?", self.param_place_holder)
                 fields += "{}={},".format(k, v0)
                 values.append(v[1])
 
@@ -459,7 +459,7 @@ class ChainDB(BaseDB):
                                     v = v0.format(*v[1:])
                                 where += " {}{}{} AND".format(k, sign, v)
                             else:
-                                where += " {}{}%s AND".format(k, sign)
+                                where += " {}{}{} AND".format(k, sign, self.param_place_holder)
                                 sql_values.append(v[1])
                         elif sign.lower() == "in":  # IN
                             # JOIN STRING DIRECT
@@ -469,7 +469,9 @@ class ChainDB(BaseDB):
                                     v1 = ",".join(v1)
                                 where += " {} IN ({}) AND".format(k, v1)
                         elif sign.lower() == "between":  # BETWEEN
-                            where += " {} BETWEEN %s AND %s AND".format(k)
+                            where += " {} BETWEEN {} AND {} AND".format(k,
+                                                                        self.param_place_holder,
+                                                                        self.param_place_holder)
                             sql_values += [v[1], v[2]]
                         elif sign.startswith("`"):
                             # native mysql function starts with `
@@ -484,7 +486,7 @@ class ChainDB(BaseDB):
                             # native mysql function
                             where += " {}={} AND".format(k, v[1:])
                         else:
-                            where += " {}=%s AND".format(k)
+                            where += " {}={} AND".format(k, self.param_place_holder)
                             sql_values.append(v)
                 if where:
                     sql += "WHERE" + where[:-3]  # trim the last AND character
