@@ -152,7 +152,7 @@ Usage for select and get
     # get the latest line
     table.order_by("id DESC").get()
 
-    # kinds of params in where,all by **AND**
+    # kinds of params in where,all by AND
     table.where({
         "a": 1,
         "b": ("OR", "BETWEEN", "1", "2"),
@@ -162,7 +162,7 @@ Usage for select and get
         "f": "`ABS(-2)",
     }).select("e,f")
 
-    # kinds of params in where,mixing **AND** and **OR**
+    # kinds of params in where,mixing AND and OR
     table.where({
             "a": 1,
             "b": ("OR", "BETWEEN", "1", "2"),
