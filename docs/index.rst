@@ -155,10 +155,10 @@ Usage for select and get
     # kinds of params in where,all by AND
     table.where({
         "a": 1,
-        "b": ("OR", "BETWEEN", "1", "2"),
-        "c": ("OR", "`ABS(?)", "2"),
-        "d": ("IS NOT", "NULL"),
-        "e": ("OR", "NOT IN", ["1","2","3"]),
+        "b": ("BETWEEN", "1", "2"),
+        "c": ("`ABS(?)", "2"),
+        "d": ("!=", 0),
+        "e": ("IN", ["1", "2", "3"]),
         "f": "`ABS(-2)",
     }).select("e,f")
 
@@ -178,7 +178,7 @@ will be transformed to SQL:
 
     SELECT * FROM xxx ;
     SELECT * FROM xxx  ORDER BY id DESC LIMIT 1;
-    SELECT e,f FROM xxx WHERE a=1 AND b BETWEEN '1' AND '2' AND c=ABS(2) AND d!=0 AND e IN (1,2,3) AND f=NOW() ;
+    SELECT e,f FROM xxx WHERE a=1 AND b BETWEEN 1 AND 2 AND c=ABS(2) AND d!=0 AND e IN (1,2,3) AND f=ABS(-2) ;
     SELECT e,f FROM xxx WHERE a=1 OR b BETWEEN 1 AND 2 OR c=ABS(2) OR d IS NOT NULL OR e NOT IN (1,2,3) AND f=ABS(-2)
 
 Usage for update
