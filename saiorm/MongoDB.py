@@ -161,13 +161,14 @@ class ConnectionMongoDB(object):
         try:
             res = getattr(self._db, self.condition["table"]).update(where, parameters)
             # returns  {'n': 1, 'nModified': 1, 'ok': 1.0, 'updatedExisting': True}
+            query = "{}.update({}, {})".format(self.condition["table"], str(where),
+                                               str(parameters)) if self._return_query else ""
             self.condition = {}  # reset condition
             return {
                 "lastrowid": 0,  # the primary key id affected
                 "rowcount": res.get("nModified", res["n"]),  # number of rows affected
                 "rownumber": 0,  # line number
-                "query": "{}.update({}, {})".format(self.condition["table"], str(where),
-                                                    str(parameters)) if self._return_query else ""
+                "query": query
                 # query executed
             }
         except Exception as e:
@@ -179,13 +180,14 @@ class ConnectionMongoDB(object):
         try:
             res = getattr(self._db, self.condition["table"]).remove(where)
             # returns {'n': 2, 'ok': 1.0}
+            query = "{}.remove({})".format(self.condition["table"],
+                                           str(self.condition["where"])) if self._return_query else ""
             self.condition = {}  # reset condition
             return {
                 "lastrowid": 0,  # the primary key id affected
                 "rowcount": res.get("nRemoved", res["n"]),  # number of rows affected
                 "rownumber": 0,  # line number
-                "query": "{}.remove({})".format(self.condition["table"],
-                                                str(where)) if self._return_query else ""  # query executed
+                "query": query  # query executed
             }
         except Exception as e:
             self._log_exception(e, "delete", self.condition)
