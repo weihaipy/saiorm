@@ -15,7 +15,7 @@ Documentation
 Task
 ====
 
-- [x] Support MySQL
+- [x] Support MySQL, MariaDB
 - [x] Support PostgreSQL
 - [x] Support SQL Server
 - [x] Support SQLite
