@@ -164,12 +164,12 @@ Usage for select and get
 
     # kinds of params in where,mixing AND and OR
     table.where({
-            "a": 1,
-            "b": ("OR", "BETWEEN", "1", "2"),
-            "c": ("OR", "`ABS(?)", "2"),
-            "d": ("OR", "IS NOT", "NULL"),
-            "e": ("OR", "NOT IN", ["1","2","3"]),
-            "f": "`ABS(-2)",
+        "a": ("OR", 1),
+        "b": ("OR", "BETWEEN", "1", "2"),
+        "c": ("OR", "`ABS(?)", "2"),
+        "d": ("OR", "IS NOT", "NULL"),
+        "e": ("NOT IN", ["1", "2", "3"]),
+        "f": "`ABS(-2)",
         }).select("e,f")
 
 will be transformed to SQL:
@@ -179,8 +179,7 @@ will be transformed to SQL:
     SELECT * FROM xxx ;
     SELECT * FROM xxx  ORDER BY id DESC LIMIT 1;
     SELECT e,f FROM xxx WHERE a=1 AND b BETWEEN '1' AND '2' AND c=ABS(2) AND d!=0 AND e IN (1,2,3) AND f=NOW() ;
-    SELECT e,f FROM xxx WHERE a=1 AND b BETWEEN 1 AND 2 OR c=ABS(2) OR d IS NOT NULL AND e NOT IN (1,2,3) OR f=ABS(-2) ;
-
+    SELECT e,f FROM xxx WHERE a=1 OR b BETWEEN 1 AND 2 OR c=ABS(2) OR d IS NOT NULL OR e NOT IN (1,2,3) AND f=ABS(-2)
 
 Usage for update
 ~~~~~~~~~~~~~~~~
@@ -337,7 +336,7 @@ Method where
         "a": 1,
         "b": ("BETWEEN", "1", "2"),
         "c": ("`ABS(?)", "2"),
-        "d": ("or", "!=", 0), # use OR
+        "d": ("OR", "!=", 0), # use OR with the next condition
         "e": ("IN", "1,2,3"),
         "f": "`NOW()",
     }).select("e,f")
@@ -346,7 +345,7 @@ Method where
 
 - use IN or BETWEEN should pass a tuple or list.
 
-- The default parallel relationship is AND,use tuple or list with the first item "or" to toggle to "or".
+- The default parallel relationship with the next condition is AND,use tuple or list with the first item "or" to toggle to "or".
 
 - condition will be equals value,or pass a tuple or list, and set the first item to change it.
 
