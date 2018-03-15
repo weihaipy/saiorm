@@ -26,7 +26,7 @@ is_array = utility.is_array
 to_unicode = utility.to_unicode
 
 
-class ConnectionSQLServer(object):
+class Connection(object):
     def __init__(self, host, port, database, user=None, password=None,
                  max_idle_time=7 * 3600, return_query=False):
         self.host = host
@@ -181,7 +181,7 @@ class ChainDB(base.ChainDB):
 
     def connect(self, config_dict=None, return_query=False):
         config_dict["return_query"] = return_query
-        self.db = ConnectionSQLServer(**config_dict)
+        self.db = Connection(**config_dict)
 
     def table(self, table_name="", primary_key=""):
         """

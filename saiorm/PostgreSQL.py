@@ -26,7 +26,7 @@ is_array = utility.is_array
 to_unicode = utility.to_unicode
 
 
-class ConnectionPostgreSQL(object):
+class Connection(object):
     def __init__(self, host, port, database, user=None, password=None,
                  max_idle_time=7 * 3600):
         self.host = host
@@ -158,16 +158,11 @@ class ConnectionPostgreSQL(object):
 
 class ChainDB(base.ChainDB):
     def connect(self, config_dict=None):
-        self.db = ConnectionPostgreSQL(**config_dict)
+        self.db = Connection(**config_dict)
 
     def parse_condition(self):
         """
         generate query condition
-
-        **ATTENTION**
-
-        You must check the parameters to prevent injection vulnerabilities
-
         """
         sql, sql_values = self.parse_where_condition()
 

@@ -25,7 +25,7 @@ is_array = utility.is_array
 to_unicode = utility.to_unicode
 
 
-class ConnectionMySQL(object):
+class Connection(object):
     def __init__(self, host, port, database, user=None, password=None,
                  max_idle_time=7 * 3600, connect_timeout=60,
                  time_zone="+0:00", charset="utf8", **kwargs):
@@ -161,4 +161,4 @@ class ConnectionMySQL(object):
 
 class ChainDB(base.ChainDB):
     def connect(self, config_dict=None):
-        self.db = ConnectionMySQL(**config_dict)
+        self.db = Connection(**config_dict)
