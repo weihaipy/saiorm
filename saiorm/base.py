@@ -343,7 +343,20 @@ class BaseDB(object):
     inc = increase
     dec = decrease
 
+    def parse_where(self):
+        """
+        parse where condition
+
+        where condition is the most complex condition,let it alone
+        """
+        raise NotImplementedError("You must implement it in subclass")
+
     def parse_condition(self):
+        """
+        parse all condition
+
+        Calling parse_where first is a good idea.
+        """
         raise NotImplementedError("You must implement it in subclass")
 
 
@@ -420,15 +433,8 @@ class ChainDB(BaseDB):
         """get one line from table"""
         return "SELECT * FROM {} LIMIT 1;".format(self._table)
 
-    def parse_condition(self):
-        """
-        generate query condition
-
-        **ATTENTION**
-
-        You must check the parameters to prevent injection vulnerabilities
-
-        """
+    def parse_where_condition(self):
+        """parse where condition"""
         sql = ""
         sql_values = []
         if self._where:
@@ -482,6 +488,14 @@ class ChainDB(BaseDB):
                             sql_values.append(v)
                 if where:
                     sql += "WHERE" + where[:-3]  # trim the last AND character
+
+        return sql, sql_values
+
+    def parse_condition(self):
+        """
+        generate query condition
+        """
+        sql, sql_values = self.parse_where_condition()
 
         if self._inner_join:
             sql += " INNER JOIN {} ON {}".format(self._inner_join, self._on)
