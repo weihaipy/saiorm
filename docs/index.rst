@@ -13,7 +13,7 @@ You can inherit from saiorm.base.ChainDB to support other types of database with
 
 - **insert, select, update, delete, increase, decrease** should be executed **finally**,they will take effect immediately.
 
-- **where** receive dict type. **IN** require a string or a sequence with str.
+- **where** receive dict type. **IN** require a string or a sequence only.
 
 - **select** return all data with list.
 
@@ -152,15 +152,25 @@ Usage for select and get
     # get the latest line
     table.order_by("id DESC").get()
 
-    # kinds of params in where
+    # kinds of params in where,all by **AND**
     table.where({
         "a": 1,
-        "b": ("BETWEEN", "1", "2"),
-        "c": ("`ABS(?)", "2"),
-        "d": ("!=", 0),
-        "e": ("IN", "1,2,3"),
-        "f": "`NOW()",
+        "b": ("OR", "BETWEEN", "1", "2"),
+        "c": ("OR", "`ABS(?)", "2"),
+        "d": ("IS NOT", "NULL"),
+        "e": ("OR", "NOT IN", ["1","2","3"]),
+        "f": "`ABS(-2)",
     }).select("e,f")
+
+    # kinds of params in where,mixing **AND** and **OR**
+    table.where({
+            "a": 1,
+            "b": ("OR", "BETWEEN", "1", "2"),
+            "c": ("OR", "`ABS(?)", "2"),
+            "d": ("OR", "IS NOT", "NULL"),
+            "e": ("OR", "NOT IN", ["1","2","3"]),
+            "f": "`ABS(-2)",
+        }).select("e,f")
 
 will be transformed to SQL:
 
@@ -169,6 +179,8 @@ will be transformed to SQL:
     SELECT * FROM xxx ;
     SELECT * FROM xxx  ORDER BY id DESC LIMIT 1;
     SELECT e,f FROM xxx WHERE a=1 AND b BETWEEN '1' AND '2' AND c=ABS(2) AND d!=0 AND e IN (1,2,3) AND f=NOW() ;
+    SELECT e,f FROM xxx WHERE a=1 AND b BETWEEN 1 AND 2 OR c=ABS(2) OR d IS NOT NULL AND e NOT IN (1,2,3) OR f=ABS(-2) ;
+
 
 Usage for update
 ~~~~~~~~~~~~~~~~
@@ -325,18 +337,18 @@ Method where
         "a": 1,
         "b": ("BETWEEN", "1", "2"),
         "c": ("`ABS(?)", "2"),
-        "d": ("!=", 0),
+        "d": ("or", "!=", 0), # use OR
         "e": ("IN", "1,2,3"),
         "f": "`NOW()",
     }).select("e,f")
 
-- must check param to prevent injection vulnerabilities.
-
 - when calling native function the param placeholder should be ?.
 
-- condition will be equals value,or pass a tuple or list, and set the first item to change it.
-
 - use IN or BETWEEN should pass a tuple or list.
+
+- The default parallel relationship is AND,use tuple or list with the first item "or" to toggle to "or".
+
+- condition will be equals value,or pass a tuple or list, and set the first item to change it.
 
 - pass string type is allowed with SQL databases.
 

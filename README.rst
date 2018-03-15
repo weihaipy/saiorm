@@ -34,8 +34,6 @@ TODO
         COMMIT
         ROLLBACK
 
-    - OR / IS NOT / NOT IN in where condition
-
     - having
 
     - join: support FULL OUTER JOIN and FULL JOIN.

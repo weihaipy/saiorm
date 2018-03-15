@@ -4,25 +4,19 @@ import saiorm
 
 
 def test(DB, table):
-    #
-    # # test native function
-    # res = DB.select("`ABS(-2)")
-    # # print(res)
-    # print(DB.last_query)
-    #
-    # res = DB.select("`SUM(1+2)")
-    # # print(res)
-    # print(DB.last_query)
-    #
-    # # Normal usage
-    # res = table.select()
+    # test native function
+    res = DB.select("`ABS(-2)")
     # print(res)
-    # print(DB.last_query)
+    print(DB.last_query)
 
-    # for i in res:
-    #     print(i)
+    res = DB.select("`SUM(1+2)")
+    # print(res)
+    print(DB.last_query)
 
-    # raise
+    # Normal usage
+    res = table.select()
+    print(res)
+    print(DB.last_query)
 
     res = table.order_by("a DESC").get()
     # print(res)
@@ -38,7 +32,18 @@ def test(DB, table):
         "b": ("BETWEEN", "1", "2"),
         "c": ("`ABS(?)", "2"),
         "d": ("!=", 0),
-        "e": ("IN", "1,2,3"),
+        "e": ("IN", ["1","2","3"]),
+        "f": "`ABS(-2)",
+    }).select("e,f")
+    # print(res)
+    print(DB.last_query)
+
+    res = table.where({
+        "a": 1,
+        "b": ("OR", "BETWEEN", "1", "2"),
+        "c": ("OR", "`ABS(?)", "2"),
+        "d": ("IS NOT", "NULL"),
+        "e": ("OR", "NOT IN", ["1","2","3"]),
         "f": "`ABS(-2)",
     }).select("e,f")
     # print(res)

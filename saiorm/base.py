@@ -445,8 +445,16 @@ class ChainDB(BaseDB):
                 for k in self._where.keys():
                     v = self._where[k]
                     if is_array(v):
+                        and_or = "AND"  # Parallel relationship
                         v0 = v[0]
+                        if isinstance(v0, str) and v0.lower() == "or":
+                            and_or = "OR"
+                            v = v[1:]
+                            v0 = v[0]
+
                         sign = v0.strip()
+
+                        print(sign, sign.lower() in ("in", "not in", "is", "is not"))
 
                         if v0[0] in ("<", ">", "!"):  # < <= > >= !=
                             v1 = v[1]
@@ -457,33 +465,36 @@ class ChainDB(BaseDB):
                                 if "?" in v1:
                                     v0 = v0.replace("?", "{}")
                                     v = v0.format(*v[1:])
-                                where += " {}{}{} AND".format(k, sign, v)
+                                where += " {}{}{} {}".format(k, sign, v, and_or)
                             else:
-                                where += " {}{}{} AND".format(k, sign, self.param_place_holder)
+                                where += " {}{}{} {}".format(k, sign, self.param_place_holder, and_or)
                                 sql_values.append(v[1])
-                        elif sign.lower() == "in":  # IN
+                        elif sign.lower() in ("in", "not in", "is not"):
+                            # IN / NOT IN / IS / IS NOT etc.
                             # JOIN STRING DIRECT
                             v1 = v[1]
-                            if v1:
-                                if is_array(v1):
-                                    v1 = ",".join(v1)
-                                where += " {} IN ({}) AND".format(k, v1)
+
+                            if is_array(v1):
+                                v1 = ",".join(v1)
+                                where += " {} {} ({}) {}".format(k, sign, v1, and_or)
+                            else:
+                                where += " {} {} {} {}".format(k, sign, str(v1), and_or)
+
                         elif sign.lower() == "between":  # BETWEEN
-                            where += " {} BETWEEN {} AND {} AND".format(k,
-                                                                        self.param_place_holder,
-                                                                        self.param_place_holder)
+                            where += " {} BETWEEN {} AND {} {}".format(k,
+                                                                       self.param_place_holder,
+                                                                       self.param_place_holder,
+                                                                       and_or)
                             sql_values += [v[1], v[2]]
-                        elif sign.startswith("`"):
-                            # native mysql function starts with `
+                        elif sign.startswith("`"):  # native mysql function
                             # JOIN STRING DIRECT
                             v0 = v0.replace("`", "")
                             if "?" in v0:
                                 v0 = v0.replace("?", "{}")
                                 v0 = v0.format(*v[1:])
-                            where += " {}={} AND".format(k, v0)
+                            where += " {}={} {}".format(k, v0, and_or)
                     else:
-                        if isinstance(v, str) and v.startswith("`"):
-                            # native mysql function
+                        if isinstance(v, str) and v.startswith("`"):  # native mysql function
                             where += " {}={} AND".format(k, v[1:])
                         else:
                             where += " {}={} AND".format(k, self.param_place_holder)
