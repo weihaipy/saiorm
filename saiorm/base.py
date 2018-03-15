@@ -442,6 +442,7 @@ class ChainDB(BaseDB):
                 sql += "WHERE" + self._where
             elif isinstance(self._where, dict):
                 where = ""
+                and_or_length = 3  # length of AND or OR
                 for k in self._where.keys():
                     v = self._where[k]
                     if is_array(v):
@@ -449,14 +450,17 @@ class ChainDB(BaseDB):
                         v0 = v[0]
                         if isinstance(v0, str) and v0.lower() == "or":
                             and_or = "OR"
+                            and_or_length = 2
                             v = v[1:]
-                            v0 = v[0]
+                            if len(v) == 1:
+                                v = v[0]
+                                v0 = None
+                            else:
+                                v0 = v[0]
 
-                        sign = v0.strip()
+                        sign = v0.strip() if isinstance(v0, str) else ""
 
-                        print(sign, sign.lower() in ("in", "not in", "is", "is not"))
-
-                        if v0[0] in ("<", ">", "!"):  # < <= > >= !=
+                        if sign and sign[0] in ("<", ">", "!"):  # < <= > >= !=
                             v1 = v[1]
                             if isinstance(v1, str) and v1.startswith("`"):
                                 # native mysql function starts with `
@@ -470,7 +474,7 @@ class ChainDB(BaseDB):
                                 where += " {}{}{} {}".format(k, sign, self.param_place_holder, and_or)
                                 sql_values.append(v[1])
                         elif sign.lower() in ("in", "not in", "is not"):
-                            # IN / NOT IN / IS / IS NOT etc.
+                            # IN / NOT IN / IS NOT etc.
                             # JOIN STRING DIRECT
                             v1 = v[1]
 
@@ -493,14 +497,22 @@ class ChainDB(BaseDB):
                                 v0 = v0.replace("?", "{}")
                                 v0 = v0.format(*v[1:])
                             where += " {}={} {}".format(k, v0, and_or)
+
+                        else:
+                            if isinstance(v, str) and v.startswith("`"):  # native mysql function
+                                where += " {}={} {}".format(k, v[1:], and_or)
+                            else:
+                                where += " {}={} {}".format(k, self.param_place_holder, and_or)
+                                sql_values.append(v)
                     else:
+                        and_or_length = 3
                         if isinstance(v, str) and v.startswith("`"):  # native mysql function
                             where += " {}={} AND".format(k, v[1:])
                         else:
                             where += " {}={} AND".format(k, self.param_place_holder)
                             sql_values.append(v)
                 if where:
-                    sql += "WHERE" + where[:-3]  # trim the last AND character
+                    sql += "WHERE" + where[:0 - and_or_length]  # trim the last AND / OR character
 
         return sql, sql_values
 

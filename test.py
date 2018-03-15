@@ -32,18 +32,18 @@ def test(DB, table):
         "b": ("BETWEEN", "1", "2"),
         "c": ("`ABS(?)", "2"),
         "d": ("!=", 0),
-        "e": ("IN", ["1","2","3"]),
+        "e": ("IN", ["1", "2", "3"]),
         "f": "`ABS(-2)",
     }).select("e,f")
     # print(res)
     print(DB.last_query)
 
     res = table.where({
-        "a": 1,
+        "a": ("OR", 1),
         "b": ("OR", "BETWEEN", "1", "2"),
         "c": ("OR", "`ABS(?)", "2"),
-        "d": ("IS NOT", "NULL"),
-        "e": ("OR", "NOT IN", ["1","2","3"]),
+        "d": ("OR", "IS NOT", "NULL"),
+        "e": ("NOT IN", ["1", "2", "3"]),
         "f": "`ABS(-2)",
     }).select("e,f")
     # print(res)
