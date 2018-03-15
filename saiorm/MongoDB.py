@@ -130,13 +130,12 @@ class ConnectionMongoDB(object):
     def insert(self, parameters):
         try:
             getattr(self._db, self.condition["table"]).insert_one(parameters)
-            query = "MongoDB {}.insert_one({})".format(self.condition["table"],
-                                                       str(parameters)) if self._return_query else ""
             return {
                 "lastrowid": 0,  # the primary key id affected
                 "rowcount": 0,  # number of rows affected
                 "rownumber": 0,  # line number
-                "query": query  # query executed
+                "query": "{}.insert_one({})".format(self.condition["table"],
+                                                    str(parameters)) if self._return_query else ""  # query executed
             }
         except Exception as e:
             self._log_exception(e, "insert", self.condition)
@@ -145,50 +144,48 @@ class ConnectionMongoDB(object):
     def insert_many(self, parameters):
         try:
             getattr(self._db, self.condition["table"]).insert_many(parameters)
-            query = "MongoDB {}.insert_many({})".format(self.condition["table"],
-                                                        str(parameters)) if self._return_query else ""
             return {
                 "lastrowid": 0,  # the primary key id affected
                 "rowcount": 0,  # number of rows affected
                 "rownumber": 0,  # line number
-                "query": query  # query executed
+                "query": "{}.insert_many({})".format(self.condition["table"],
+                                                     str(parameters)) if self._return_query else ""  # query executed
             }
         except Exception as e:
             self._log_exception(e, "insert_many", self.condition)
             raise
 
     def update(self, parameters):
-        condition = self.condition["where"]
+        where = self.condition["where"]
 
         try:
-            res = getattr(self._db, self.condition["table"]).update(condition, parameters)
+            res = getattr(self._db, self.condition["table"]).update(where, parameters)
             # returns  {'n': 1, 'nModified': 1, 'ok': 1.0, 'updatedExisting': True}
-            query = "MongoDB {}.update({}, {})".format(self.condition["table"], str(self.condition["where"]),
-                                                       str(parameters)) if self._return_query else ""
             self.condition = {}  # reset condition
             return {
                 "lastrowid": 0,  # the primary key id affected
                 "rowcount": res.get("nModified", res["n"]),  # number of rows affected
                 "rownumber": 0,  # line number
-                "query": query  # query executed
+                "query": "{}.update({}, {})".format(self.condition["table"], str(where),
+                                                    str(parameters)) if self._return_query else ""
+                # query executed
             }
         except Exception as e:
             self._log_exception(e, "update", self.condition)
             raise
 
     def delete(self):
-        condition = self.condition["where"]
+        where = self.condition["where"]
         try:
-            res = getattr(self._db, self.condition["table"]).remove(condition)
-            query = "MongoDB {}.remove({})".format(self.condition["table"],
-                                                   str(self.condition["where"])) if self._return_query else ""
-            self.condition = {}  # reset condition
+            res = getattr(self._db, self.condition["table"]).remove(where)
             # returns {'n': 2, 'ok': 1.0}
+            self.condition = {}  # reset condition
             return {
                 "lastrowid": 0,  # the primary key id affected
                 "rowcount": res.get("nRemoved", res["n"]),  # number of rows affected
                 "rownumber": 0,  # line number
-                "query": query  # query executed
+                "query": "{}.remove({})".format(self.condition["table"],
+                                                str(where)) if self._return_query else ""  # query executed
             }
         except Exception as e:
             self._log_exception(e, "delete", self.condition)

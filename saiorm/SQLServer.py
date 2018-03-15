@@ -115,17 +115,11 @@ class Connection(object):
         cursor = self._cursor()
         try:
             self._execute(cursor, query, parameters, kwparameters)
-            if self._return_query:
-                sql = query.replace("%s", "{}").format(*parameters)
-            else:
-                sql = ""
             column_names = [d[0] for d in cursor.description]
-            data = [Row(zip(column_names, row)) for row in cursor.fetchall()]
-
             return {
-                "data": data,
+                "data": [Row(zip(column_names, row)) for row in cursor.fetchall()],
                 "column_names": column_names,
-                "query": query  # query executed
+                "query": query.replace("%s", "{}").format(*parameters) if self._return_query else ""  # query executed
             }
         finally:
             cursor.close()
@@ -135,15 +129,11 @@ class Connection(object):
         cursor = self._cursor()
         try:
             self._execute(cursor, query, parameters, kwparameters)
-            if self._return_query:
-                sql = query.replace("%s", "{}").format(*parameters)
-            else:
-                sql = ""
             return {
                 "lastrowid": cursor.lastrowid,  # the primary key id affected
                 "rowcount": cursor.rowcount,  # number of rows affected
                 "rownumber": cursor.rownumber,  # line number
-                "query": query  # query executed
+                "query": query.replace("%s", "{}").format(*parameters) if self._return_query else ""  # query executed
             }
         finally:
             cursor.close()
@@ -153,15 +143,11 @@ class Connection(object):
         cursor = self._cursor()
         try:
             cursor.executemany(query, parameters)
-            if self._return_query:
-                sql = query.replace("%s", "{}").format(*parameters)
-            else:
-                sql = ""
             return {
                 "lastrowid": cursor.lastrowid,  # the primary key id affected
                 "rowcount": cursor.rowcount,  # number of rows affected
                 "rownumber": cursor.rownumber,  # line number
-                "query": query  # query executed
+                "query": query.replace("%s", "{}").format(*parameters) if self._return_query else ""  # query executed
             }
         except Exception as e:
             self._log_exception(e, query, parameters)
