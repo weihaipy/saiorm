@@ -258,7 +258,11 @@ class PositionDB(Connection):
         cursor = self._cursor()
         try:
             self._execute(cursor, query, parameters, kwparameters)
-            return cursor.lastrowid, cursor.rowcount
+
+            return {
+                "lastrowid":cursor.lastrowid,
+                "rowcount": cursor.rowcount,
+            }
         finally:
             cursor.close()
 
@@ -267,7 +271,10 @@ class PositionDB(Connection):
         cursor = self._cursor()
         try:
             cursor.executemany(query, parameters)
-            return cursor.lastrowid, cursor.rowcount
+            return {
+                "lastrowid":cursor.lastrowid,
+                "rowcount": cursor.rowcount,
+            }
         finally:
             cursor.close()
 
