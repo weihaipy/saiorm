@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
+from .utility import GraceDict
 
 
 def init(driver="MySQL", **kwargs):

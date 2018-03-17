@@ -53,8 +53,9 @@ class Connection(object):
         try:
             self.reconnect()
         except Exception:
-            logging.error("Cannot connect to MySQL on %s", self.host,
-                          exc_info=True)
+            # logging.error("Cannot connect to MySQL on %s", self.host,
+            #               exc_info=True)
+            pass
 
     def __del__(self):
         self.close()
@@ -102,8 +103,9 @@ class Connection(object):
     def _log_exception(self, exception, query, parameters):
         """log exception when execute SQL"""
         logging.error("Error on MySQL Server:" + self.host)
-        logging.error("Error query:", query.replace("%s", "{}").format(*parameters))
-        logging.error("Error Exception:" + str(exception))
+        logging.error("Error query:", query)
+        logging.error("Error parameters:", parameters)
+        logging.error("Error Exception:", str(exception))
 
     def _execute(self, cursor, query, parameters, kwparameters):
         try:
@@ -294,10 +296,13 @@ class PositionDB(Connection):
             else:
                 field_str += (i + ",")
                 value_str += "%s,"
+        if value_str:
+            value_str = value_str[:-1]
         if not many:
-            query = "INSERT INTO {} ({}) VALUE {}".format(table, field_str[:-1], value_str)
+            query = "INSERT INTO {} ({}) VALUES ({})".format(table, field_str[:-1], value_str)
         else:
-            query = "INSERT INTO {} ({}) VALUES {}".format(table, field_str[:-1], value_str)
+            query = "INSERT INTO {} ({}) VALUES ({})".format(table, field_str[:-1], value_str)
+
         return query
 
     def mk_delete_query(self, table, condition):
@@ -334,7 +339,7 @@ class PositionDB(Connection):
 
         :return: tuple,lastrowid and rowcount
         """
-        query = self.mk_insert_query(table, field, many=True)
+        query = self.mk_insert_query(table, field, many=False)
         return self.execute_both(query, *parameters, **kwparameters)
 
     def insert_many(self, table, field, *parameters, **kwparameters):
@@ -369,6 +374,7 @@ class PositionDB(Connection):
         """
         table = self.prefix + table
         query = "SELECT " + field + " FROM " + table + " " + condition
+
         return self.query(query, *parameters, **kwparameters)
 
     def get(self, table, field, condition, *parameters, **kwparameters):
