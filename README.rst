@@ -1,7 +1,7 @@
 saiorm
 ======
 
-`Saiorm <https://weihaipy.github.io/saiorm>`_  is a lightweight library for accessing database.It will take you have a easy way to use database,including SQL and NoSQL.
+`Saiorm <https://weihaipy.github.io/saiorm>`_  is a lightweight library for accessing database.It will take you have a easy way to use kinds of database with the same syntax,including SQL and NoSQL.
 
 If you want to support other database,just implement like siaorm.PostgreSQL.ChainDB.
 
