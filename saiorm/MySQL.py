@@ -253,26 +253,26 @@ class PositionDB(Connection):
         finally:
             cursor.close()
 
-    def execute_both(self, query, *parameters, **kwparameters):
+    def execute_return_detail(self, query, *parameters, **kwparameters):
         """return lastrowid and rowcount"""
         cursor = self._cursor()
         try:
             self._execute(cursor, query, parameters, kwparameters)
 
             return {
-                "lastrowid":cursor.lastrowid,
+                "lastrowid": cursor.lastrowid,
                 "rowcount": cursor.rowcount,
             }
         finally:
             cursor.close()
 
-    def executemany_both(self, query, parameters):
+    def executemany_return_detail(self, query, parameters):
         """return lastrowid and rowcount"""
         cursor = self._cursor()
         try:
             cursor.executemany(query, parameters)
             return {
-                "lastrowid":cursor.lastrowid,
+                "lastrowid": cursor.lastrowid,
                 "rowcount": cursor.rowcount,
             }
         finally:
@@ -343,41 +343,35 @@ class PositionDB(Connection):
 
     def insert(self, table, field, *parameters, **kwparameters):
         """
-
         :return: tuple,lastrowid and rowcount
         """
         query = self.mk_insert_query(table, field, many=False)
-        return self.execute_both(query, *parameters, **kwparameters)
+        return self.execute_return_detail(query, *parameters, **kwparameters)
 
     def insert_many(self, table, field, *parameters, **kwparameters):
         """
-
         :return: tuple,lastrowid and rowcount
         """
         query = self.mk_insert_query(table, field, many=True)
-        return self.executemany_both(query, *parameters, **kwparameters)
+        return self.executemany_return_detail(query, *parameters, **kwparameters)
 
     def delete(self, table, condition, *parameters, **kwparameters):
         """
-
         :return: tuple,lastrowid and rowcount
         """
         query = self.mk_delete_query(table, condition)
-        return self.execute_both(query, *parameters, **kwparameters)
+        return self.execute_return_detail(query, *parameters, **kwparameters)
 
     def update(self, table, field, condition, *parameters, **kwparameters):
         """
-
         :return: tuple,lastrowid and rowcount
         """
         query = self.mk_update_query(table, field, condition)
-        return self.execute_both(query, *parameters, **kwparameters)
+        return self.execute_return_detail(query, *parameters, **kwparameters)
 
     def select(self, table, field, condition, *parameters, **kwparameters):
         """
-        return all data with the conditions
-
-        :return: list
+        :return: list,all data with the conditions
         """
         table = self.prefix + table
         query = "SELECT " + field + " FROM " + table + " " + condition
@@ -386,9 +380,7 @@ class PositionDB(Connection):
 
     def get(self, table, field, condition, *parameters, **kwparameters):
         """
-        return the latest line of data with the conditions
-
-        :return: dict
+        :return: dict,the latest line of data with the conditions
         """
         data = self.select(table, field, condition, *parameters, **kwparameters)
         return data[0] if data else []
@@ -407,3 +399,16 @@ class PositionDB(Connection):
             return int(rows_count[0]["rows_count"])
         else:
             return 0
+
+    def increase(self, table, field, step=1, where="", *parameters, **kwparameters):
+        """number field Increase """
+
+        sql = "UPDATE {} SET {}={}+{}  {};".format(self.prefix + table, field, field, step, where)
+        res = self.execute_return_detail(sql, *parameters, **kwparameters)
+        return res
+
+    def decrease(self, table, field, step=1, where="", *parameters, **kwparameters):
+        """number field decrease """
+        sql = "UPDATE {} SET {}={}-{} {};".format(self.prefix + table, field, field, step, where)
+        res = self.execute_return_detail(sql, *parameters, **kwparameters)
+        return res

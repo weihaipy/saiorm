@@ -427,7 +427,7 @@ class ChainDB(BaseDB):
 
     def gen_decrease(self, field, step=1):
         """number field decrease """
-        return "UPDATE {} SET {}={}-{};".format(self._table, field, field, str(step))
+        return "UPDATE {} SET {}={}-{};".format(self._table, field, field, step)
 
     def gen_get_fields_name(self):
         """get one line from table"""
