@@ -129,57 +129,71 @@ def test(DB, table):
     # print(DB.last_query)
 
 
-DB_type_list = []
-DB_list = []
-table_list = []
+#
+# DB_type_list = []
+# DB_list = []
+# table_list = []
+#
+# # MySQL
+# DB = saiorm.init()
+# DB.connect({"host": "127.0.0.1", "port": 3306, "database": "x", "user": "root", "password": "root"})
+# table = DB.table("xxx")
+# DB_type_list.append("MySQL")
+# DB_list.append(DB)
+# table_list.append(table)
+#
+# # PostgreSQL
+# DB = saiorm.init(driver="PostgreSQL")
+# DB.connect({"host": "127.0.0.1", "port": "5432", "database": "x", "user": "postgres", "password": "123"})
+# table = DB.table("xxx")
+#
+# DB_type_list.append("MySQL")
+# DB_list.append(DB)
+# table_list.append(table)
+#
+# # SQLServer
+# DB = saiorm.init(driver="SQLServer")
+# DB.connect({"host": "127.0.0.1", "port": "1433", "database": "x", "user": "root", "password": "123"},
+#            return_query=True)
+# table = DB.table("xxx", primary_key="id")  # For LIMIT implement with SQL Server
+#
+# DB_type_list.append("SQLServer")
+# DB_list.append(DB)
+# table_list.append(table)
+#
+# # SQLite
+# DB = saiorm.init(driver="SQLite")
+# DB.connect({"host": "test.db"}, return_query=True)
+# # DB.execute('''CREATE TABLE xxx (id int, a int, b int, c int, d int, e int, f int)''')
+# # DB.execute("drop table xxx")
+# table = DB.table("xxx")
+#
+# DB_type_list.append("SQLite")
+# DB_list.append(DB)
+# table_list.append(table)
+#
+# # MongoDB
+# DB = saiorm.init(driver="MongoDB")
+# DB.connect({"host": "127.0.0.1", "port": "27017", "database": "x", "user": "", "password": ""}, return_query=True)
+# table = DB.table("xxx")
+#
+# DB_type_list.append("MongoDB")
+# DB_list.append(DB)
+# table_list.append(table)
 
-# MySQL
-DB = saiorm.init()
-DB.connect({"host": "127.0.0.1", "port": 3306, "database": "x", "user": "root", "password": "root"})
-table = DB.table("xxx")
-DB_type_list.append("MySQL")
-DB_list.append(DB)
-table_list.append(table)
+# for index, i in enumerate(DB_type_list):
+#     print("-" * 30 + "TEST::" + i + "-" * 30)
+#     test(DB_list[index], table_list[index])
+
 
 # PostgreSQL
-DB = saiorm.init(driver="PostgreSQL")
+DB = saiorm.init(driver="PostgreSQL", table_name_prefix="zz_")
 DB.connect({"host": "127.0.0.1", "port": "5432", "database": "x", "user": "postgres", "password": "123"})
 table = DB.table("xxx")
 
-DB_type_list.append("MySQL")
-DB_list.append(DB)
-table_list.append(table)
+print("table._table::", table._table)
 
-# SQLServer
-DB = saiorm.init(driver="SQLServer")
-DB.connect({"host": "127.0.0.1", "port": "1433", "database": "x", "user": "root", "password": "123"},
-           return_query=True)
-table = DB.table("xxx", primary_key="id")  # For LIMIT implement with SQL Server
-
-DB_type_list.append("SQLServer")
-DB_list.append(DB)
-table_list.append(table)
-
-# SQLite
-DB = saiorm.init(driver="SQLite")
-DB.connect({"host": "test.db"}, return_query=True)
-# DB.execute('''CREATE TABLE xxx (id int, a int, b int, c int, d int, e int, f int)''')
-# DB.execute("drop table xxx")
-table = DB.table("xxx")
-
-DB_type_list.append("SQLite")
-DB_list.append(DB)
-table_list.append(table)
-
-# MongoDB
-DB = saiorm.init(driver="MongoDB")
-DB.connect({"host": "127.0.0.1", "port": "27017", "database": "x", "user": "", "password": ""}, return_query=True)
-table = DB.table("xxx")
-
-DB_type_list.append("MongoDB")
-DB_list.append(DB)
-table_list.append(table)
-
-for index, i in enumerate(DB_type_list):
-    print("-" * 30 + "TEST::" + i + "-" * 30)
-    test(DB_list[index], table_list[index])
+# test(DB, table)
+res = table.select()
+# print(res)
+print(DB.last_query)

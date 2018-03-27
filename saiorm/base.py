@@ -91,8 +91,7 @@ class BaseDB(object):
         """
         # check table name prefix
         if self.table_name_prefix and not table_name.startswith(self.table_name_prefix):
-            table_name += self.table_name_prefix
-
+            table_name = self.table_name_prefix + table_name
         self._table = table_name
         return self
 
