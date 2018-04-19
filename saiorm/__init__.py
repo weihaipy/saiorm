@@ -7,9 +7,9 @@ def init(driver="MySQL", **kwargs):
     if driver.lower() == "mysql":
         from .MySQL import ChainDB
         return ChainDB(**kwargs)
-    if driver.lower() == "mysql_position":
+    elif driver.lower() == "mysql_position":
         from .MySQL import PositionDB
-        return PositionDB
+        return PositionDB(**kwargs)
     elif driver.lower() == "postgresql":
         from .PostgreSQL import ChainDB
         return ChainDB(**kwargs)
