@@ -76,9 +76,10 @@ class ConnectionMongoDB(object):
 
     def _log_exception(self, exception, query, parameters):
         """log exception when execute query"""
-        logging.error("Error on MongoDB:" + self.host)
-        logging.error("Error query:", query + ": " + str(parameters))
-        logging.error("Error Exception:" + str(exception))
+        pass
+        # logging.error("Error on MongoDB:" + self.host)
+        # logging.error("Error query:", query + ": " + str(parameters))
+        # logging.error("Error Exception:" + str(exception))
 
     def select(self, parameters):
         """

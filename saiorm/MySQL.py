@@ -102,10 +102,11 @@ class Connection(object):
 
     def _log_exception(self, exception, query, parameters):
         """log exception when execute SQL"""
-        logging.error("Error on MySQL Server:" + self.host)
-        logging.error("Error query:", query)
-        logging.error("Error parameters:", parameters)
-        logging.error("Error Exception:", str(exception))
+        pass
+        # logging.info("Error on MySQL Server:" + self.host)
+        # logging.info("Error query:", query)
+        # logging.info("Error parameters:", parameters)
+        # logging.error("Error Exception:", str(exception))
 
     def _execute(self, cursor, query, parameters, kwparameters):
         try:

@@ -98,9 +98,10 @@ class Connection(object):
 
     def _log_exception(self, exception, query, parameters):
         """log exception when execute SQL"""
-        logging.error("Error on SQL Server:" + self.host)
-        logging.error("Error query:", query.replace("%s", "{}").format(*parameters))
-        logging.error("Error Exception:" + str(exception))
+        pass
+        # logging.info("Error on SQL Server:" + self.host)
+        # logging.info("Error query:", query.replace("%s", "{}").format(*parameters))
+        # logging.info("Error Exception:" + str(exception))
 
     def _execute(self, cursor, query, parameters, kwparameters):
         try:
