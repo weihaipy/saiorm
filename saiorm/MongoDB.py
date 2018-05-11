@@ -77,9 +77,6 @@ class ConnectionMongoDB(object):
     def _log_exception(self, exception, query, parameters):
         """log exception when execute query"""
         pass
-        # logging.error("Error on MongoDB:" + self.host)
-        # logging.error("Error query:", query + ": " + str(parameters))
-        # logging.error("Error Exception:" + str(exception))
 
     def select(self, parameters):
         """
@@ -318,20 +315,22 @@ class ChainDB(base.ChainDB):
         sql_values = []
         if self._where:
             # TODO support native function,BETWEEN,IN etc.
-            if isinstance(self._where, dict):
-                for k in self._where.keys():
+            if isinstance(self._where, list):
+                for i in self._where:
+                    k = i[0]  # field name
+                    v = i[1:]  # where condation
                     if not k.startswith(">="):
-                        res["where"][k] = {"$gte": self._where[k]}
+                        res["where"][k] = {"$gte": v}
                     elif not k.startswith(">"):
-                        res["where"][k] = {"$gt": self._where[k]}
+                        res["where"][k] = {"$gt": v}
                     elif not k.startswith("<="):
-                        res["where"][k] = {"$lte": self._where[k]}
+                        res["where"][k] = {"$lte": v}
                     elif not k.startswith("<"):
-                        res["where"][k] = {"$lt": self._where[k]}
+                        res["where"][k] = {"$lt": v}
                     elif not k.startswith("!="):
-                        res["where"][k] = {"$ne": self._where[k]}
+                        res["where"][k] = {"$ne": v}
                     elif not k.startswith("`"):
-                        res["where"][k] = self._where[k]
+                        res["where"][k] = v
             else:
                 logging.error("Saiorm does not support str type where condition in MongoDB")
 

@@ -27,32 +27,32 @@ def test(DB, table):
     print(DB.last_query)
     # raise
 
-    res = table.where({
-        "a": 1,
-        "b": ("BETWEEN", "1", "2"),
-        "c": ("`ABS(?)", "2"),
-        "d": ("!=", 0),
-        "e": ("IN", ["1", "2", "3"]),
-        "f": "`ABS(-2)",
-    }).select("e,f")
+    res = table.where([
+        ("a", 1),
+        ("b", "BETWEEN", "1", "2"),
+        ("c", "`ABS(?)", "2"),
+        ("d", "!=", 0),
+        ("e", "IN", ["1", "2", "3"]),
+        ("f", "`ABS(-2)"),
+    ]).select("e,f")
     # print(res)
     print(DB.last_query)
 
-    res = table.where({
-        "a": ("OR", 1),
-        "b": ("OR", "BETWEEN", "1", "2"),
-        "c": ("OR", "`ABS(?)", "2"),
-        "d": ("OR", "IS NOT", "NULL"),
-        "e": ("NOT IN", ["1", "2", "3"]),
-        "f": "`ABS(-2)",
-    }).select("e,f")
+    res = table.where([
+        ("a", "OR", 1),
+        ("b", "OR", "BETWEEN", "1", "2"),
+        ("c", "OR", "`ABS(?)", "2"),
+        ("d", "OR", "IS NOT", "NULL"),
+        ("e", "NOT IN", ["1", "2", "3"]),
+        ("f", "`ABS(-2)"),
+    ]).select("e,f")
     # print(res)
     print(DB.last_query)
 
-    res = table.where({
-        "a": ("IN", ["1", "2", "3"]),
-        "b": ("`ABS(?)", "2"),
-    }).update({
+    res = table.where([
+        ("a", "IN", ["1", "2", "3"]),
+        ("b", "`ABS(?)", "2"),
+    ]).update({
         "c": "`ABS(2)",
         "d": ("`ABS(?)", 3),
         "e": "2",

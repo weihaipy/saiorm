@@ -40,7 +40,8 @@ class BaseDB(object):
         self._where = ""
         self._order_by = ""
         self._group_by = ""
-        self._limit = ""
+        self._limit = 0
+        self._offset = 0
         self._inner_join = ""
         self._left_join = ""
         self._right_join = ""
@@ -52,7 +53,8 @@ class BaseDB(object):
         self._where = ""
         self._order_by = ""
         self._group_by = ""
-        self._limit = ""
+        self._limit = 0
+        self._offset = 0
         self._inner_join = ""
         self._left_join = ""
         self._right_join = ""
@@ -105,6 +107,10 @@ class BaseDB(object):
 
     def limit(self, condition):
         self._limit = condition
+        return self
+
+    def offset(self, condition):
+        self._offset = condition
         return self
 
     def group_by(self, condition):
@@ -442,11 +448,12 @@ class ChainDB(BaseDB):
             elif isinstance(self._where, dict):
                 where = ""
                 and_or_length = 3  # length of AND or OR
-                for k in self._where.keys():
-                    v = self._where[k]
-                    if is_array(v):
+                for i in self._where:  # WHERE SHOULD BE LIST, change in 0.2
+                    k = i[0]  # field name
+                    v = i[1:]  # where value
+                    v0 = v[0]
+                    if len(v) > 1:
                         and_or = "AND"  # Parallel relationship
-                        v0 = v[0]
                         if isinstance(v0, str) and v0.lower() == "or":
                             and_or = "OR"
                             and_or_length = 2
@@ -503,38 +510,61 @@ class ChainDB(BaseDB):
                             else:
                                 where += " {}={} {}".format(k, self.param_place_holder, and_or)
                                 sql_values.append(v)
-                    else:
+                    else:  # single value
                         and_or_length = 3
-                        if isinstance(v, str) and v.startswith("`"):  # native mysql function
+                        if isinstance(v0, str) and v0.startswith("`"):  # native mysql function
                             where += " {}={} AND".format(k, v[1:])
                         else:
                             where += " {}={} AND".format(k, self.param_place_holder)
-                            sql_values.append(v)
+                            sql_values.append(v0)
                 if where:
                     sql += "WHERE" + where[:0 - and_or_length]  # trim the last AND / OR character
 
         return sql, sql_values
 
-    def parse_condition(self):
-        """
-        generate query condition
-        """
-        sql, sql_values = self.parse_where_condition()
-
+    def parse_join(self, sql):
+        """parse join condition"""
         if self._inner_join:
             sql += " INNER JOIN {} ON {}".format(self._inner_join, self._on)
         elif self._left_join:
             sql += " LEFT JOIN {} ON {}".format(self._left_join, self._on)
         elif self._right_join:
             sql += " RIGHT JOIN {} ON {}".format(self._right_join, self._on)
+        return sql
 
+    def parse_order_by(self, sql):
+        """parse order by condition"""
         if self._order_by:
-            sql += " ORDER BY " + self._order_by
+            sql += " ORDER BY {} ".format(self._order_by)
+        return sql
 
-        if self._limit:
-            sql += " LIMIT " + str(self._limit)
+    def parse_limit(self, sql):
+        """parse limit condition"""
 
+        # default MySQL style
+        if isinstance(self._limit, str) and "," in self._limit:
+            m, n = self._limit.replace(" ", "").split(",")
+            sql += " LIMIT {} {}".format(m, n)
+        elif self._offset:
+            sql += " LIMIT {}, {}".format(self._offset, self._limit)
+        else:
+            sql += " LIMIT {} ".format(self._limit)
+        return sql
+
+    def parse_group_by(self, sql):
+        """parse order by condition"""
         if self._group_by:
-            sql += " GROUP BY " + self._group_by
+            sql += " GROUP BY {} ".format(self._group_by)
+        return sql
+
+    def parse_condition(self):
+        """
+        generate query condition
+        """
+        sql, sql_values = self.parse_where_condition()
+        sql = self.parse_join(sql)
+        sql = self.parse_order_by(sql)
+        sql = self.parse_limit(sql)
+        sql = self.parse_group_by(sql)
 
         return sql, sql_values

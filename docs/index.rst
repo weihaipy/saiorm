@@ -153,24 +153,24 @@ Usage for select and get
     table.order_by("id DESC").get()
 
     # kinds of params in where,all by AND
-    table.where({
-        "a": 1,
-        "b": ("BETWEEN", "1", "2"),
-        "c": ("`ABS(?)", "2"),
-        "d": ("!=", 0),
-        "e": ("IN", ["1", "2", "3"]),
-        "f": "`ABS(-2)",
-    }).select("e,f")
+    table.where([
+        ("a", 1),
+        ("b", "BETWEEN", "1", "2"),
+        ("c", "`ABS(?)", "2"),
+        ("d", "!=", 0),
+        ("e", "IN", ["1", "2", "3"]),
+        ("f", "`ABS(-2)"),
+    ]).select("e,f")
 
     # kinds of params in where,mixing AND and OR
-    table.where({
-        "a": ("OR", 1),
-        "b": ("OR", "BETWEEN", "1", "2"),
-        "c": ("OR", "`ABS(?)", "2"),
-        "d": ("OR", "IS NOT", "NULL"),
-        "e": ("NOT IN", ["1", "2", "3"]),
-        "f": "`ABS(-2)",
-        }).select("e,f")
+    table.where([
+        ("a", "OR", 1),
+        ("b", "OR", "BETWEEN", "1", "2"),
+        ("c", "OR", "`ABS(?)", "2"),
+        ("d", "OR", "IS NOT", "NULL"),
+        ("e", "NOT IN", ["1", "2", "3"]),
+        ("f", "`ABS(-2)"),
+    ]).select("e,f")
 
 will be transformed to SQL:
 
@@ -332,14 +332,14 @@ Method where
 
 .. code:: python
 
-    table.where({
-        "a": 1,
-        "b": ("BETWEEN", "1", "2"),
-        "c": ("`ABS(?)", "2"),
-        "d": ("OR", "!=", 0), # use OR with the next condition
-        "e": ("IN", "1,2,3"),
-        "f": "`NOW()",
-    }).select("e,f")
+    table.where([
+        ("a", 1),
+        ("b", "OR", "BETWEEN", "1", "2"),
+        ("c", "OR", "`ABS(?)", "2"),
+        ("d", "OR", "IS NOT", "NULL"),
+        ("e", "NOT IN", ["1", "2", "3"]),
+        ("f", "`ABS(-2)"),
+    ]).select("e,f")
 
 - when calling native function the param placeholder should be ?.
 

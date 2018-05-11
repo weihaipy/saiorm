@@ -97,9 +97,6 @@ class Connection(object):
     def _log_exception(self, exception, query, parameters):
         """log exception when execute SQL"""
         pass
-        # logging.error("Error on postgresSQL:" + self.host)
-        # logging.error("Error query:", query.replace("%s", "{}").format(*parameters))
-        # logging.error("Error Exception:" + str(exception))
 
     def _execute(self, cursor, query, parameters, kwparameters):
         try:
@@ -161,31 +158,17 @@ class ChainDB(base.ChainDB):
     def connect(self, config_dict=None):
         self.db = Connection(**config_dict)
 
-    def parse_condition(self):
-        """
-        generate query condition
-        """
-        sql, sql_values = self.parse_where_condition()
+    def parse_limit(self, sql):
+        """parse limit condition"""
 
-        if self._inner_join:
-            sql += " INNER JOIN {} ON {}".format(self._inner_join, self._on)
-        elif self._left_join:
-            sql += " LEFT JOIN {} ON {}".format(self._left_join, self._on)
-        elif self._right_join:
-            sql += " RIGHT JOIN {} ON {}".format(self._right_join, self._on)
-
-        if self._order_by:
-            sql += " ORDER BY " + self._order_by
-
-        # PostgreSQL LIMIT id different from MySQL
+        # PostgreSQL LIMIT is different from MySQL
         if self._limit:
             if isinstance(self._limit, str) and "," in self._limit:
                 m, n = self._limit.replace(" ", "").split(",")
                 sql += " LIMIT {} OFFSET {}".format(n, m)
+            elif self._offset:
+                sql += " LIMIT {} OFFSET {}".format(self._limit, self._offset)
             else:
-                sql += " LIMIT " + str(self._limit)
+                sql += " LIMIT {} ".format(self._limit)
 
-        if self._group_by:
-            sql += " GROUP BY " + self._group_by
-
-        return sql, sql_values
+        return sql
