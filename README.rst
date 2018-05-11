@@ -26,6 +26,10 @@ Note that MongoDB support **select,get,update,insert,insert_many,delete,increase
 TODO
 ====
 
+- FIX BUG IN USEING OR STATEMENT,CHANGE WHERE PARAM TO LIST INSTEAD OF DICT
+
+- CHANGE LINIT,USE LIMIT OFFSET
+
 - SQL database:
 
     - Transaction::
