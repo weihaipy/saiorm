@@ -1,19 +1,19 @@
 Welcome to saiorm /saɪɔ:m/,塞翁
 ===============================
 
-Saiorm is a lightweight library for accessing database.It will take you have a easy way to use kinds of database with the same syntax,including SQL and NoSQL.
+Saiorm : surely an incorrect orm.
+
+Saiorm is a lightweight library for accessing database,but only translate the params to database statements.
 
 Support MySQL, PostgreSQL, SQL Server ,SQLite and MongoDB,require pymysql psycopg2 pymssql sqlite3 pymongo  for each database type.
 
-Syntax looks like a mixture of SQL and mongodb. Only translate the params to database statements.
+It will take you have a easy way to use kinds of database with the same syntax,including SQL and NoSQL.Syntax looks like a mixture of SQL and mongodb.
 
-You can inherit from saiorm.base.ChainDB to support other types of database with the same API,like siaorm.PostgreSQL.ChainDB.
+You can inherit from saiorm.base.ChainDB to support other types of database with the same API.
 
-**Common methods:**
+**Common methods,both SQL and NoSQL:**
 
-- **insert, select, update, delete, increase, decrease** should be executed **finally**,they will take effect immediately.
-
-- **where** receive dict type. **IN** require a string or a sequence only.
+- **insert, select, update, delete, increase, decrease** should be called **finally**,they will take effect immediately.
 
 - **select** return all data with list.
 
@@ -29,7 +29,7 @@ You can inherit from saiorm.base.ChainDB to support other types of database with
 
     **get_fields_name** get a list of all fields name, cache them by default.
 
-    **where** can receive str type.
+    **where** can receive list type(recommend) or string type.
 
     Use various **join**,should use string for **join** and **where**.
 
@@ -43,11 +43,13 @@ You can inherit from saiorm.base.ChainDB to support other types of database with
 
 - native function
 
-   Add **`** as a prefix to set the field to native function in **select** and **update** etc.
+   Add **`** as a prefix.
 
 - **MongoDB is not full support:**
 
     Only support select,get,update,insert,insert_many,delete,increase,decrease,where,limit,order_by
+
+    **where** receive list type
 
 **ATTENTION**
 
