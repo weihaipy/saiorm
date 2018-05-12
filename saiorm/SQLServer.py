@@ -163,6 +163,7 @@ class ChainDB(base.ChainDB):
                  cache_fields_name=True, grace_result=True, primary_key=""):
         self._primary_key = primary_key  # For SQL Server
         self._return_query = None
+        self.field_name_quote = "'"
         super().__init__(table_name_prefix=table_name_prefix, debug=debug, strict=strict,
                          cache_fields_name=cache_fields_name, grace_result=grace_result)
 

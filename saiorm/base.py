@@ -35,6 +35,7 @@ class BaseDB(object):
         self._cached_fields_name = {}  # cached fields name
         self.grace_result = grace_result
         self.param_place_holder = "%s"  # SQLite will use ?
+        self.field_name_quote = "`"  # MySQL use `,PostgreSql and SQLite use ",SQLServer use ', new in 0.2
 
         self._table = ""
         self._where = ""
@@ -60,6 +61,17 @@ class BaseDB(object):
         self._right_join = ""
         self._on = ""
         self.last_query = ""  # latest executed sql
+
+    def wrap_field_name(self, fields):
+        """
+        wrap each field name with quote. should used in SELECT statement
+        new in 0.2
+        """
+        if self.field_name_quote not in fields and "," in fields:
+            fields = self.field_name_quote + \
+                     self.field_name_quote.join(fields.split(",")) + \
+                     self.field_name_quote
+        return fields
 
     def connect(self, config_dict=None):
         """
@@ -373,6 +385,7 @@ class ChainDB(BaseDB):
     """
 
     def gen_select_with_fields(self, fields, condition):
+        fields = self.wrap_field_name(fields)
         return "SELECT {} FROM {} {};".format(fields, self._table, condition)
 
     def gen_select_without_fields(self, fields):

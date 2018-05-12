@@ -178,8 +178,8 @@ will be transformed to SQL:
 
     SELECT * FROM xxx ;
     SELECT * FROM xxx  ORDER BY id DESC LIMIT 1;
-    SELECT e,f FROM xxx WHERE a=1 AND b BETWEEN 1 AND 2 AND c=ABS(2) AND d!=0 AND e IN (1,2,3) AND f=ABS(-2) ;
-    SELECT e,f FROM xxx WHERE a=1 OR b BETWEEN 1 AND 2 OR c=ABS(2) OR d IS NOT NULL OR e NOT IN (1,2,3) AND f=ABS(-2)
+    SELECT `e`,`f` FROM xxx WHERE a=1 AND b BETWEEN 1 AND 2 AND c=ABS(2) AND d!=0 AND e IN (1,2,3) AND f=ABS(-2) ;
+    SELECT `e`,`f` FROM xxx WHERE a=1 OR b BETWEEN 1 AND 2 OR c=ABS(2) OR d IS NOT NULL OR e NOT IN (1,2,3) AND f=ABS(-2)
 
 Usage for update
 ~~~~~~~~~~~~~~~~
@@ -188,10 +188,10 @@ If you want use native function,you can pass a tuple.
 
 .. code:: python
 
-    table.where({
-        "a": ("IN", ["1", "2", "3"]),
-        "b": ("`ABS(?)", "2"),
-    }).update({
+    table.where([
+        ("a", "IN", ["1", "2", "3"]),
+        ("b","`ABS(?)", "2"),
+    ]).update({
         "c": "`ABS(2)",
         "d": ("`ABS(?)", 3),
         "e": "2",
@@ -335,21 +335,19 @@ Method where
     table.where([
         ("a", 1),
         ("b", "OR", "BETWEEN", "1", "2"),
-        ("c", "OR", "`ABS(?)", "2"),
+        ("c", "!=", "`ABS(?)", "2"),
         ("d", "OR", "IS NOT", "NULL"),
         ("e", "NOT IN", ["1", "2", "3"]),
         ("f", "`ABS(-2)"),
     ]).select("e,f")
 
-- when calling native function the param placeholder should be ?.
-
-- use IN or BETWEEN should pass a tuple or list.
-
 - The default parallel relationship with the next condition is AND,use tuple or list with the first item "or" to toggle to "or".
 
-- condition will be equals value,or pass a tuple or list, and set the first item to change it.
+- Condition will be equals value,or pass a second item(like !=) to change it.
 
-- pass string type is allowed with SQL databases.
+- When calling native function the param placeholder should be ?.
+
+- Pass string type is allowed with SQL databases.
 
 Shortcuts
 ~~~~~~~~~

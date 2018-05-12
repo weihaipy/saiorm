@@ -155,6 +155,8 @@ class Connection(object):
 
 
 class ChainDB(base.ChainDB):
+    field_name_quote = '"'
+
     def connect(self, config_dict=None):
         self.db = Connection(**config_dict)
 
