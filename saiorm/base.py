@@ -67,10 +67,12 @@ class BaseDB(object):
         wrap each field name with quote. should used in SELECT statement
         new in 0.2
         """
+        # todo  在 join 的时候,添加符号可能导致出错,需要判断是否有点,然后分开处理
         if self.field_name_quote not in fields and "," in fields:
-            fields = self.field_name_quote + \
-                     self.field_name_quote.join(fields.split(",")) + \
-                     self.field_name_quote
+            if "." not in fields:
+                fields = self.field_name_quote + \
+                         self.field_name_quote.join(fields.split(",")) + \
+                         self.field_name_quote
         return fields
 
     def connect(self, config_dict=None):
@@ -129,28 +131,45 @@ class BaseDB(object):
         self._group_by = condition
         return self
 
-    def join(self, condition):
+    def on(self, condition):
         if self.table_name_prefix and "###" in condition:
             condition = condition.replace("###", self.table_name_prefix)
+        self._on = condition
+        return self
 
+    def join(self, condition):
+        if self.table_name_prefix:
+            if "###" in condition:
+                condition = condition.replace("###", self.table_name_prefix)
+            else:
+                condition = self.table_name_prefix + condition
         self._inner_join = condition
         return self
 
     def inner_join(self, condition):
-        if self.table_name_prefix and "###" in condition:
-            condition = condition.replace("###", self.table_name_prefix)
+        if self.table_name_prefix:
+            if "###" in condition:
+                condition = condition.replace("###", self.table_name_prefix)
+            else:
+                condition = self.table_name_prefix + condition
         self._inner_join = condition
         return self
 
     def left_join(self, condition):
-        if self.table_name_prefix and "###" in condition:
-            condition = condition.replace("###", self.table_name_prefix)
+        if self.table_name_prefix:
+            if "###" in condition:
+                condition = condition.replace("###", self.table_name_prefix)
+            else:
+                condition = self.table_name_prefix + condition
         self._left_join = condition
         return self
 
     def right_join(self, condition):
-        if self.table_name_prefix and "###" in condition:
-            condition = condition.replace("###", self.table_name_prefix)
+        if self.table_name_prefix:
+            if "###" in condition:
+                condition = condition.replace("###", self.table_name_prefix)
+            else:
+                condition = self.table_name_prefix + condition
         self._right_join = condition
         return self
 
@@ -164,8 +183,9 @@ class BaseDB(object):
             sql = self.gen_select_without_fields(fields[1:])  # 用于直接执行 mysql 函数
         else:
             condition_sql, condition_values = self.parse_condition()
+            print("condition_sql:", condition_sql)
             sql = self.gen_select_with_fields(fields, condition_sql)
-
+        print("sql:::", sql)
         res = self.query(sql, *condition_values)
         self.last_query = res["query"]
         if self.grace_result:
@@ -553,6 +573,9 @@ class ChainDB(BaseDB):
 
     def parse_limit(self, sql):
         """parse limit condition"""
+
+        if self._limit == 0:
+            return sql
 
         # default MySQL style
         if isinstance(self._limit, str) and "," in self._limit:

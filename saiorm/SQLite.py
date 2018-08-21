@@ -157,6 +157,9 @@ class ChainDB(base.ChainDB):
     def parse_limit(self, sql):
         """parse limit condition"""
 
+        if self._limit == 0:
+            return sql
+
         # SQLite LIMIT is different from MySQL
         if self._limit:
             if isinstance(self._limit, str) and "," in self._limit:
