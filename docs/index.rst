@@ -312,6 +312,17 @@ will be transformed to SQL:
 
     UPDATE xxx SET a=a-1
 
+Usage for left join
+~~~~~~~~~~~~~~~~~~~
+
+.. code:: python
+
+    DB.table("tableA AS a")
+      .left_join("tableB AS b")
+      .on("b.bb = a.aa")
+      .where([("expire_time", ">", now)])
+      .select("a.*,b.disabled_function")
+
 Method limit
 ~~~~~~~~~~~~
 
