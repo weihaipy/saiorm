@@ -67,7 +67,8 @@ MySQL:
 
     import saiorm
     DB = saiorm.init()  # without table name prefix
-    # DB = saiorm.init(table_name_prefix="abc_") # mysql with table name prefix
+    # or
+    DB = saiorm.init(table_name_prefix="abc_") # mysql with table name prefix
     DB.connect({"host": "", "port": 3306, "database": "", "user": "", "password": ""})
     table = DB.table("xxx")
 
@@ -77,7 +78,8 @@ PostgreSQL:
 
     import saiorm
     DB = saiorm.init(driver="PostgreSQL")   # without table name prefix
-    # DB = saiorm.init(driver="PostgreSQL", table_name_prefix="abc_") # with table name prefix
+    # or
+    DB = saiorm.init(driver="PostgreSQL", table_name_prefix="abc_") # with table name prefix
     DB.connect({"host": "", "port": "5432", "database": "", "user": "", "password": ""})
     table = DB.table("xxx")
 
@@ -89,7 +91,8 @@ You should pass **primary_key** to method table,because SQL Server does not supp
 
     import saiorm
     DB = saiorm.init(driver="SQLServer")   # without table name prefix
-    # DB = saiorm.init(driver="SQLServer", table_name_prefix="abc_") # with table name prefix
+    # or
+    DB = saiorm.init(driver="SQLServer", table_name_prefix="abc_") # with table name prefix
     DB.connect({"host": "", "port": "1433", "database": "", "user": "", "password": ""})
     # DB.connect({"host": "", "port": "1433", "database": "", "user": "", "password": ""}, return_query=True) # can get latest query you executed
     table = DB.table("xxx", primary_key="id")  # For LIMIT implement with SQL Server
@@ -103,7 +106,8 @@ The only param **host** should be the path to db file.
 
     import saiorm
     DB = saiorm.init(driver="SQLite")   # without table name prefix
-    # DB = saiorm.init(driver="SQLite", table_name_prefix="abc_") # with table name prefix
+    # or
+    DB = saiorm.init(driver="SQLite", table_name_prefix="abc_") # with table name prefix
     DB.connect({"host": "test.db"})
     # DB.connect({"host": "test.db"}, return_query=True) # can get latest query you executed
     table = DB.table("xxx")
@@ -115,7 +119,8 @@ MongoDB:
     import saiorm
     DB = saiorm.init(driver="MongoDB")
     DB.connect({"host": "127.0.0.1", "port": "27017", "database": "x", "user": "", "password": ""})
-    # DB.connect({"host": "127.0.0.1", "port": "27017", "database": "x", "user": "", "password": ""}, return_query=True)# can get latest query you executed
+    # or
+    DB.connect({"host": "127.0.0.1", "port": "27017", "database": "x", "user": "", "password": ""}, return_query=True)# can get latest query you executed
     table = DB.table("xxx")
 
 ----
