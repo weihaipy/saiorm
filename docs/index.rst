@@ -328,8 +328,8 @@ Usage for left join
       .where([("expire_time", ">", now)])
       .select("a.*,b.disabled_function")
 
-Method limit
-~~~~~~~~~~~~
+Method limit and offset
+~~~~~~~~~~~~~~~~~~~~~~~
 
 Param should be str type.
 
@@ -337,13 +337,13 @@ basic usage:
 
 .. code:: python
 
-    table.limit("number")
+    table.limit(number)
 
 with offset:
 
 .. code:: python
 
-    table.limit("offset, number")
+    table.limit(number).offset(number)
 
 Method where
 ~~~~~~~~~~~~
