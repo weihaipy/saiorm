@@ -362,24 +362,6 @@ class BaseDB(object):
         """get one line from table"""
         raise NotImplementedError("You must implement it in subclass")
 
-    # shorthand
-    t = table
-    w = where
-    ob = order_by
-    l = limit
-    gb = group_by
-    j = join
-    ij = inner_join
-    lj = left_join
-    rj = right_join
-    s = select
-    i = insert
-    im = insert_many
-    u = update
-    d = delete
-    inc = increase
-    dec = decrease
-
     def parse_where_condition(self):
         """
         parse where condition
