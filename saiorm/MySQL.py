@@ -397,15 +397,14 @@ class PositionDB(Connection):
         else:
             return 0
 
-    def increase(self, table, field, step=1, where="", *parameters, **kwparameters):
+    def increase(self, table, field, condition, *parameters, step=1, **kwparameters):
         """number field Increase """
-
-        sql = "UPDATE {} SET {}={}+{}  {};".format(self.prefix + table, field, field, step, where)
+        sql = "UPDATE {} SET {}={}+{}  {};".format(self.prefix + table, field, field, step, condition)
         res = self.execute_return_detail(sql, *parameters, **kwparameters)
         return res
 
-    def decrease(self, table, field, step=1, where="", *parameters, **kwparameters):
+    def decrease(self, table, field, condition, *parameters, step=1, **kwparameters):
         """number field decrease """
-        sql = "UPDATE {} SET {}={}-{} {};".format(self.prefix + table, field, field, step, where)
+        sql = "UPDATE {} SET {}={}-{} {};".format(self.prefix + table, field, field, step, condition)
         res = self.execute_return_detail(sql, *parameters, **kwparameters)
         return res

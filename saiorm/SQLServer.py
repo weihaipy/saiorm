@@ -233,6 +233,7 @@ class ChainDB(base.ChainDB):
             condition_sql, condition_values = self.parse_condition()
 
             if pre_where:
+                # todo after fixing join statement,here will have issue
                 if condition_sql.startswith("WHERE"):
                     condition_sql = pre_where + " AND " + condition_sql[len("WHERE"):]
                 else:

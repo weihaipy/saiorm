@@ -183,9 +183,8 @@ class BaseDB(object):
             sql = self.gen_select_without_fields(fields[1:])  # 用于直接执行 mysql 函数
         else:
             condition_sql, condition_values = self.parse_condition()
-            print("condition_sql:", condition_sql)
             sql = self.gen_select_with_fields(fields, condition_sql)
-        print("sql:::", sql)
+
         res = self.query(sql, *condition_values)
         self.last_query = res["query"]
         if self.grace_result:
@@ -217,10 +216,10 @@ class BaseDB(object):
         self.last_query = res["query"]
         return res
 
-    def gen_update(self, fields, condition):
+    def gen_update(self, *args, **kwargs):
         raise NotImplementedError("You must implement it in subclass")
 
-    def split_update_fields_value(self, dict_data):
+    def split_update_fields_value(self, *args, **kwargs):
         raise NotImplementedError("You must implement it in subclass")
 
     def insert(self, dict_data=None):
@@ -257,10 +256,10 @@ class BaseDB(object):
         self.last_query = res["query"]
         return res
 
-    def gen_insert_with_fields(self, fields, condition):
+    def gen_insert_with_fields(self, *args, **kwargs):
         raise NotImplementedError("You must implement it in subclass")
 
-    def gen_insert_without_fields(self, fields):
+    def gen_insert_without_fields(self, *args, **kwargs):
         raise NotImplementedError("You must implement it in subclass")
 
     def insert_many(self, dict_data=None):
@@ -304,10 +303,10 @@ class BaseDB(object):
         self.last_query = res["query"]
         return res
 
-    def gen_insert_many_with_fields(self, fields, condition):
+    def gen_insert_many_with_fields(self, *args, **kwargs):
         raise NotImplementedError("You must implement it in subclass")
 
-    def gen_insert_many_without_fields(self, fields):
+    def gen_insert_many_without_fields(self, *args, **kwargs):
         raise NotImplementedError("You must implement it in subclass")
 
     def delete(self):
@@ -321,7 +320,7 @@ class BaseDB(object):
         self.last_query = res["query"]
         return res
 
-    def gen_delete(self, condition):
+    def gen_delete(self, *args, **kwargs):
         raise NotImplementedError("You must implement it in subclass")
 
     def increase(self, field, step=1):
@@ -331,7 +330,7 @@ class BaseDB(object):
         self.last_query = res["query"]
         return res
 
-    def gen_increase(self, field, step):
+    def gen_increase(self, *args, **kwargs):
         raise NotImplementedError("You must implement it in subclass")
 
     def decrease(self, field, step=1):
@@ -341,10 +340,10 @@ class BaseDB(object):
         self.last_query = res["query"]
         return res
 
-    def gen_decrease(self, field, step):
+    def gen_decrease(self, *args, **kwargs):
         raise NotImplementedError("You must implement it in subclass")
 
-    def get_fields_name(self):
+    def get_fields_name(self, *args, **kwargs):
         """return all fields of table"""
         if not self._table:
             return []
@@ -358,11 +357,11 @@ class BaseDB(object):
 
             return fields_name
 
-    def gen_get_fields_name(self):
+    def gen_get_fields_name(self, *args, **kwargs):
         """get one line from table"""
         raise NotImplementedError("You must implement it in subclass")
 
-    def parse_where_condition(self):
+    def parse_where_condition(self, *args, **kwargs):
         """
         parse where condition
 
@@ -370,7 +369,7 @@ class BaseDB(object):
         """
         raise NotImplementedError("You must implement it in subclass")
 
-    def parse_condition(self):
+    def parse_condition(self, *args, **kwargs):
         """
         parse all condition
 
@@ -383,7 +382,7 @@ class ChainDB(BaseDB):
     """
     Common SQL class,Most basic SQL statements are same as each other.
 
-    Implement the different only.
+    Implement the difference only.
     """
 
     def gen_select_with_fields(self, fields, condition):
@@ -453,14 +452,27 @@ class ChainDB(BaseDB):
         """get one line from table"""
         return "SELECT * FROM {} LIMIT 1;".format(self._table)
 
-    def parse_where_condition(self):
-        """parse where condition"""
+    def parse_join(self):
+        """parse join condition"""
         sql = ""
+        if self._inner_join:
+            sql += " INNER JOIN {} ON {}".format(self._inner_join, self._on)
+        elif self._left_join:
+            sql += " LEFT JOIN {} ON {}".format(self._left_join, self._on)
+        elif self._right_join:
+            sql += " RIGHT JOIN {} ON {}".format(self._right_join, self._on)
+        return sql
+
+    def parse_where_condition(self, sql):
+        """parse where condition
+        :param sql:str
+        """
+        sql = sql + " "  # Add a space
         sql_values = []
         if self._where:
             if isinstance(self._where, str):
                 sql += "WHERE" + self._where
-            elif isinstance(self._where, dict):
+            elif isinstance(self._where, list) or isinstance(self._where, tuple):
                 where = ""
                 and_or_length = 3  # length of AND or OR
                 for i in self._where:  # WHERE SHOULD BE LIST, change in 0.2
@@ -504,7 +516,6 @@ class ChainDB(BaseDB):
                                 where += " {} {} ({}) {}".format(k, sign, v1, and_or)
                             else:
                                 where += " {} {} {} {}".format(k, sign, str(v1), and_or)
-
                         elif sign.lower() == "between":  # BETWEEN
                             where += " {} BETWEEN {} AND {} {}".format(k,
                                                                        self.param_place_holder,
@@ -518,7 +529,6 @@ class ChainDB(BaseDB):
                                 v0 = v0.replace("?", "{}")
                                 v0 = v0.format(*v[1:])
                             where += " {}={} {}".format(k, v0, and_or)
-
                         else:
                             if isinstance(v, str) and v.startswith("`"):  # native mysql function
                                 where += " {}={} {}".format(k, v[1:], and_or)
@@ -536,16 +546,6 @@ class ChainDB(BaseDB):
                     sql += "WHERE" + where[:0 - and_or_length]  # trim the last AND / OR character
 
         return sql, sql_values
-
-    def parse_join(self, sql):
-        """parse join condition"""
-        if self._inner_join:
-            sql += " INNER JOIN {} ON {}".format(self._inner_join, self._on)
-        elif self._left_join:
-            sql += " LEFT JOIN {} ON {}".format(self._left_join, self._on)
-        elif self._right_join:
-            sql += " RIGHT JOIN {} ON {}".format(self._right_join, self._on)
-        return sql
 
     def parse_order_by(self, sql):
         """parse order by condition"""
@@ -579,8 +579,11 @@ class ChainDB(BaseDB):
         """
         generate query condition
         """
-        sql, sql_values = self.parse_where_condition()
-        sql = self.parse_join(sql)
+        sql = ""
+        # should parse join statement,the next one is whee statement
+        if any((self._inner_join, self.left_join, self.right_join)):
+            sql = self.parse_join()
+        sql, sql_values = self.parse_where_condition(sql)
         sql = self.parse_order_by(sql)
         sql = self.parse_limit(sql)
         sql = self.parse_group_by(sql)
