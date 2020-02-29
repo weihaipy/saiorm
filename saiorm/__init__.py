@@ -4,23 +4,24 @@ from .utility import GraceDict
 
 
 def init(driver="MySQL", **kwargs):
-    if driver.lower() == "mysql":
+    driver_lower = driver.lower()
+    if driver_lower == "mysql":
         from .MySQL import ChainDB
         return ChainDB(**kwargs)
-    elif driver.lower() == "mysql_position":
+    elif driver_lower == "mysql_position":
         from .MySQL import PositionDB
         return PositionDB(**kwargs)
-    elif driver.lower() == "postgresql":
+    elif driver_lower == "postgresql":
         from .PostgreSQL import ChainDB
         return ChainDB(**kwargs)
-    elif driver.lower().replace(" ", "") == "sqlserver":
+    elif driver_lower.replace(" ", "") == "sqlserver":
         from .SQLServer import ChainDB
         return ChainDB(**kwargs)
-    elif driver.lower() == "sqlite":
+    elif driver_lower == "sqlite":
         from .SQLite import ChainDB
         return ChainDB(**kwargs)
-    elif driver.lower() == "mongodb":
+    elif driver_lower == "mongodb":
         from .MongoDB import ChainDB
         return ChainDB(**kwargs)
     else:
-        raise ValueError("Init saiorm with wrong database driver type")
+        raise ValueError("saiorm does not support " + driver)

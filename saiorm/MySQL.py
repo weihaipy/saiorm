@@ -8,8 +8,6 @@ import time
 from pymysql import cursors
 from pymysql import connect
 
-import logging
-
 try:
     from . import utility
 except ImportError:

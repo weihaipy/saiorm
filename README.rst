@@ -1,7 +1,9 @@
 saiorm
 ======
 
-`Saiorm <https://weihaipy.github.io/saiorm>`_  is a lightweight library for accessing database.It will take you have a easy way to use kinds of database with the same syntax,including SQL and NoSQL.
+`Saiorm <https://weihaipy.github.io/saiorm>`_  is a very lightweight translator for accessing kinds of database with the same syntax,including SQL and NoSQL.
+
+It only translate python code and arguments to database statement,no longer need models.Directly operate the data in the database. No data type conversion, minimize the performance loss.
 
 If you want to support other database,just implement like siaorm.PostgreSQL.ChainDB.
 
@@ -49,3 +51,14 @@ TODO
 
     group
     native function,BETWEEN,IN etc.
+
+- pyodbc::
+
+    https://www.jb51.net/article/143212.htm
+
+- 添加别名::
+
+    select > fetchall
+    get > fetchone
+
+- 字符串的处理全部改用 f 字符串,提高速度
