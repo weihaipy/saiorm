@@ -39,6 +39,7 @@ def reset_database():
 class TestFunctions(unittest.TestCase):
     def setUp(self):
         reset_database()
+
     #
     # def tearDown(self):
     #     pass
@@ -51,39 +52,88 @@ class TestFunctions(unittest.TestCase):
         res = DB.get("`SUM(1+2) as s")
         self.assertEqual(decimal.Decimal("3"), res["s"])
 
-    def test_insert(self):
-        pass
+    def test_insert_natural_dict(self):
+        field = "name"
+        name = "test_insert_natural_dict"
+        table = DB.table("user")
+        table.insert({
+            field: name,
+            "phone": "13512345678"
+        })
+
+        res = table.where([("name", name)]).get(field)
+        self.assertEqual(name, res[field])
+
+    def test_insert_split_dict(self):
+        field = "name"
+        name = "test_insert_split_dict"
+        table = DB.table("user")
+        table.insert({
+            "fields": [field, "phone"],
+            "values": [name, "13612345678"],
+        })
+
+        res = table.where([("name", name)]).get(field)
+        self.assertEqual(name, res[field])
 
     def test_insert_many(self):
-        pass
+        field = "name"
+        name = "test_insert_many"
+        table = DB.table("user")
+        table.insert_many([{
+            field: name + "_1",
+            "phone": "14012345678",
+        }, {
+            field: name + "_2",
+            "phone": "14112345678",
+        }, {
+            field: name + "_3",
+            "phone": "14212345678",
+        }])
+
+        res = table.where([("name", name + "_1")]).get(field)
+        self.assertEqual(name + "_1", res[field])
 
     def test_delete(self):
-        pass
+        table = DB.table("user")
+        field = "name"
+        table.where([("id", 1)]).delete()
+        res = table.where([("id", 2)]).get(field)
+        self.assertEqual(1, len(res))
 
     def test_update_and_where(self):
+        table = DB.table("blog")
         field = "content"
         content = "test_update"
 
-        DB.table("blog").where([
+        table.where([
             ("id", 4),
         ]).update({
             field: content
         })
 
-        res = DB.table("blog").where([("id", 4)]).get(field)
+        res = table.where([("id", 4)]).get(field)
         self.assertEqual(content, res[field])
 
     def test_increase(self):
+        table = DB.table("user")
         field = "login_times"
-        DB.table("user").where([
+        table.where([
             ("id", 4),
         ]).increase(field, 1)
 
-        res = DB.table("user").where([("id", 4)]).get(field)
+        res = table.where([("id", 4)]).get(field)
         self.assertEqual(445, res[field])
 
     def test_decrease(self):
-        pass
+        table = DB.table("user")
+        field = "login_times"
+        table.where([
+            ("id", 3),
+        ]).decrease(field, 1)
+
+        res = table.where([("id", 3)]).get(field)
+        self.assertEqual(332, res[field])
 
     def test_query(self):
         pass
