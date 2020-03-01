@@ -62,7 +62,12 @@ CREATE TABLE `prefix_login_log` (
 
 LOCK TABLES `prefix_login_log` WRITE;
 /*!40000 ALTER TABLE `prefix_login_log` DISABLE KEYS */;
-INSERT INTO `prefix_login_log` VALUES (1,1,'2020-01-01 00:00:00'),(2,1,'2020-01-01 10:00:00'),(3,2,'2020-01-01 11:00:00'),(4,3,'2010-01-02 00:00:00'),(5,2,'2020-01-02 07:00:00'),(6,4,'2020-01-02 07:00:00');
+INSERT INTO `prefix_login_log` VALUES (1,1,'2020-01-01 00:00:00'),
+(2,1,'2020-01-01 10:00:00'),
+(3,2,'2020-01-01 11:00:00'),
+(4,3,'2010-01-02 00:00:00'),
+(5,2,'2020-01-02 07:00:00'),
+(6,4,'2020-01-02 07:00:00');
 /*!40000 ALTER TABLE `prefix_login_log` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -88,7 +93,10 @@ CREATE TABLE `prefix_user` (
 
 LOCK TABLES `prefix_user` WRITE;
 /*!40000 ALTER TABLE `prefix_user` DISABLE KEYS */;
-INSERT INTO `prefix_user` VALUES (1,'zhangsan','13112345678',111),(2,'lisi','13212345678',222),(3,'wangwu','13312345678',333),(4,'maliu','13412345678',444);
+INSERT INTO `prefix_user` VALUES (1,'zhangsan','13112345678',111),
+(2,'lisi','13212345678',222),
+(3,'wangwu','13312345678',333),
+(4,'maliu','13412345678',444);
 /*!40000 ALTER TABLE `prefix_user` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
