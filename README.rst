@@ -62,3 +62,7 @@ TODO
     get > fetchone
 
 - 字符串的处理全部改用 f 字符串,提高速度
+
+- 已知问题::
+
+    increase 的 where 无效

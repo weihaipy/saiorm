@@ -135,7 +135,8 @@ table_list = []
 
 # MySQL
 DB = saiorm.init()
-DB.connect({"host": "127.0.0.1", "port": 3306, "database": "x", "user": "root", "password": "root"})
+DB.connect({"host": "127.0.0.1", "port": 3306, "database": "x",
+            "user": "root", "password": "root"})
 table = DB.table("xxx")
 DB_type_list.append("MySQL")
 DB_list.append(DB)
@@ -143,7 +144,8 @@ table_list.append(table)
 
 # PostgreSQL
 DB = saiorm.init(driver="PostgreSQL")
-DB.connect({"host": "127.0.0.1", "port": "5432", "database": "x", "user": "postgres", "password": "123"})
+DB.connect({"host": "127.0.0.1", "port": "5432", "database": "x",
+            "user": "postgres", "password": "123"})
 table = DB.table("xxx")
 
 DB_type_list.append("MySQL")
@@ -154,7 +156,8 @@ table_list.append(table)
 DB = saiorm.init(driver="SQLServer")
 DB.connect({"host": "127.0.0.1", "port": "1433", "database": "x", "user": "root", "password": "123"},
            return_query=True)
-table = DB.table("xxx", primary_key="id")  # For LIMIT implement with SQL Server
+# For LIMIT implement with SQL Server
+table = DB.table("xxx", primary_key="id")
 
 DB_type_list.append("SQLServer")
 DB_list.append(DB)
@@ -173,7 +176,8 @@ table_list.append(table)
 
 # MongoDB
 DB = saiorm.init(driver="MongoDB")
-DB.connect({"host": "127.0.0.1", "port": "27017", "database": "x", "user": "", "password": ""}, return_query=True)
+DB.connect({"host": "127.0.0.1", "port": "27017", "database": "x",
+            "user": "", "password": ""}, return_query=True)
 table = DB.table("xxx")
 
 DB_type_list.append("MongoDB")

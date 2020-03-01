@@ -382,7 +382,7 @@ class ChainDB(BaseDB):
     """
     Common SQL class,Most basic SQL statements are same as each other.
 
-    Implement the difference only.
+    Statements are MySQL style.For other type ,implement the difference only.
     """
 
     def gen_select_with_fields(self, fields, condition):
@@ -559,7 +559,6 @@ class ChainDB(BaseDB):
         if self._limit == 0:
             return sql
 
-        # default MySQL style
         if isinstance(self._limit, str) and "," in self._limit:
             m, n = self._limit.replace(" ", "").split(",")
             sql += " LIMIT {} {}".format(m, n)
