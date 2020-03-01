@@ -3,11 +3,13 @@ Welcome to saiorm /saɪɔ:m/,塞翁
 
 Saiorm : surely an incorrect orm.
 
-Saiorm is a lightweight library for accessing database,but only translate the params to database statements.
+`Saiorm <https://weihaipy.github.io/saiorm>`_  is a very lightweight translator for accessing kinds of database with the same syntax,including SQL and NoSQL.
 
-Support MySQL, PostgreSQL, SQL Server ,SQLite and MongoDB,require pymysql psycopg2 pymssql sqlite3 pymongo  for each database type.
+It only translate python code and arguments to database statement,no longer need models.Directly operate the data in the database. No data type conversion, minimize the performance loss.
 
-It will take you have a easy way to use kinds of database with the same syntax,including SQL and NoSQL.Syntax looks like a mixture of SQL and mongodb.
+Support MySQL, PostgreSQL, SQL Server ,SQLite and MongoDB,require pymysql psycopg2 pymssql sqlite3 pymongo for each database type.
+
+It will take you have an easy way to use kinds of database with the same syntax,including SQL and NoSQL.The syntax looks like a mixture of SQL and mongodb.
 
 You can inherit from saiorm.base.ChainDB to support other types of database with the same API.
 
@@ -66,9 +68,9 @@ MySQL:
 .. code:: python
 
     import saiorm
-    DB = saiorm.init()  # without table name prefix
+    DB = saiorm.init()  # without table name prefix,default driver is MySQL
     # or
-    DB = saiorm.init(table_name_prefix="abc_") # mysql with table name prefix
+    DB = saiorm.init(driver="MySQL",table_name_prefix="abc_") # mysql with table name prefix
     DB.connect({"host": "", "port": 3306, "database": "", "user": "", "password": ""})
     table = DB.table("xxx")
 
