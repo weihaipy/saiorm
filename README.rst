@@ -9,6 +9,8 @@ If you want to support other database,just implement like siaorm.PostgreSQL.Chai
 
 like Saiorm.PostgreSQL.CoherentDB and add a few driver code to Saiorm.init.
 
+**python version** python3.6 and later.
+
 Documentation
 =============
 
@@ -48,3 +50,5 @@ TODO
     MySQL 报错 sql_mode=only_full_group_by 的解决方法:
     select @@global.sql_mode;
     set @@global.sql_mode='';  去掉前面查询的 ONLY_FULL_GROUP_BY
+
+
