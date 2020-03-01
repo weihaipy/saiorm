@@ -48,7 +48,7 @@ class Connection(object):
         try:
             self.reconnect()
         except Exception:
-            logging.error("Cannot connect to SQLServer on {}:{}".format(self.host, port),
+            logging.error(f"Cannot connect to SQLServer on {self.host}:{port}",
                           exc_info=True)
 
     def __del__(self):
@@ -56,7 +56,7 @@ class Connection(object):
 
     def close(self):
         """Closes this database connection."""
-        if getattr(self, "_db", None) is not None:
+        if getattr(self, "db", None) is not None:
             self.db.close()
             self.db = None
 
@@ -208,24 +208,12 @@ class ChainDB(base.ChainDB):
                 else:
                     m, n = _limit.split(",")
                     if self._where:
-                        param = {
-                            "m": m,
-                            "fields": fields,
-                            "table": self._table,
-                            "pk": self._primary_key
-                        }
-                        pre_where = " WHERE {pk} NOT IN (SELECT TOP {m}-1 {pk} FROM {table}) ".format(param)
+                        pre_where = f" WHERE {self._primary_key} NOT IN" \
+                                    f" (SELECT TOP {m}-1 {self._primary_key} FROM {self._table}) "
                         self._where = None  # clean self._where
                     else:
-                        param = {
-                            "m": m,
-                            "n": n,
-                            "fields": fields,
-                            "table": self._table,
-                            "pk": self._primary_key
-                        }
-                        pre_sql = "SELECT TOP ({n}-{m}+1) {fields} FROM {table} " \
-                                  "WHERE {pk} NOT IN (SELECT TOP {m}-1 {pk} FROM {table})".format(**param)
+                        pre_sql = f"SELECT TOP ({n}-{m}+1) {fields} FROM {self._table}" \
+                                  f" WHERE {self._primary_key} NOT IN (SELECT TOP {m}-1 {self._primary_key} FROM {self._table})"
                 self._limit = None  # clean self._limit
             else:
                 pre_sql = "SELECT {} FROM {} ".format(fields, self._table)
@@ -235,9 +223,9 @@ class ChainDB(base.ChainDB):
             if pre_where:
                 # todo after fixing join statement,here will have issue
                 if condition_sql.startswith("WHERE"):
-                    condition_sql = pre_where + " AND " + condition_sql[len("WHERE"):]
+                    condition_sql = f"{pre_where} AND {condition_sql[len('WHERE'):]}"
                 else:
-                    condition_sql = pre_where + " AND " + condition_sql
+                    condition_sql = f"{pre_where} AND {condition_sql}"
 
             sql = pre_sql + condition_sql
 
@@ -250,4 +238,4 @@ class ChainDB(base.ChainDB):
 
     def gen_get_fields_name(self):
         """get one line from table"""
-        return "SELECT TOP 1 * FROM {};".format(self._table)
+        return f"SELECT TOP 1 * FROM {self._table};"

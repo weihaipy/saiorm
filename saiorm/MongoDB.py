@@ -50,7 +50,7 @@ class ConnectionMongoDB(object):
         try:
             self.reconnect()
         except Exception:
-            logging.error("Cannot connect to PostgreSQL on {}:{}".format(self.host, port),
+            logging.error(f"Cannot connect to PostgreSQL on {self.host}:{port}",
                           exc_info=True)
 
     def __del__(self):
@@ -58,7 +58,7 @@ class ConnectionMongoDB(object):
 
     def close(self):
         """Closes this database connection."""
-        if getattr(self, "_db", None) is not None:
+        if getattr(self, "db", None) is not None:
             self.client.close()
             self.db = None
 
@@ -132,8 +132,8 @@ class ConnectionMongoDB(object):
                 "lastrowid": 0,  # the primary key id affected
                 "rowcount": 0,  # number of rows affected
                 "rownumber": 0,  # line number
-                "query": "{}.insert_one({})".format(self.condition["table"],
-                                                    str(parameters)) if self._return_query else ""  # query executed
+                "query": f"{self.condition['table']}.insert_one({parameters})" if self._return_query else ""
+                # query executed
             }
         except Exception as e:
             self._log_exception(e, "insert", self.condition)
@@ -146,8 +146,8 @@ class ConnectionMongoDB(object):
                 "lastrowid": 0,  # the primary key id affected
                 "rowcount": 0,  # number of rows affected
                 "rownumber": 0,  # line number
-                "query": "{}.insert_many({})".format(self.condition["table"],
-                                                     str(parameters)) if self._return_query else ""  # query executed
+                "query": f"{self.condition['table']}.insert_many({parameters})" if self._return_query else ""
+                # query executed
             }
         except Exception as e:
             self._log_exception(e, "insert_many", self.condition)
@@ -159,8 +159,7 @@ class ConnectionMongoDB(object):
         try:
             res = getattr(self.db, self.condition["table"]).update(where, parameters)
             # returns  {'n': 1, 'nModified': 1, 'ok': 1.0, 'updatedExisting': True}
-            query = "{}.update({}, {})".format(self.condition["table"], str(where),
-                                               str(parameters)) if self._return_query else ""
+            query = f"{self.condition['table']}.update({where}, {parameters})" if self._return_query else ""
             self.condition = {}  # reset condition
             return {
                 "lastrowid": 0,  # the primary key id affected
@@ -178,8 +177,7 @@ class ConnectionMongoDB(object):
         try:
             res = getattr(self.db, self.condition["table"]).remove(where)
             # returns {'n': 2, 'ok': 1.0}
-            query = "{}.remove({})".format(self.condition["table"],
-                                           str(self.condition["where"])) if self._return_query else ""
+            query = f"{self.condition['table']}.remove({self.condition['where']})" if self._return_query else ""
             self.condition = {}  # reset condition
             return {
                 "lastrowid": 0,  # the primary key id affected

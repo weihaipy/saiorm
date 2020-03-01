@@ -400,10 +400,10 @@ class ChainDB(BaseDB):
 
     def gen_select_with_fields(self, fields, condition):
         fields = self.wrap_field_name(fields)
-        return "SELECT {} FROM {} {};".format(fields, self._table, condition)
+        return f"SELECT {fields} FROM {self._table} {condition};"
 
     def gen_select_without_fields(self, fields):
-        return "SELECT {};".format(fields)
+        return f"SELECT {fields};"
 
     def split_update_fields_value(self, dict_data):
         """
@@ -418,7 +418,7 @@ class ChainDB(BaseDB):
             if isinstance(v, str):
                 if v.startswith("`"):  # native function without param
                     v = v[1:]
-                    fields += "{}={},".format(k, v)
+                    fields += f"{k}={v},"
                 else:
                     fields += k + "=" + self.param_place_holder + ","
                     values.append(v)
@@ -427,7 +427,7 @@ class ChainDB(BaseDB):
                 if v0.startswith("`"):
                     v0 = v0[1:]
                 v0 = v0.replace("?", self.param_place_holder)
-                fields += "{}={},".format(k, v0)
+                fields += f"{k}={v},"
                 values.append(v[1])
 
         if fields:
@@ -436,51 +436,51 @@ class ChainDB(BaseDB):
         return fields, values
 
     def gen_update(self, fields, condition):
-        return "UPDATE {} SET {} {};".format(self._table, fields, condition)
+        return f"UPDATE {self._table} SET {fields} {condition};"
 
     def gen_insert_with_fields(self, fields, values_sign):
-        return "INSERT INTO {} ({}) VALUES ({});".format(self._table, fields, values_sign)
+        return f"INSERT INTO {self._table} ({fields}) VALUES ({values_sign});"
 
     def gen_insert_without_fields(self, values_sign):
-        return "INSERT INTO {} VALUES ({});".format(self._table, values_sign)
+        return f"INSERT INTO {self._table} VALUES ({values_sign});"
 
     def gen_insert_many_with_fields(self, fields, values_sign):
-        return "INSERT INTO {} ({}) VALUES ({});".format(self._table, fields, values_sign)
+        return f"INSERT INTO {self._table} ({fields}) VALUES ({values_sign});"
 
     def gen_insert_many_without_fields(self, values_sign):
-        return "INSERT INTO {}  VALUES ({});".format(self._table, values_sign)
+        return f"INSERT INTO {self._table}  VALUES ({values_sign});"
 
     def gen_delete(self):
         sql_where, sql_values_where = self.parse_where_condition("")
-        return "DELETE FROM {} {};".format(self._table, sql_where), sql_values_where
+        return f"DELETE FROM {self._table} {sql_where};", sql_values_where
 
     def gen_increase(self, field, step):
         """number field Increase"""
         sql_where, sql_values_where = self.parse_where_condition("")
-        return "UPDATE {} SET {}={}+{} {};".format(self._table, field, field, step, sql_where), sql_values_where
+        return f"UPDATE {self._table} SET {field}={field}+{step} {sql_where};", sql_values_where
 
     def gen_decrease(self, field, step=1):
         """number field decrease"""
         sql_where, sql_values_where = self.parse_where_condition("")
-        return "UPDATE {} SET {}={}-{} {};".format(self._table, field, field, step, sql_where), sql_values_where
+        return f"UPDATE {self._table} SET {field}={field}-{step} {sql_where};", sql_values_where
 
     def gen_get_fields_name(self):
         """get one line from table"""
-        return "SELECT * FROM {} LIMIT 1;".format(self._table)
+        return f"SELECT * FROM {self._table} LIMIT 1;"
 
     def parse_join(self):
         """parse join condition"""
         sql = ""
         if self._inner_join:
-            sql += " INNER JOIN {} ON {}".format(self._inner_join, self._on)
+            sql += f" INNER JOIN {self._inner_join} ON {self._on}"
         elif self._left_join:
-            sql += " LEFT JOIN {} ON {}".format(self._left_join, self._on)
+            sql += f" LEFT JOIN {self._left_join} ON {self._on}"
         elif self._right_join:
-            sql += " RIGHT JOIN {} ON {}".format(self._right_join, self._on)
+            sql += f" RIGHT JOIN {self._right_join} ON {self._on}"
         elif self._outer_join:
-            sql += " OUTER JOIN {} ON {}".format(self._right_join, self._on)
+            sql += f" OUTER JOIN {self._right_join} ON {self._on}"
         elif self._full_join:
-            sql += " FULL JOIN {} ON {}".format(self._right_join, self._on)
+            sql += f" FULL JOIN {self._right_join} ON {self._on}"
         return sql
 
     def parse_where_condition(self, sql):
@@ -522,9 +522,9 @@ class ChainDB(BaseDB):
                                 if "?" in v1:
                                     v0 = v0.replace("?", "{}")
                                     v = v0.format(*v[1:])
-                                where += " {}{}{} {}".format(k, sign, v, and_or)
+                                where += f" {k}{sign}{v} {and_or}"
                             else:
-                                where += " {}{}{} {}".format(k, sign, self.param_place_holder, and_or)
+                                where += f" {k}{sign}{self.param_place_holder} {and_or}"
                                 sql_values.append(v[1])
                         elif sign.lower() in ("in", "not in", "is not"):
                             # IN / NOT IN / IS NOT etc.
@@ -533,14 +533,11 @@ class ChainDB(BaseDB):
 
                             if is_array(v1):
                                 v1 = ",".join(v1)
-                                where += " {} {} ({}) {}".format(k, sign, v1, and_or)
+                                where += f" {k} {sign} ({v1}) {and_or}"
                             else:
-                                where += " {} {} {} {}".format(k, sign, str(v1), and_or)
+                                where += f" {k} {sign} {v1} {and_or}"
                         elif sign.lower() == "between":  # BETWEEN
-                            where += " {} BETWEEN {} AND {} {}".format(k,
-                                                                       self.param_place_holder,
-                                                                       self.param_place_holder,
-                                                                       and_or)
+                            where += f" {k} BETWEEN {self.param_place_holder} AND {self.param_place_holder} {and_or}"
                             sql_values += [v[1], v[2]]
                         elif sign.startswith("`"):  # native mysql function
                             # JOIN STRING DIRECT
@@ -548,19 +545,19 @@ class ChainDB(BaseDB):
                             if "?" in v0:
                                 v0 = v0.replace("?", "{}")
                                 v0 = v0.format(*v[1:])
-                            where += " {}={} {}".format(k, v0, and_or)
+                            where += f" {k}={v0} {and_or}"
                         else:
                             if isinstance(v, str) and v.startswith("`"):  # native mysql function
-                                where += " {}={} {}".format(k, v[1:], and_or)
+                                where += f" {k}={v[1:]} {and_or}"
                             else:
-                                where += " {}={} {}".format(k, self.param_place_holder, and_or)
+                                where += f" {k}={self.param_place_holder} {and_or}"
                                 sql_values.append(v)
                     else:  # single value
                         and_or_length = 3
                         if isinstance(v0, str) and v0.startswith("`"):  # native mysql function
-                            where += " {}={} AND".format(k, v[1:])
+                            where += f" {k}={v[1:]} AND"
                         else:
-                            where += " {}={} AND".format(k, self.param_place_holder)
+                            where += f" {k}={self.param_place_holder} AND"
                             sql_values.append(v0)
                 if where:
                     sql += "WHERE" + where[:0 - and_or_length]  # trim the last AND / OR character
@@ -570,7 +567,7 @@ class ChainDB(BaseDB):
     def parse_order_by(self, sql):
         """parse order by condition"""
         if self._order_by:
-            sql += " ORDER BY {} ".format(self._order_by)
+            sql += f" ORDER BY {self._order_by} "
         return sql
 
     def parse_limit(self, sql):
@@ -581,11 +578,11 @@ class ChainDB(BaseDB):
 
         if isinstance(self._limit, str) and "," in self._limit:
             m, n = self._limit.replace(" ", "").split(",")
-            sql += " LIMIT {} {}".format(m, n)
+            sql += f" LIMIT {m} {n}"
         elif self._offset:
-            sql += " LIMIT {}, {}".format(self._offset, self._limit)
+            sql += f" LIMIT {self._offset}, {self._limit}"
         else:
-            sql += " LIMIT {} ".format(self._limit)
+            sql += f" LIMIT {self._limit} "
         return sql
 
     def parse_group_by(self, sql):

@@ -36,7 +36,7 @@ class Connection(object):
         try:
             self.reconnect()
         except Exception:
-            logging.error("Cannot connect to SQLite on {}".format(self.host),
+            logging.error(f"Cannot connect to SQLite on {self.host}",
                           exc_info=True)
 
     def __del__(self):
@@ -44,7 +44,7 @@ class Connection(object):
 
     def close(self):
         """Closes this database connection."""
-        if getattr(self, "_db", None) is not None:
+        if getattr(self, "db", None) is not None:
             self.db.close()
             self.db = None
 
@@ -164,10 +164,10 @@ class ChainDB(base.ChainDB):
         if self._limit:
             if isinstance(self._limit, str) and "," in self._limit:
                 m, n = self._limit.replace(" ", "").split(",")
-                sql += " LIMIT {} OFFSET {}".format(n, m)
+                sql += f" LIMIT {n} OFFSET {m}"
             elif self._offset:
-                sql += " LIMIT {} OFFSET {}".format(self._limit, self._offset)
+                sql += f" LIMIT {self._limit} OFFSET {self._offset}"
             else:
-                sql += " LIMIT {} ".format(self._limit)
+                sql += f" LIMIT {self._limit} "
 
         return sql

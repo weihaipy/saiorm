@@ -61,7 +61,7 @@ class Connection(object):
 
     def close(self):
         """Closes this database connection."""
-        if getattr(self, "_db", None) is not None:
+        if getattr(self, "db", None) is not None:
             self.db.close()
             self.db = None
 
@@ -160,9 +160,6 @@ class Connection(object):
 
 class ChainDB(base.ChainDB):
     def connect(self, config_dict=None):
-
-        print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n", config_dict)
-
         self.connection = Connection(**config_dict)
 
 
@@ -305,16 +302,16 @@ class PositionDB(Connection):
         if value_str:
             value_str = value_str[:-1]
         if not many:
-            query = "INSERT INTO {} ({}) VALUES ({})".format(table, field_str[:-1], value_str)
+            query = f"INSERT INTO {table} ({field_str[:-1]}) VALUES ({value_str})"
         else:
-            query = "INSERT INTO {} ({}) VALUES ({})".format(table, field_str[:-1], value_str)
+            query = f"INSERT INTO {table} ({field_str[:-1]}) VALUES ({value_str})"
 
         return query
 
     def mk_delete_query(self, table, condition):
         # 生成 delete 语句
         table = self.prefix + table
-        query = "DELETE FROM " + table + " " + condition
+        query = f"DELETE FROM {table} {condition}"
         return query
 
     def mk_update_query(self, table, field, condition):
@@ -337,7 +334,7 @@ class PositionDB(Connection):
             else:
                 field_str += (i + "=%s, ")
 
-        query = "UPDATE {} SET {} {}".format(table, field_str[:-2], condition)
+        query = f"UPDATE {table} SET {field_str[:-2]} {condition}"
         return query
 
     def insert(self, table, field, *parameters, **kwparameters):
@@ -391,8 +388,8 @@ class PositionDB(Connection):
         :return: int
         """
         table = self.prefix + table
-        field = 'COUNT(' + field + ') AS rows_count'
-        query = "SELECT " + field + " FROM " + table + " " + condition
+        field = f'COUNT({field}) AS rows_count'
+        query = f"SELECT {field} FROM {table} {condition}"
         rows_count = self.query(query, *parameters, **kwparameters)
         if rows_count:
             return int(rows_count[0]["rows_count"])
@@ -401,12 +398,12 @@ class PositionDB(Connection):
 
     def increase(self, table, field, condition, *parameters, step=1, **kwparameters):
         """number field Increase """
-        sql = "UPDATE {} SET {}={}+{}  {};".format(self.prefix + table, field, field, step, condition)
+        sql = f"UPDATE {self.prefix + table} SET {field}={field}+{step}  {condition};"
         res = self.execute_return_detail(sql, *parameters, **kwparameters)
         return res
 
     def decrease(self, table, field, condition, *parameters, step=1, **kwparameters):
         """number field decrease """
-        sql = "UPDATE {} SET {}={}-{} {};".format(self.prefix + table, field, field, step, condition)
+        sql = f"UPDATE {self.prefix + table} SET {field}={field}-{step} {condition};"
         res = self.execute_return_detail(sql, *parameters, **kwparameters)
         return res
