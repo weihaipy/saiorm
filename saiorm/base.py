@@ -314,9 +314,8 @@ class BaseDB(object):
             logging.warning("without where condition,can not delete")
             return False
 
-        condition_sql, condition_values = self.parse_condition()
-        sql = self.gen_delete(condition_sql)
-        res = self.execute(sql, *condition_values)
+        sql, sql_values = self.gen_delete()
+        res = self.execute(sql, *sql_values)
         self.last_query = res["query"]
         return res
 
@@ -437,9 +436,9 @@ class ChainDB(BaseDB):
     def gen_insert_many_without_fields(self, values_sign):
         return "INSERT INTO {}  VALUES ({});".format(self._table, values_sign)
 
-    def gen_delete(self, condition):
-        """ fixme 处理 where"""
-        return "DELETE FROM {} {};".format(self._table, condition)
+    def gen_delete(self):
+        sql_where, sql_values_where = self.parse_where_condition("")
+        return "DELETE FROM {} {};".format(self._table, sql_where), sql_values_where
 
     def gen_increase(self, field, step):
         """number field Increase"""
