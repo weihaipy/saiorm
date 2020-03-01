@@ -37,8 +37,8 @@ def reset_database():
 
 
 class TestFunctions(unittest.TestCase):
-    # def setUp(self):
-    #     reset_database()
+    def setUp(self):
+        reset_database()
     #
     # def tearDown(self):
     #     pass
