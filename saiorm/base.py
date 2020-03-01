@@ -324,9 +324,9 @@ class BaseDB(object):
         raise NotImplementedError("You must implement it in subclass")
 
     def increase(self, field, step=1):
-        """number field Increase """
-        sql = self.gen_increase(field, str(step))
-        res = self.execute(sql)
+        """number field Increase"""
+        sql, sql_values = self.gen_increase(field, str(step))
+        res = self.execute(sql, sql_values)
         self.last_query = res["query"]
         return res
 
@@ -335,8 +335,8 @@ class BaseDB(object):
 
     def decrease(self, field, step=1):
         """number field decrease """
-        sql = self.gen_decrease(field, str(step))
-        res = self.execute(sql)
+        sql, sql_values = self.gen_decrease(field, str(step))
+        res = self.execute(sql, *sql_values)
         self.last_query = res["query"]
         return res
 
@@ -438,15 +438,18 @@ class ChainDB(BaseDB):
         return "INSERT INTO {}  VALUES ({});".format(self._table, values_sign)
 
     def gen_delete(self, condition):
+        """ fixme 处理 where"""
         return "DELETE FROM {} {};".format(self._table, condition)
 
     def gen_increase(self, field, step):
-        """number field Increase """
-        return "UPDATE {} SET {}={}+{};".format(self._table, field, field, step)
+        """number field Increase"""
+        sql_where, sql_values_where = self.parse_where_condition("")
+        return "UPDATE {} SET {}={}+{} {};".format(self._table, field, field, step, sql_where), sql_values_where
 
     def gen_decrease(self, field, step=1):
-        """number field decrease """
-        return "UPDATE {} SET {}={}-{};".format(self._table, field, field, step)
+        """number field decrease"""
+        sql_where, sql_values_where = self.parse_where_condition("")
+        return "UPDATE {} SET {}={}-{} {};".format(self._table, field, field, step, sql_where), sql_values_where
 
     def gen_get_fields_name(self):
         """get one line from table"""
