@@ -42,8 +42,8 @@ class Connection(object):
             database=database,
         )
 
-        self._db = None
-        self._db_args = args
+        self.db = None
+        self.db_args = args
         self._last_use_time = time.time()
         try:
             self.reconnect()
@@ -57,21 +57,21 @@ class Connection(object):
     def close(self):
         """Closes this database connection."""
         if getattr(self, "_db", None) is not None:
-            self._db.close()
-            self._db = None
+            self.db.close()
+            self.db = None
 
     def reconnect(self):
         """Closes the existing database connection and re-opens it.
         改用 pymssql 实现"""
         self.close()
 
-        self._db = pymssql.connect(**self._db_args)
-        self._db.autocommit(True)
+        self.db = pymssql.connect(**self.db_args)
+        self.db.autocommit(True)
 
     def iter(self, query, *parameters, **kwparameters):
         """Returns an iterator for the given query and parameters."""
         self._ensure_connected()
-        # cursor = cursors.SSCursor(self._db) # psycopg2 没有 cursors
+        # cursor = cursors.SSCursor(self.db) # psycopg2 没有 cursors
         cursor = self._cursor()
         try:
             self._execute(cursor, query, parameters, kwparameters)
@@ -87,14 +87,14 @@ class Connection(object):
         # you try to perform a query and it fails.  Protect against this
         # case by preemptively closing and reopening the connection
         # if it has been idle for too long (7 hours by default).
-        if (self._db is None or
+        if (self.db is None or
                 (time.time() - self._last_use_time > self.max_idle_time)):
             self.reconnect()
         self._last_use_time = time.time()
 
     def _cursor(self):
         self._ensure_connected()
-        return self._db.cursor()
+        return self.db.cursor()
 
     def _log_exception(self, exception, query, parameters):
         """log exception when execute SQL"""
@@ -169,7 +169,7 @@ class ChainDB(base.ChainDB):
 
     def connect(self, config_dict=None, return_query=False):
         config_dict["return_query"] = return_query
-        self.db = Connection(**config_dict)
+        self.connection = Connection(**config_dict)
 
     def table(self, table_name="", primary_key=""):
         """

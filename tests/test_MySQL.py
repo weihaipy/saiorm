@@ -53,9 +53,10 @@ class TestFunctions(unittest.TestCase):
         self.assertEqual(decimal.Decimal("3"), res["s"])
 
     def test_insert_natural_dict(self):
+        table = DB.table("user")
         field = "name"
         name = "test_insert_natural_dict"
-        table = DB.table("user")
+
         table.insert({
             field: name,
             "phone": "13512345678"
@@ -65,9 +66,10 @@ class TestFunctions(unittest.TestCase):
         self.assertEqual(name, res[field])
 
     def test_insert_split_dict(self):
+        table = DB.table("user")
         field = "name"
         name = "test_insert_split_dict"
-        table = DB.table("user")
+
         table.insert({
             "fields": [field, "phone"],
             "values": [name, "13612345678"],
@@ -77,9 +79,10 @@ class TestFunctions(unittest.TestCase):
         self.assertEqual(name, res[field])
 
     def test_insert_many(self):
+        table = DB.table("user")
         field = "name"
         name = "test_insert_many"
-        table = DB.table("user")
+
         table.insert_many([{
             field: name + "_1",
             "phone": "14012345678",
@@ -173,6 +176,27 @@ class TestFunctions(unittest.TestCase):
             ("u.id", "<", 4)
         ]).select("u.*,l.*")
         self.assertEqual(3, len(res))
+
+    def test_transaction(self):
+        table = DB.table("user")
+        field = "name"
+        name = "test_transaction"
+
+        DB.begin()
+
+        table.insert({
+            field: name,
+            "phone": "19912345678"
+        })
+
+        res_before_commit = table.where([(field, name)]).get("*")
+        print("res_before_commit>>", res_before_commit)
+        # todo 还是会自动提交
+        # self.assertEqual(name, res_before_commit[field])
+        # DB.commit()
+        # res_after_commit = table.where([(field, name)]).get(field)
+        # print("res_after_commit>>", res_after_commit)
+        # self.assertEqual(3, len(res))
 
 
 if __name__ == '__main__':

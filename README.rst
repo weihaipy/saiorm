@@ -14,16 +14,7 @@ Documentation
 
  `Learn more <http://saiorm.readthedocs.io>`_.
 
-Task
-====
-
-- [x] Support MySQL, MariaDB
-- [x] Support PostgreSQL
-- [x] Support SQL Server
-- [x] Support SQLite
-- [x] Support MongoDB
-
-Note that MongoDB support **select,get,update,insert,insert_many,delete,increase,decrease,where,limit,order_by**
+MongoDB only support **select,get,update,insert,insert_many,delete,increase,decrease,where,limit,order_by**
 
 TODO
 ====
@@ -35,15 +26,7 @@ TODO
 
 - SQL database:
 
-    - Transaction::
-
-        BEGIN
-        COMMIT
-        ROLLBACK
-
     - having
-
-    - join: support FULL OUTER JOIN and FULL JOIN.
 
     - check auto commit in SQLite
 
@@ -59,6 +42,8 @@ TODO
 - 字符串的处理全部改用 f 字符串,提高速度
 
 - 已知问题::
+
+    autocommit 在 MySQL 事务中无效
 
     MySQL 报错 sql_mode=only_full_group_by 的解决方法:
     select @@global.sql_mode;

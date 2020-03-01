@@ -44,8 +44,8 @@ class ConnectionMongoDB(object):
             database=database,
         )
 
-        self._db = None
-        self._db_args = args
+        self.db = None
+        self.db_args = args
         self._last_use_time = time.time()
         try:
             self.reconnect()
@@ -60,18 +60,18 @@ class ConnectionMongoDB(object):
         """Closes this database connection."""
         if getattr(self, "_db", None) is not None:
             self.client.close()
-            self._db = None
+            self.db = None
 
     def reconnect(self):
         """Closes the existing database connection and re-opens it."""
         self.close()
-        database = self._db_args["database"]
-        user = self._db_args["user"]
-        password = self._db_args["password"]
-        client = pymongo.MongoClient(host=self._db_args["host"], port=self._db_args["port"])
+        database = self.db_args["database"]
+        user = self.db_args["user"]
+        password = self.db_args["password"]
+        client = pymongo.MongoClient(host=self.db_args["host"], port=self.db_args["port"])
         if user and password:
             client.authenticate(user, password)
-        self._db = getattr(client, database)
+        self.db = getattr(client, database)
         self.client = client
 
     def _log_exception(self, exception, query, parameters):
@@ -88,7 +88,7 @@ class ConnectionMongoDB(object):
         limit = self.condition.get("limit", "")
 
         try:
-            eval_str = """getattr(self._db, self.condition["table"]).find(condition)"""
+            eval_str = """getattr(self.db, self.condition["table"]).find(condition)"""
             if sort:
                 eval_str += ".sort(" + str(sort) + ")"
             if skip:
@@ -127,7 +127,7 @@ class ConnectionMongoDB(object):
 
     def insert(self, parameters):
         try:
-            getattr(self._db, self.condition["table"]).insert_one(parameters)
+            getattr(self.db, self.condition["table"]).insert_one(parameters)
             return {
                 "lastrowid": 0,  # the primary key id affected
                 "rowcount": 0,  # number of rows affected
@@ -141,7 +141,7 @@ class ConnectionMongoDB(object):
 
     def insert_many(self, parameters):
         try:
-            getattr(self._db, self.condition["table"]).insert_many(parameters)
+            getattr(self.db, self.condition["table"]).insert_many(parameters)
             return {
                 "lastrowid": 0,  # the primary key id affected
                 "rowcount": 0,  # number of rows affected
@@ -157,7 +157,7 @@ class ConnectionMongoDB(object):
         where = self.condition["where"]
 
         try:
-            res = getattr(self._db, self.condition["table"]).update(where, parameters)
+            res = getattr(self.db, self.condition["table"]).update(where, parameters)
             # returns  {'n': 1, 'nModified': 1, 'ok': 1.0, 'updatedExisting': True}
             query = "{}.update({}, {})".format(self.condition["table"], str(where),
                                                str(parameters)) if self._return_query else ""
@@ -176,7 +176,7 @@ class ConnectionMongoDB(object):
     def delete(self):
         where = self.condition["where"]
         try:
-            res = getattr(self._db, self.condition["table"]).remove(where)
+            res = getattr(self.db, self.condition["table"]).remove(where)
             # returns {'n': 2, 'ok': 1.0}
             query = "{}.remove({})".format(self.condition["table"],
                                            str(self.condition["where"])) if self._return_query else ""
@@ -200,7 +200,7 @@ class ChainDB(base.ChainDB):
     def connect(self, config_dict=None, return_query=False):
         if return_query:
             config_dict["return_query"] = return_query
-        self.db = ConnectionMongoDB(**config_dict)
+        self.connection = ConnectionMongoDB(**config_dict)
 
     def execute(self, *args, **kwargs):
         logging.warning("Saiorm does not support execute in MongoDB")
@@ -236,20 +236,20 @@ class ChainDB(base.ChainDB):
 
     def select(self, fields="*"):
         self.set_condition()
-        res = self.db.select(fields)
+        res = self.connection.select(fields)
         self.last_query = res["query"]
         return res["data"]
 
     def get(self, fields="*"):
         self._limit = 1
         self.set_condition()
-        res = self.db.select(fields)
+        res = self.connection.select(fields)
         self.last_query = res["query"]
         return res["data"]
 
     def update(self, dict_data=None):
         self.set_condition()
-        res = self.db.update(dict_data)
+        res = self.connection.update(dict_data)
         self.last_query = res["query"]
         return res
 
@@ -259,7 +259,7 @@ class ChainDB(base.ChainDB):
             dict_data = {k: dict_data["values"][index]
                          for index, k in enumerate(dict_data["fields"])}
 
-        res = self.db.insert(dict_data)
+        res = self.connection.insert(dict_data)
         self.last_query = res["query"]
         return res
 
@@ -272,27 +272,27 @@ class ChainDB(base.ChainDB):
                              for index, k in enumerate(dict_data["fields"])
                              for v in dict_data["values"]]
 
-        res = self.db.insert_many(dict_data)
+        res = self.connection.insert_many(dict_data)
         self.last_query = res["query"]
         return res
 
     def delete(self):
         self.set_condition()
-        res = self.db.delete()
+        res = self.connection.delete()
         self.last_query = res["query"]
         return res
 
     def increase(self, field, step=1):
         """number field Increase """
         self.set_condition()
-        res = self.db.update({"$inc": {field: step}})
+        res = self.connection.update({"$inc": {field: step}})
         self.last_query = res["query"]
         return res
 
     def decrease(self, field, step=1):
         """number field decrease """
         self.set_condition()
-        res = self.db.update({"$inc": {field: 0 - step}})
+        res = self.connection.update({"$inc": {field: 0 - step}})
         self.last_query = res["query"]
         return res
 
@@ -352,6 +352,6 @@ class ChainDB(base.ChainDB):
                 res["limit"] = n
                 res["skip"] = m
 
-        self.db.condition = res
+        self.connection.condition = res
 
         return sql, sql_values

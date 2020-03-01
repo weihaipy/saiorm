@@ -26,11 +26,11 @@ class BaseDB(object):
 
     def __init__(self, table_name_prefix="", debug=False, strict=True,
                  cache_fields_name=True, grace_result=True):
-        self.db = None
+        self.connection = None
         self.table_name_prefix = table_name_prefix
         self.debug = debug
         self.strict = strict
-        self.last_query = ""  # latest executed sql
+
         self.cache_fields_name = cache_fields_name  # when call get_fields_name
         self._cached_fields_name = {}  # cached fields name
         self.grace_result = grace_result
@@ -38,15 +38,7 @@ class BaseDB(object):
         self.field_name_quote = "`"  # MySQL use `,PostgreSql and SQLite use ",SQLServer use ', new in 0.2
 
         self._table = ""
-        self._where = ""
-        self._order_by = ""
-        self._group_by = ""
-        self._limit = 0
-        self._offset = 0
-        self._inner_join = ""
-        self._left_join = ""
-        self._right_join = ""
-        self._on = ""
+        self._reset()
 
     def _reset(self):
         """reset param when call again"""
@@ -59,6 +51,8 @@ class BaseDB(object):
         self._inner_join = ""
         self._left_join = ""
         self._right_join = ""
+        self._outer_join = ""
+        self._full_join = ""
         self._on = ""
         self.last_query = ""  # latest executed sql
 
@@ -85,19 +79,19 @@ class BaseDB(object):
 
     def execute(self, *args, **kwargs):
         """execute SQL"""
-        res = self.db.execute_return_detail(*args, **kwargs)
+        res = self.connection.execute_return_detail(*args, **kwargs)
         self._reset()  # reset param
         return res
 
     def executemany(self, *args, **kwargs):
         """execute SQL with many lines"""
-        res = self.db.executemany_return_detail(*args, **kwargs)
+        res = self.connection.executemany_return_detail(*args, **kwargs)
         self._reset()  # reset param
         return res
 
     def query(self, *args, **kwargs):
         """query SQL"""
-        res = self.db.query_return_detail(*args, **kwargs)
+        res = self.connection.query_return_detail(*args, **kwargs)
         self._reset()  # reset param
         return res
 
@@ -349,7 +343,7 @@ class BaseDB(object):
         if self.cache_fields_name and self._cached_fields_name.get(self._table):
             return self._cached_fields_name.get(self._table)
         else:
-            res = self.db.query_return_detail(self.gen_get_fields_name())
+            res = self.connection.query_return_detail(self.gen_get_fields_name())
             fields_name = res["column_names"]
             self._cached_fields_name[self._table] = fields_name
 
@@ -372,6 +366,24 @@ class BaseDB(object):
         parse all condition
 
         Calling parse_where_condition first is a good idea.
+        """
+        raise NotImplementedError("You must implement it in subclass")
+
+    def begin(self, *args, **kwargs):
+        """
+        Transaction
+        """
+        raise NotImplementedError("You must implement it in subclass")
+
+    def commit(self, *args, **kwargs):
+        """
+        Transaction
+        """
+        raise NotImplementedError("You must implement it in subclass")
+
+    def rollback(self, *args, **kwargs):
+        """
+        Transaction
         """
         raise NotImplementedError("You must implement it in subclass")
 
@@ -465,6 +477,10 @@ class ChainDB(BaseDB):
             sql += " LEFT JOIN {} ON {}".format(self._left_join, self._on)
         elif self._right_join:
             sql += " RIGHT JOIN {} ON {}".format(self._right_join, self._on)
+        elif self._outer_join:
+            sql += " OUTER JOIN {} ON {}".format(self._right_join, self._on)
+        elif self._full_join:
+            sql += " FULL JOIN {} ON {}".format(self._right_join, self._on)
         return sql
 
     def parse_where_condition(self, sql):
@@ -592,3 +608,25 @@ class ChainDB(BaseDB):
         sql = self.parse_group_by(sql)
 
         return sql, sql_values
+
+    def begin(self, *args, **kwargs):
+        """
+        Transaction
+        """
+        # self.connection.db.autocommit(False)
+        # todo pymysql 可能需要重新初始化才能修改 autocommit
+
+        self.execute("start transaction;")
+
+    def commit(self, *args, **kwargs):
+        """
+        Transaction
+        """
+        self.execute("COMMIT")
+
+    def rollback(self, *args, **kwargs):
+        """
+        Transaction
+        """
+        self.execute("ROLLBACK")
+        self.connection.db.autocommit(True)
