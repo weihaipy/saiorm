@@ -26,7 +26,7 @@ is_array = utility.is_array
 to_unicode = utility.to_unicode
 
 
-class Connection(object):
+class Connection(base.BaseConnection):
     def __init__(self, host, return_query=False):
         self.host = host
         self._return_query = return_query
@@ -39,19 +39,9 @@ class Connection(object):
             logging.error(f"Cannot connect to SQLite on {self.host}",
                           exc_info=True)
 
-    def __del__(self):
-        self.close()
-
-    def close(self):
-        """Closes this database connection."""
-        if getattr(self, "db", None) is not None:
-            self.db.close()
-            self.db = None
-
     def reconnect(self):
         """Closes the existing database connection and re-opens it."""
         self.close()
-
         self.db = sqlite3.connect(self.host)
 
     def iter(self, query, *parameters, **kwparameters):
@@ -67,34 +57,12 @@ class Connection(object):
         finally:
             cursor.close()
 
-    #
-    # def _ensure_connected(self):
-    #     # Mysql by default closes client connections that are idle for
-    #     # 8 hours, but the client library does not report this fact until
-    #     # you try to perform a query and it fails.  Protect against this
-    #     # case by preemptively closing and reopening the connection
-    #     # if it has been idle for too long (7 hours by default).
-    #     if (self.db is None or
-    #             (time.time() - self._last_use_time > self.max_idle_time)):
-    #         self.reconnect()
-    #     self._last_use_time = time.time()
-
-    def _cursor(self):
-        return self.db.cursor()
+    def _ensure_connected(self):
+        pass
 
     def _log_exception(self, exception, query, parameters):
         """log exception when execute SQL"""
         pass
-
-    def _execute(self, cursor, query, parameters, kwparameters):
-        try:
-            res = cursor.execute(query, kwparameters or parameters)
-            # TODO check auto commit
-            return res
-        except Exception as e:
-            self._log_exception(e, query, parameters)
-            self.close()
-            raise
 
     def query_return_detail(self, query, *parameters, **kwparameters):
         """return_detail"""
@@ -142,7 +110,6 @@ class Connection(object):
             self.close()
             raise
         finally:
-            # cursor.close()
             pass
 
 

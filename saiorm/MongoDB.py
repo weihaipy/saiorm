@@ -26,7 +26,7 @@ is_array = utility.is_array
 to_unicode = utility.to_unicode
 
 
-class ConnectionMongoDB(object):
+class ConnectionMongoDB(base.BaseConnection):
     def __init__(self, host, port, database, user=None, password=None,
                  max_idle_time=7 * 3600, return_query=False):
         self.host = host
@@ -52,15 +52,6 @@ class ConnectionMongoDB(object):
         except Exception:
             logging.error(f"Cannot connect to PostgreSQL on {self.host}:{port}",
                           exc_info=True)
-
-    def __del__(self):
-        self.close()
-
-    def close(self):
-        """Closes this database connection."""
-        if getattr(self, "db", None) is not None:
-            self.client.close()
-            self.db = None
 
     def reconnect(self):
         """Closes the existing database connection and re-opens it."""

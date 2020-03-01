@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
-
+import time
 import logging
 
 try:
@@ -10,6 +10,127 @@ except ImportError:
 
 GraceDict = utility.GraceDict
 is_array = utility.is_array
+Row = utility.Row
+to_unicode = utility.to_unicode
+
+
+class BaseConnection(object):
+    """default MySQL"""
+    def __init__(self, host, port, database, user=None, password=None,
+                 max_idle_time=7 * 3600, connect_timeout=60, autocommit=True,
+                 time_zone="+0:00", charset="utf8", **kwargs):
+        self.host = host
+        self.database = database
+        self.max_idle_time = float(max_idle_time)
+
+        args = dict(
+            host=host,
+            port=int(port),
+            user=user,
+            passwd=password,
+            db=database,
+            charset=charset,
+            use_unicode=True,
+            init_command=('SET time_zone = "%s"' % time_zone),
+            connect_timeout=connect_timeout,
+            autocommit=autocommit,
+            **kwargs
+        )
+
+        self.db = None
+        self.db_args = args
+        self._last_use_time = time.time()
+        try:
+            self.reconnect()
+        except Exception:
+            pass
+
+    def __del__(self):
+        self.close()
+
+    def close(self):
+        """Closes this database connection."""
+        if getattr(self, "db", None) is not None:
+            self.db.close()
+            self.db = None
+
+    def reconnect(self):
+        raise NotImplementedError("You must implement it in subclass")
+
+    def iter(self, query, *parameters, **kwparameters):
+        raise NotImplementedError("You must implement it in subclass")
+
+    def _log_exception(self, exception, query, parameters):
+        raise NotImplementedError("You must implement it in subclass")
+
+    def _ensure_connected(self):
+        # Mysql by default closes client connections that are idle for
+        # 8 hours, but the client library does not report this fact until
+        # you try to perform a query and it fails.  Protect against this
+        # case by preemptively closing and reopening the connection
+        # if it has been idle for too long (7 hours by default).
+        if (self.db is None or
+                (time.time() - self._last_use_time > self.max_idle_time)):
+            self.reconnect()
+        self._last_use_time = time.time()
+
+    def _cursor(self):
+        self._ensure_connected()
+        return self.db.cursor()
+
+    def _execute(self, cursor, query, parameters, kwparameters):
+        try:
+            return cursor.execute(query, kwparameters or parameters)
+        except Exception as e:
+            self._log_exception(e, query, parameters)
+            self.close()
+            raise
+
+    def query_return_detail(self, query, *parameters, **kwparameters):
+        """return_detail"""
+        cursor = self._cursor()
+        try:
+            self._execute(cursor, query, parameters, kwparameters)
+            column_names = [d[0] for d in cursor.description]
+            return {
+                "data": [Row(zip(column_names, row)) for row in cursor],
+                "column_names": column_names,
+                "query": to_unicode(cursor._executed)  # query executed
+            }
+        finally:
+            cursor.close()
+
+    def execute_return_detail(self, query, *parameters, **kwparameters):
+        """return_detail"""
+        cursor = self._cursor()
+        try:
+            self._execute(cursor, query, parameters, kwparameters)
+            return {
+                "lastrowid": cursor.lastrowid,  # the primary key id affected
+                "rowcount": cursor.rowcount,  # number of rows affected
+                "rownumber": cursor.rownumber,  # line number
+                "query": to_unicode(cursor._executed)  # query executed
+            }
+        finally:
+            cursor.close()
+
+    def executemany_return_detail(self, query, parameters):
+        """return_detail"""
+        cursor = self._cursor()
+        try:
+            cursor.executemany(query, parameters)
+            return {
+                "lastrowid": cursor.lastrowid,  # the primary key id affected
+                "rowcount": cursor.rowcount,  # number of rows affected
+                "rownumber": cursor.rownumber,  # line number
+                "query": to_unicode(cursor._executed)  # query executed
+            }
+        except Exception as e:
+            self._log_exception(e, query, parameters)
+            self.close()
+            raise
+        finally:
+            cursor.close()
 
 
 class BaseDB(object):
