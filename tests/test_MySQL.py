@@ -136,35 +136,43 @@ class TestFunctions(unittest.TestCase):
         res = table.where([("id", 3)]).get(field)
         self.assertEqual(332, res[field])
 
-    def test_query(self):
-        pass
-
-    def test_execute(self):
-        pass
-
-    def test_executemany(self):
-        pass
-
-    def test_where(self):
-        pass
-
     def test_order_by(self):
-        pass
+        table = DB.table("login_log")
+        res = table.where([
+            ("user_id", 1)
+        ]).order_by("id desc").select("*")
+        self.assertEqual(2, len(res))
 
     def test_group_by(self):
-        pass
+        table = DB.table("login_log")
+        res = table.group_by("user_id").select("*")
+        self.assertEqual(4, len(res))
 
     def test_limit(self):
-        pass
+        table = DB.table("login_log")
+        res = table.limit(3).select("*")
+        self.assertEqual(3, len(res))
 
     def test_inner_join(self):
-        pass
+        res = DB.table("user AS u").inner_join("login_log AS l").on("l.user_id = u.id").where([
+            ("u.id", ">", 1),
+            ("u.id", "<", 4)
+        ]).select("u.*,l.*")
+        self.assertEqual(3, len(res))
 
     def test_left_join(self):
-        pass
+        res = DB.table("user AS u").left_join("login_log AS l").on("l.user_id = u.id").where([
+            ("u.id", ">", 1),
+            ("u.id", "<", 4)
+        ]).select("u.*,l.*")
+        self.assertEqual(3, len(res))
 
     def test_right_join(self):
-        pass
+        res = DB.table("user AS u").right_join("login_log AS l").on("l.user_id = u.id").where([
+            ("u.id", ">", 1),
+            ("u.id", "<", 4)
+        ]).select("u.*,l.*")
+        self.assertEqual(3, len(res))
 
 
 if __name__ == '__main__':

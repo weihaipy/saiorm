@@ -184,7 +184,6 @@ class BaseDB(object):
         else:
             condition_sql, condition_values = self.parse_condition()
             sql = self.gen_select_with_fields(fields, condition_sql)
-
         res = self.query(sql, *condition_values)
         self.last_query = res["query"]
         if self.grace_result:
@@ -375,6 +374,9 @@ class BaseDB(object):
         Calling parse_where_condition first is a good idea.
         """
         raise NotImplementedError("You must implement it in subclass")
+
+    fetchall = select  # alias
+    fetchone = get  # alias
 
 
 class ChainDB(BaseDB):

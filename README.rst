@@ -56,13 +56,10 @@ TODO
 
     https://www.jb51.net/article/143212.htm
 
-- 添加别名::
-
-    select > fetchall
-    get > fetchone
-
 - 字符串的处理全部改用 f 字符串,提高速度
 
 - 已知问题::
 
-    暂无
+    MySQL 报错 sql_mode=only_full_group_by 的解决方法:
+    select @@global.sql_mode;
+    set @@global.sql_mode='';  去掉前面查询的 ONLY_FULL_GROUP_BY
