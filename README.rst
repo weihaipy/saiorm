@@ -47,6 +47,8 @@ TODO
 
     autocommit 在 MySQL 事务中无效
 
+    PostgreSQL 单元测试有错误 test_increase test_group_by test_inner_join
+
     MySQL 报错 sql_mode=only_full_group_by 的解决方法:
     select @@global.sql_mode;
     set @@global.sql_mode='';  去掉前面查询的 ONLY_FULL_GROUP_BY
