@@ -13,7 +13,7 @@ conf = database_conf.MySQL
 
 test_sql_file_path = os.path.join(os.getcwd(), conf["test_sql_file_name"])
 
-DB = saiorm.init(driver="MySQL", table_name_prefix=conf["table_name_prefix"])  # mysql with table name prefix
+DB = saiorm.init(driver="MySQL", table_name_prefix=conf["table_name_prefix"])
 DB.connect({
     "host": conf["host"],
     "port": conf["port"],
@@ -61,7 +61,7 @@ class TestFunctions(unittest.TestCase):
             "phone": "13512345678"
         })
 
-        res = table.where([("name", name)]).get(field)
+        res = table.where([(field, name)]).get(field)
         self.assertEqual(name, res[field])
 
     def test_insert_split_dict(self):
@@ -73,7 +73,7 @@ class TestFunctions(unittest.TestCase):
             "values": [name, "13612345678"],
         })
 
-        res = table.where([("name", name)]).get(field)
+        res = table.where([(field, name)]).get(field)
         self.assertEqual(name, res[field])
 
     def test_insert_many(self):
@@ -91,15 +91,16 @@ class TestFunctions(unittest.TestCase):
             "phone": "14212345678",
         }])
 
-        res = table.where([("name", name + "_1")]).get(field)
+        res = table.where([(field, name + "_1")]).get(field)
         self.assertEqual(name + "_1", res[field])
 
     def test_delete(self):
         table = DB.table("user")
         field = "name"
         table.where([("id", 1)]).delete()
-        res = table.where([("id", 2)]).get(field)
-        self.assertEqual(1, len(res))
+        res_1 = table.where([("id", 1)]).get(field)
+        res_2 = table.where([("id", 2)]).get(field)
+        self.assertEqual(1, len(res_1) + len(res_2))
 
     def test_update_and_where(self):
         table = DB.table("blog")

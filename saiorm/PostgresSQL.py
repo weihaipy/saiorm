@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
 """
-Support PostgreSQL
+Support PostgresSQL
 
 bases on torndb
 """

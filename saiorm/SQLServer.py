@@ -214,7 +214,7 @@ class ChainDB(base.ChainDB):
                             "table": self._table,
                             "pk": self._primary_key
                         }
-                        pre_where = "WHERE {pk} NOT IN (SELECT TOP {m}-1 {pk} FROM {table})".format(param)
+                        pre_where = " WHERE {pk} NOT IN (SELECT TOP {m}-1 {pk} FROM {table}) ".format(param)
                         self._where = None  # clean self._where
                     else:
                         param = {
