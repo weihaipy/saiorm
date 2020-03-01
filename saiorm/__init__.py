@@ -11,8 +11,8 @@ def init(driver="MySQL", **kwargs):
     elif driver_lower == "mysql_position":
         from .MySQL import PositionDB
         return PositionDB(**kwargs)
-    elif driver_lower == "postgressql":
-        from .PostgresSQL import ChainDB
+    elif driver_lower == "postgresql":
+        from .PostgreSQL import ChainDB
         return ChainDB(**kwargs)
     elif driver_lower.replace(" ", "") == "sqlserver":
         from .SQLServer import ChainDB
