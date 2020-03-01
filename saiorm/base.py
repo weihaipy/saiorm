@@ -616,17 +616,17 @@ class ChainDB(BaseDB):
         # self.connection.db.autocommit(False)
         # todo pymysql 可能需要重新初始化才能修改 autocommit
 
-        self.execute("start transaction;")
+        self.execute("START TRANSACTION;")
 
     def commit(self, *args, **kwargs):
         """
         Transaction
         """
-        self.execute("COMMIT")
+        self.execute("COMMIT;")
 
     def rollback(self, *args, **kwargs):
         """
         Transaction
         """
-        self.execute("ROLLBACK")
+        self.execute("ROLLBACK;")
         self.connection.db.autocommit(True)

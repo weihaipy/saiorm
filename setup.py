@@ -9,7 +9,7 @@ with io.open(os.path.join("docs", 'index.rst'), encoding='utf-8') as f:
 with io.open('requirements.txt') as f:
     requirements = f.readlines()
 
-version = "0.0.4"
+version = "0.1.1"
 
 setup(
     name="saiorm",
